@@ -6,10 +6,6 @@ import { useRouter } from 'next/navigation';
 export default function PersonalDetailForm() {
     const router = useRouter();
 
-    const handleNext = () => {
-        router.push('./app/address.tsx');
-    };
-
     const [formData, setFormData] = useState({
         title: '',
         firstName: '',
@@ -29,6 +25,7 @@ export default function PersonalDetailForm() {
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         console.log(formData);
+        router.push('/address');
     };
 
     return (
@@ -57,7 +54,7 @@ export default function PersonalDetailForm() {
             </div>
 
             {/* Form Container */}
-            <div className="bg-white p-8 pb-4 rounded-xl shadow-lg w-full max-w-5xl lg:min-h-[380px]">
+            <div className="bg-white p-8 pb-4 rounded-xl shadow-lg w-full max-w-5xl lg:min-h-[400px] xl:min-h-[450px]">
                 <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div>
                         <label className="block text-gray-700">Title *</label>
@@ -106,8 +103,7 @@ export default function PersonalDetailForm() {
                     </div>
                     <div className="col-span-1 md:col-span-3 flex justify-end mt-4">
                         <button
-                            type="button"
-                            onClick={handleNext}
+                            type="submit"
                             className="bg-blue-600 text-white px-4 py-2 rounded"
                         >
                             Next

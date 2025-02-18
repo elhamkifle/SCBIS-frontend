@@ -1,8 +1,27 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function AddressForm() {
+    const router = useRouter();
+
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        console.log(formData);
+        handleNext(); // Move to the next step after submitting
+    };
+
+    // Navigate to the previous step
+    const handlePrevious = () => {
+        router.push('/personalDetails');
+    };
+
+    // Navigate to the next step
+    const handleNext = () => {
+        router.push('/uploadID');
+    };
+    
     const [formData, setFormData] = useState({
         country: '',
         state: '',
@@ -61,11 +80,6 @@ export default function AddressForm() {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
-
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        console.log(formData);
     };
 
     return (
@@ -138,7 +152,7 @@ export default function AddressForm() {
                     </div>
                     <div>
                         <label className="block text-gray-700">Subcity *</label>
-                        <input type="text" name="nationality" value={formData.subcity} onChange={handleChange} className="w-full p-2 border rounded" />
+                        <input type="text" name="subcity" value={formData.subcity} onChange={handleChange} className="w-full p-2 border rounded" />
                     </div>
                     <div>
                         <label className="block text-gray-700">Zone</label>
@@ -158,7 +172,7 @@ export default function AddressForm() {
                     </div>
 
                     <div className="col-span-1 md:col-span-3 flex justify-between mt-4">
-                        <button type="button" className="bg-gray-700 text-white px-4 py-2 rounded">Previous</button>
+                        <button type="button" onClick={handlePrevious} className="bg-gray-700 text-white px-4 py-2 rounded">Previous</button>
                         <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">Next</button>                    </div>
                 </form>
             </div>

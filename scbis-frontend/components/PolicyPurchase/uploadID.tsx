@@ -1,8 +1,26 @@
 'use client'
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function UploadIDForm() {
+
+    const router = useRouter();
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        handleNext(); // Move to the next step after submitting
+    };
+
+    // Navigate to the previous step
+    const handlePrevious = () => {
+        router.push('/address');
+    };
+
+    // Navigate to the next step
+    const handleNext = () => {
+        router.push('/preview');
+    };
+
     const [file, setFile] = useState<File | null>(null);
     const [error, setError] = useState<string>('');
 
@@ -98,8 +116,8 @@ export default function UploadIDForm() {
                 </div>
 
                 <div className="flex justify-between mt-8">
-                    <button className="bg-blue-600 text-white px-4 py-2 rounded">Previous</button>
-                    <button className="bg-green-500 text-white px-4 py-2 rounded">Preview</button>
+                    <button className="bg-blue-600 text-white px-4 py-2 rounded" onClick={handlePrevious}>Previous</button>
+                    <button className="bg-green-500 text-white px-4 py-2 rounded" onClick={handleNext}>Preview</button>
                 </div>
             </div>
         </div>
