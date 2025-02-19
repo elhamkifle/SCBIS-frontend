@@ -21,7 +21,7 @@ export default function AddressForm() {
     const handleNext = () => {
         router.push('/uploadID');
     };
-    
+
     const [formData, setFormData] = useState({
         country: '',
         state: '',
@@ -76,39 +76,46 @@ export default function AddressForm() {
         'Bahir Dar', 'Kochere', 'Kebri Dehar', 'Dilla', 'Lalibela'
     ];
 
-
-
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-100">
-            <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-5xl relative">
-                <button type="button" className="absolute top-4 right-4 bg-gray-700 text-white px-4 py-2 rounded">Save as draft</button>
-                <h2 className="text-2xl font-bold mb-4 text-left">Policy Purchase</h2>
-                <div className="flex flex-col md:flex-row items-start sm:pl-8 justify-around mb-6">
-                    <div className="relative z-10 flex items-center mb-4 md:mb-0">
-                        <div className="w-8 h-8 flex items-center justify-center bg-green-500 text-white rounded-full">1</div>
-                        <span className="ml-2 font-medium text-gray-700 text-sm md:text-base">Personal Detail</span>
-                    </div>
-                    <div className="relative z-10 flex items-center mb-4 md:mb-0">
-                        <div className="w-8 h-8 flex items-center justify-center bg-green-500 text-white rounded-full">2</div>
-                        <span className="ml-2 text-gray-500 text-sm md:text-base">Address</span>
-                    </div>
-                    <div className="relative z-10 flex items-center">
-                        <div className="w-8 h-8 flex items-center justify-center bg-blue-600 text-white rounded-full">3</div>
-                        <span className="ml-2 text-gray-500 text-sm md:text-base">Upload ID</span>
-                    </div>
+        <div className="flex flex-col items-center px-4">
+            <div className="w-full max-w-5xl flex justify-between items-center mt-8">
+                <h2 className="md:text-xl sm:text-lg font-bold">Policy Purchase</h2>
+                <button className="bg-[#0F1D3F] sm:text-xs md:text-lg text-white px-4 py-2 rounded">Save as draft</button>
+            </div>
+
+            {/* Progress Bar */}
+            <div className="flex flex-wrap sm:justify-start md:justify-center items-center gap-4 sm:gap-8 mt-6 mb-4">
+                <div className="flex items-center">
+                    <div className="w-8 h-8 flex items-center justify-center bg-green-500 text-white rounded-full">1</div>
+                    <span className="ml-2 font-medium text-black text-sm sm:text-base">Personal Detail</span>
                 </div>
-                <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <label className="block text-gray-700">Country *</label>
+                <div className="w-16 sm:border-t-2 border-l-2 border-gray-400"></div>
+                <div className="flex items-center">
+                    <div className="w-8 h-8 flex items-center justify-center bg-[#1F4878] text-white rounded-full">2</div>
+                    <span className="ml-2 text-black text-sm sm:text-base">Address</span>
+                </div>
+                <div className="w-16 sm:border-t-2 border-l-2 border-gray-400"></div>
+                <div className="flex items-center">
+                    <div className="w-8 h-8 flex items-center justify-center bg-gray-300 text-white rounded-full">3</div>
+                    <span className="ml-2 text-black text-sm sm:text-base">Upload ID</span>
+                </div>
+            </div>
+
+            {/* Form Container */}
+            <div className="bg-white p-4 rounded-xl w-full max-w-5xl lg:min-h-[350px] xl:min-h-[480px] xl:p-6"
+                style={{ boxShadow: '0px 8px 12px rgba(0, 123, 255, 0.3)' }} >
+                <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 sm:gap- gap-12 xl:gap-20">
+                    <div className="relative w-full">
+                        <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Country *</label>
                         <select
                             name="country"
                             value={formData.country}
                             onChange={handleChange}
-                            className="w-full p-2 border rounded"
+                            className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                             required
                         >
                             <option value="">Select a country</option>
@@ -116,15 +123,14 @@ export default function AddressForm() {
                                 <option key={index} value={country}>{country}</option>
                             ))}
                         </select>
-
                     </div>
-                    <div>
-                        <label className="block text-gray-700">Region *</label>
+                    <div className="relative w-full">
+                        <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Region *</label>
                         <select
                             name="state"
                             value={formData.state}
                             onChange={handleChange}
-                            className="w-full p-2 border rounded"
+                            className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                             required
                         >
                             <option value="">State/Region</option>
@@ -133,49 +139,80 @@ export default function AddressForm() {
                             ))}
                         </select>
                     </div>
-                    <div>
-                        <div>
-                            <label className="block text-gray-700">City *</label>
-                            <select
-                                name="city"
-                                value={formData.city}
-                                onChange={handleChange}
-                                className="w-full p-2 border rounded"
-                                required
-                            >
-                                <option value="">Select a city</option>
-                                {ethiopianCities.map((city, index) => (
-                                    <option key={index} value={city}>{city}</option>
-                                ))}
-                            </select>
-                        </div>
+                    <div className="relative w-full">
+                        <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">City *</label>
+                        <select
+                            name="city"
+                            value={formData.city}
+                            onChange={handleChange}
+                            className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            required
+                        >
+                            <option value="">Select a city</option>
+                            {ethiopianCities.map((city, index) => (
+                                <option key={index} value={city}>{city}</option>
+                            ))}
+                        </select>
                     </div>
-                    <div>
-                        <label className="block text-gray-700">Subcity *</label>
-                        <input type="text" name="subcity" value={formData.subcity} onChange={handleChange} className="w-full p-2 border rounded" />
+                    <div className="relative w-full">
+                        <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Subcity *</label>
+                        <input
+                            type="text"
+                            name="subcity"
+                            value={formData.subcity}
+                            onChange={handleChange}
+                            className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            required
+                        />
                     </div>
-                    <div>
-                        <label className="block text-gray-700">Zone</label>
-                        <input type="text" name="zone" value={formData.zone} onChange={handleChange} className="w-full p-2 border rounded" required />
+                    <div className="relative w-full">
+                        <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Zone *</label>
+                        <input
+                            type="text"
+                            name="zone"
+                            value={formData.zone}
+                            onChange={handleChange}
+                            className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            required
+                        />
                     </div>
-                    <div>
-                        <label className="block text-gray-700">Wereda</label>
-                        <input type="text" name="wereda" value={formData.wereda} onChange={handleChange} className="w-full p-2 border rounded" />
+                    <div className="relative w-full">
+                        <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Wereda *</label>
+                        <input
+                            type="text"
+                            name="wereda"
+                            value={formData.wereda}
+                            onChange={handleChange}
+                            className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            required
+                        />
                     </div>
-                    <div>
-                        <label className="block text-gray-700">Kebele</label>
-                        <input type="text" name="kebele" value={formData.kebele} onChange={handleChange} className="w-full p-2 border rounded" />
+                    <div className="relative w-full">
+                        <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Kebele *</label>
+                        <input
+                            type="text"
+                            name="kebele"
+                            value={formData.kebele}
+                            onChange={handleChange}
+                            className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            required
+                        />
                     </div>
-                    <div>
-                        <label className="block text-gray-700">House No.</label>
-                        <input type="text" name="houseNo" value={formData.houseNo} onChange={handleChange} className="w-full p-2 border rounded" />
+                    <div className="relative w-full">
+                        <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">House No.</label>
+                        <input
+                            type="text"
+                            name="houseNo"
+                            value={formData.houseNo}
+                            onChange={handleChange}
+                            className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        />
                     </div>
-
                     <div className="col-span-1 md:col-span-3 flex justify-between mt-4">
-                        <button type="button" onClick={handlePrevious} className="bg-gray-700 text-white px-4 py-2 rounded">Previous</button>
+                        <button type="button" onClick={handlePrevious} className="bg-[#3AA4FF] text-white px-4 py-2 rounded">Previous</button>
                         <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">Next</button>                    </div>
                 </form>
             </div>
-        </div>
+        </div>    
     );
 }

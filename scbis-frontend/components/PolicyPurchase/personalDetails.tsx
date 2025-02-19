@@ -54,57 +54,69 @@ export default function PersonalDetailForm() {
             </div>
 
             {/* Form Container */}
-            <div className="bg-white p-8 pb-4 rounded-xl shadow-lg w-full max-w-5xl lg:min-h-[400px] xl:min-h-[450px]">
-                <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div>
-                        <label className="block text-gray-700">Title *</label>
-                        <select name="title" value={formData.title} onChange={handleChange} className="w-full p-2 border rounded" required>
+            <div className="bg-white mb-10 p-4 rounded-xl w-full max-w-5xl lg:min-h-[350px] xl:min-h-[480px] xl:p-6"
+                style={{ boxShadow: '0px 8px 12px rgba(0, 123, 255, 0.3)' }} >
+                <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-16 xl:gap-20">
+                    <div className='relative w-full'>
+                        <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Title *</label>
+                        <select name="title" value={formData.title} onChange={handleChange} className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400" required>
                             <option value="">Select</option>
                             <option value="Mr">Mr</option>
                             <option value="Ms">Ms</option>
                             <option value="Mrs">Mrs</option>
                         </select>
                     </div>
-                    <div>
-                        <label className="block text-gray-700">First Name *</label>
-                        <input type="text" name="firstName" value={formData.firstName} onChange={handleChange} className="w-full p-2 border rounded" required />
+                    <div className="relative w-full">
+                        <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1">
+                            First Name *
+                        </label>
+                        <input
+                            type="text"
+                            name="firstName"
+                            onChange={handleChange}
+                            className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            required
+                        />
                     </div>
-                    <div>
-                        <label className="block text-gray-700">Last Name *</label>
-                        <input type="text" name="lastName" value={formData.lastName} onChange={handleChange} className="w-full p-2 border rounded" required />
+
+
+
+                    <div className='relative w-full'>
+                        <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Last Name *</label>
+                        <input type="text" name="lastName" value={formData.lastName} onChange={handleChange} className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400" required />
                     </div>
-                    <div>
-                        <label className="block text-gray-700">Gender *</label>
-                        <select name="gender" value={formData.gender} onChange={handleChange} className="w-full p-2 border rounded" required>
+                    <div className='relative w-full'>
+                        <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Gender *</label>
+                        <select name="gender" value={formData.gender} onChange={handleChange} className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400" required>
                             <option value="">Select</option>
                             <option value="Male">Male</option>
                             <option value="Female">Female</option>
                         </select>
                     </div>
-                    <div>
-                        <label className="block text-gray-700">Date Of Birth *</label>
-                        <input type="date" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange} className="w-full p-2 border rounded" required />
+                    <div className='relative w-full'>
+                        <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Date Of Birth *</label>
+                        <input type="date" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange} className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400" required />
                     </div>
-                    <div>
-                        <label className="block text-gray-700">Nationality</label>
-                        <input type="text" name="nationality" value={formData.nationality} onChange={handleChange} className="w-full p-2 border rounded" />
+                    <div className='relative w-full'>
+                        <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Nationality</label>
+                        <input type="text" name="nationality" value={formData.nationality} onChange={handleChange} className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400" />
                     </div>
-                    <div>
-                        <label className="block text-gray-700">Email Address</label>
-                        <input type="email" name="email" value={formData.email} onChange={handleChange} className="w-full p-2 border rounded" />
+                    <div className='relative w-full'>
+                        <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Email Address</label>
+                        <input type="email" name="email" value={formData.email} onChange={handleChange} className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400" />
                     </div>
-                    <div>
-                        <label className="block text-gray-700">Additional Phone No.</label>
-                        <input type="text" name="phone" value={formData.phone} onChange={handleChange} className="w-full p-2 border rounded" />
+                    <div className='relative w-full'>
+                        <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Additional Phone No.</label>
+                        <input type="text" name="phone" value={formData.phone} onChange={handleChange} className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400" />
                     </div>
-                    <div>
-                        <label className="block text-gray-700">TIN No.</label>
-                        <input type="text" name="tin" value={formData.tin} onChange={handleChange} className="w-full p-2 border rounded" />
+                    <div className='relative w-full'>
+                        <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1">TIN No.</label>
+                        <input type="text" name="tin" value={formData.tin} onChange={handleChange} className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400" />
                     </div>
-                    <div className="col-span-1 md:col-span-3 flex justify-end mt-4">
+                    <div className="col-span-1 md:col-span-3 flex justify-end">
                         <button
                             type="submit"
-                            className="bg-blue-600 text-white px-4 py-2 rounded"
+                            className="bg-[#1A73E8] text-white px-16 py-2 rounded"
                         >
                             Next
                         </button>

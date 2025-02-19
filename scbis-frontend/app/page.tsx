@@ -24,7 +24,7 @@ export default function HomePage() {
                 </div>
 
                 {/* Main Content */}
-                <main className="flex-1 mt-6">
+                <main className="flex-1 mt-2">
                     <div className="max-w-6xl mx-auto px-4">
                         <PersonalDetailForm />
                     </div>
