@@ -93,8 +93,8 @@ export default function UploadIDForm() {
                     </div>
 
                     <div className="col-span-1 md:col-span-3 flex justify-between mt-4">
-                        <button type="button" onClick={handlePrevious} className="bg-[#3AA4FF] text-white px-4 py-2 rounded">Previous</button>
-                        <button type="submit" onClick={handleNext} className="bg-green-500 text-white px-6 py-2 rounded">Preview</button>
+                        <button type="button" onClick={handlePrevious} className="bg-[#3AA4FF] text-white p-7 py-2  rounded">Previous</button>
+                        <button type="submit" onClick={handleNext} className="bg-green-500 text-white p-7 py-2 rounded">Preview</button>
                     </div>
                 </div>
             </div>

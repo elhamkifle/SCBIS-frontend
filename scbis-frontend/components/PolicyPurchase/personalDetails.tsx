@@ -116,7 +116,7 @@ export default function PersonalDetailForm() {
                     <div className="col-span-1 md:col-span-3 flex justify-end">
                         <button
                             type="submit"
-                            className="bg-[#1A73E8] text-white px-16 py-2 rounded"
+                            className="bg-[#1A73E8] text-white p-7 py-2 rounded"
                         >
                             Next
                         </button>

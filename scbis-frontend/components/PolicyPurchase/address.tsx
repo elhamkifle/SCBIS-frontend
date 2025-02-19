@@ -209,8 +209,8 @@ export default function AddressForm() {
                         />
                     </div>
                     <div className="col-span-1 md:col-span-3 flex justify-between mt-4">
-                        <button type="button" onClick={handlePrevious} className="bg-[#3AA4FF] text-white px-4 py-2 rounded">Previous</button>
-                        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">Next</button>                    </div>
+                        <button type="button" onClick={handlePrevious} className="bg-[#3AA4FF] text-white p-7 py-2 rounded">Previous</button>
+                        <button type="submit" className="bg-blue-600 text-white p-7 py-2 rounded">Next</button>                    </div>
                 </form>
             </div>
         </div>    
