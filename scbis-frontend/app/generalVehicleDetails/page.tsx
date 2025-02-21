@@ -1,8 +1,7 @@
 import Sidebar from "@/components/staticComponents/sidebar";
 import Header from "@/components/staticComponents/header";
 import { Footer } from "@/components/staticComponents/footer";
-import PersonalDetailForm from "@/components/PolicyPurchase/CustomerInformation/personalDetails";
-import Preview from "@/components/PolicyPurchase/CustomerInformation/preview";
+import GeneralVehicleDetailForm from "@/components/PolicyPurchase/VehicleDetails/generalVehicleDetails";
 
 export default function HomePage() {
     return (
@@ -27,7 +26,7 @@ export default function HomePage() {
                 {/* Main Content */}
                 <main className="flex-1 mt-6">
                     <div className="max-w-6xl mx-auto px-4">
-                        <Preview />
+                        <GeneralVehicleDetailForm />
                     </div>
                 </main>
 

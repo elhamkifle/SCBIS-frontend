@@ -1,7 +1,7 @@
 import Sidebar from "@/components/staticComponents/sidebar";
 import Header from "@/components/staticComponents/header";
 import { Footer } from "@/components/staticComponents/footer";
-import PersonalDetailForm from "@/components/PolicyPurchase/personalDetails";
+import PersonalDetailForm from "@/components/PolicyPurchase/CustomerInformation/personalDetails";
 
 export default function HomePage() {
     return (

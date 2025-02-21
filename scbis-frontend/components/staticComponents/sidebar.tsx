@@ -18,7 +18,7 @@ export default function Sidebar() {
                 </div>
 
                 {/* Centered Navigation Sections */}
-                <div className="flex-1 flex flex-col justify-start py-24 space-y-8 px-4 text-lg font-medium text-gray-200">
+                <div className="flex-1 flex flex-col justify-start py-24 space-y-8 px-4 text-md font-semibold text-white">
                     {!isCollapsed && (
                         <>
                             <div className="text-center">Personal Information</div>
@@ -61,7 +61,7 @@ export default function Sidebar() {
                 </div> */}
 
                 {/* Navigation Sections */}
-                <div className="space-y-2 text-gray-200">
+                <div className="space-y-2 text-gray-200 font-semibold">
                     <div>Personal Information</div>
                     <div>Vehicle Details</div>
                     <div>Policy Selection</div>

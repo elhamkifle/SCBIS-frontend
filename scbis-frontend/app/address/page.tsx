@@ -1,7 +1,7 @@
 import Sidebar from "@/components/staticComponents/sidebar";
 import Header from "@/components/staticComponents/header";
 import { Footer } from "@/components/staticComponents/footer";
-import AddressForm from "@/components/PolicyPurchase/address";
+import AddressForm from "@/components/PolicyPurchase/CustomerInformation/address";
 
 export default function HomePage() {
     return (

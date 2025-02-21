@@ -8,7 +8,7 @@ export default function Header() {
     const [menuOpen, setMenuOpen] = useState(false);
 
     return (
-        <header className="bg-[#1F4878] text-white p-8 flex justify-between items-center relative">
+        <header className="bg-[#1F4878] font-semibold text-white p-8 flex justify-between items-center relative">
             {/* Navigation Links */}
             <nav className="hidden lg:flex lg:space-x-8 lg:items-center w-full justify-center">
                 <Link href="#" className="text-white hover:text-green-400">Home</Link>
@@ -41,7 +41,7 @@ export default function Header() {
 
 
             {menuOpen && (
-                <nav className="w-full bg-[#0F3B60] flex flex-col items-center space-y-4 p-8 lg:hidden">
+                <nav className="w-full bg-[#1F4878] font-semibold flex flex-col items-center space-y-4 p-8 lg:hidden">
                     <Link href="#" className="text-white hover:text-green-400">Home</Link>
                     <Link href="#" className="text-white hover:text-green-400">Policy Purchase</Link>
                     <Link href="#" className="text-white hover:text-green-400">Claim Submission</Link>

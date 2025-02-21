@@ -106,8 +106,8 @@ export default function AddressForm() {
             </div>
 
             {/* Form Container */}
-            <div className="bg-white p-4 rounded-xl w-full max-w-5xl lg:min-h-[350px] xl:min-h-[480px] xl:p-6"
-                style={{ boxShadow: '0px 8px 12px rgba(0, 123, 255, 0.3)' }} >
+            <div className="bg-white mb-10 p-8 rounded-xl w-full max-w-5xl lg:min-h-[350px] xl:min-h-[480px] xl:p-6"
+                style={{ boxShadow: '0px 10px 20px rgba(0, 123, 255, 0.4), 0px 4px 8px rgba(0, 0, 0, 0.1)' }} >
                 <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 sm:gap- gap-12 xl:gap-20">
                     <div className="relative w-full">
                         <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Country *</label>

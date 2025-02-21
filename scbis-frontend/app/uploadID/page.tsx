@@ -1,7 +1,7 @@
 import Sidebar from "@/components/staticComponents/sidebar";
 import Header from "@/components/staticComponents/header";
 import { Footer } from "@/components/staticComponents/footer";
-import UploadIDForm from "@/components/PolicyPurchase/uploadID";
+import UploadIDForm from "@/components/PolicyPurchase/CustomerInformation/uploadID";
 
 export default function HomePage() {
     return (
