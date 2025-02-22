@@ -1,5 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import "@fontsource/syne"; // Default weight (400)
+import "@fontsource/syne/600.css"; // Specific weight (600)
+import "@fontsource/inter"; // Default weight (400)
+import "@fontsource/inter/600.css"; // Specific weight (600)
+
 import "./globals.css";
 
 const geistSans = Geist({

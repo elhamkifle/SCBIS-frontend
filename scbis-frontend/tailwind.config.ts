@@ -12,6 +12,11 @@ export default {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+
+      fontFamily: {
+        syne: ["Syne", "sans-serif"],
+        inter: ["Inter", "sans-serif"],
+      },
     },
   },
   plugins: [],
