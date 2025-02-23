@@ -8,6 +8,7 @@ export default function PrivateVehicleCategory() {
     
     const router = useRouter();
     const [carType,setCarType] = useState('')
+    const [error,setError] = useState(false)
 
     const [formData, setFormData] = useState({
         make: '',
@@ -26,7 +27,14 @@ export default function PrivateVehicleCategory() {
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setError(false)
         console.log(formData);
+        
+        if(!carType){
+            setError(true)
+            return
+        }
+
         router.push('/generalVehicleDetails');
     };
 
@@ -128,7 +136,9 @@ export default function PrivateVehicleCategory() {
 
                             
                         </div>
+                        {error && !carType && <p className='font-bold text-center text-sm text-red-600 font-inter'>Please select your vehicle category</p>}
                     </div>
+                   
 
                     <div className="col-span-1 md:col-span-3 flex justify-between">
                         <button type="button" className="bg-[#3AA4FF] text-white p-7 py-2 rounded" onClick={handlePrevious}>Previous</button>

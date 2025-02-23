@@ -4,8 +4,14 @@ import { useRouter } from 'next/navigation';
 
 export default function CommercialVehicleCategory()  {
     const router = useRouter()
+
     const handlePrevious = () => {
         router.push('/purpose');
+    };
+
+    const handleNext = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        e.preventDefault()
+        router.push('/generalVehicleDetails');
     };
 
     const handleForward = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -229,7 +235,7 @@ export default function CommercialVehicleCategory()  {
                     <button><img src="/backward.svg" alt="" width={25} height={25} /></button>
                     <button onClick={(e)=>handleForward(e)}><img src="/forward.svg" alt="" width={25} height={25} /></button>
                 </div>
-                <button type="submit" className="bg-blue-500 text-white p-5 md:px-10 py-2 rounded">Next</button>
+                <button type="submit" className="bg-blue-500 text-white p-5 md:px-10 py-2 rounded" onClick={(e)=>handleNext(e)}>Next</button>
             </div>
         </form>
     </div>

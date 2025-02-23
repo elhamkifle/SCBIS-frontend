@@ -29,7 +29,7 @@ export default function GeneralVehicleDetailForm() {
 
 
     const handlePrevious = () => {
-        router.push('/purpose');
+        router.back();
     };
 
     return (

@@ -13,6 +13,11 @@ export default {
         foreground: "var(--foreground)",
       },
 
+      backgroundColor:{
+        dust:"#1f216816",
+        darkdust:"blue"
+      },
+
       fontFamily: {
         syne: ["Syne", "sans-serif"],
         inter: ["Inter", "sans-serif"],

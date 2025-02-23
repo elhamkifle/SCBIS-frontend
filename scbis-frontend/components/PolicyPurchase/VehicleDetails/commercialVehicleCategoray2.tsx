@@ -5,12 +5,12 @@ import { useRouter } from 'next/navigation';
 export default function CommercialVehicleCategory2()  {
     const router = useRouter()
     const handlePrevious = () => {
-        router.push('/purpose');
+        router.back();
     };
 
-    const handleForward = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        e.preventDefault()
-        router.push('/commercialVehicleCategory2');
+    const handleNext = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+           e.preventDefault()
+           router.push('/generalVehicleDetails');
     };
 
     const handleBackward = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -248,9 +248,9 @@ export default function CommercialVehicleCategory2()  {
                 <button type="button" className="bg-[#3AA4FF] text-white p-3 md:px-7 py-2 rounded" onClick={handlePrevious}>Previous</button>
                 <div className='flex gap-3'>
                     <button onClick={(e)=>handleBackward(e)}><img src="/backward1.svg" alt="" width={25} height={25} /></button>
-                    <button onClick={(e)=>handleForward(e)}><img src="/forward.svg" alt="" width={25} height={25} /></button>
+                    <button onClick={(e)=>handleNext(e)}><img src="/forward.svg" alt="" width={25} height={25} /></button>
                 </div>
-                <button type="submit" className="bg-blue-500 text-white p-5 md:px-10 py-2 rounded">Next</button>
+                <button onClick={(e)=>handleNext(e)} type="submit" className="bg-blue-500 text-white p-5 md:px-10 py-2 rounded">Next</button>
             </div>
         </form>
     </div>

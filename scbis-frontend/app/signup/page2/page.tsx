@@ -1,6 +1,7 @@
 import Header from "@/components/staticComponents/header";
 import { Footer } from "@/components/staticComponents/footer";
-import Login from "@/components/Sessions/Login";
+import Signup from "@/components/Sessions/Signup2";
+
 
 export default function HomePage() {
     return (
@@ -14,7 +15,7 @@ export default function HomePage() {
                     <Header />
                 </div>
 
-                <Login/>
+                <Signup/>
                 {/* Footer */}
                 <Footer />
             </div>
