@@ -106,7 +106,7 @@ export default function VehicleInformation() {
   const router = useRouter();
 
   const handlePrevious = () => {
-    router.push('/policyDuration');
+    router.push('/policy-purchase/purchase/policyDuration');
   };
 
   const handleNext = () => {
@@ -141,7 +141,7 @@ export default function VehicleInformation() {
 
     // If there are no errors, proceed to the next page
     if (Object.keys(newErrors).length === 0) {
-      router.push('/driverInformation');
+      router.push('/policy-purchase/purchase/driverInformation');
     }
   };
 

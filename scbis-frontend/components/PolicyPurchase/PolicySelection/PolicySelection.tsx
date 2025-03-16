@@ -79,7 +79,7 @@ export default function PolicySelection() {
             return;
         }
         console.log('Selected Policy:', selectedPolicy);
-        router.push('/policyDuration'); 
+        router.push('/policy-purchase/purchase/policyDuration'); 
     };
 
     const formatInfo = (info: string) => {

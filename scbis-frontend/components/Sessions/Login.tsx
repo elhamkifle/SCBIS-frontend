@@ -22,7 +22,7 @@ export default function Login(){
 
         setEmail('')
         setPassword('')
-        router.push('/personalDetails')
+        router.push('/policy-purchase/personal-information/personalDetails');
     }
 
     const signUp = ()=>{

@@ -80,7 +80,7 @@ export default function DriverInformation() {
   const router = useRouter();
 
   const handlePrevious = () => {
-    router.push('/vehicleInformation');
+    router.push('/policy-purchase/purchase/vehicleInformation');
   };
 
   const handleNext = () => {

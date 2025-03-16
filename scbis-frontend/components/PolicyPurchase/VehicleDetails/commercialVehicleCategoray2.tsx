@@ -10,12 +10,12 @@ export default function CommercialVehicleCategory2()  {
 
     const handleNext = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
            e.preventDefault()
-           router.push('/generalVehicleDetails');
+           router.push('/policy-purchase/vehicle-information/generalVehicleDetails');
     };
 
     const handleBackward = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault()
-        router.push('/commercialVehicleCategory');
+        router.push('/policy-purchase/vehicle-information/commercialVehicleCategory');
     };
 
   return (

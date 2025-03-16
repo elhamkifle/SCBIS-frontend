@@ -35,12 +35,14 @@ export default function PrivateVehicleCategory() {
             return
         }
 
-        router.push('/generalVehicleDetails');
+        router.push("/policy-purchase/vehicle-information/generalVehicleDetails");
+
+
     };
 
 
     const handlePrevious = () => {
-        router.push('/purpose');
+        router.push("/policy-purchase/vehicle-information/purpose");
     };
 
     return (

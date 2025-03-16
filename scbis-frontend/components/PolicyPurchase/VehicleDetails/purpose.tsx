@@ -19,8 +19,11 @@ export default function ChoosePurposeForm() {
             return;
         }
         console.log('Selected Insurance Type:', selectedType);
-        router.push(`${selectedType==='private'?'/privateVehicleCategory':'commercialVehicleCategory'}`);
-    };
+        router.push(
+            selectedType === "private"
+              ? "/policy-purchase/vehicle-information/privateVehicleCategory"
+              : "/policy-purchase/vehicle-information/commercialVehicleCategory"
+          );    };
 
 
     return (

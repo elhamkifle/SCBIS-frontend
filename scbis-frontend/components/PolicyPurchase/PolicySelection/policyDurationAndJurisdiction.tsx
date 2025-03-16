@@ -35,7 +35,7 @@ export default function PolicyDuration() {
   const router = useRouter();
 
   const handlePrevious = () => {
-    router.push('/policySelection');
+    router.push('/policy-purchase/purchase/policySelection');
   };
 
   const handleNext = () => {
@@ -43,7 +43,7 @@ export default function PolicyDuration() {
       alert("Please select a policy duration and coverage area.");
       return;
     }
-    router.push('/vehicleInformation');
+    router.push('/policy-purchase/purchase/vehicleInformation');
   };
 
   return (
