@@ -6,17 +6,17 @@ export default function CommercialVehicleCategory()  {
     const router = useRouter()
 
     const handlePrevious = () => {
-        router.push('/purpose');
+        router.push('/policy-purchase/vehicle-information/purpose');
     };
 
     const handleNext = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault()
-        router.push('/generalVehicleDetails');
+        router.push('/policy-purchase/vehicle-information/generalVehicleDetails');
     };
 
     const handleForward = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault()
-        router.push('/commercialVehicleCategory2');
+        router.push('/policy-purchase/vehicle-information/commercialVehicleCategory2');
     };
 
 

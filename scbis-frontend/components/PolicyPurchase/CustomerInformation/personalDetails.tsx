@@ -25,7 +25,7 @@ export default function PersonalDetailForm() {
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         console.log(formData);
-        router.push('/address');
+        router.push('/policy-purchase/personal-information/address');
     };
 
     return (

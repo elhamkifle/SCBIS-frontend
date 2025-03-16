@@ -21,12 +21,12 @@ export default function OwnershipAndUsageForm() {
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         console.log(formData);
-        router.push('/uploadDocs');
+        router.push('/policy-purchase/vehicle-information/uploadDocs');
     };
 
     // Navigate to the previous step
     const handlePrevious = () => {
-        router.push('/generalVehicleDetails');
+        router.push('/policy-purchase/vehicle-information/generalVehicleDetails');
     };
 
     return (

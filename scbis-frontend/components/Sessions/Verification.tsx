@@ -30,7 +30,7 @@ export default function Verification(){
         setFour('')
         setFive('')
         setSix('')
-        router.push('/personalDetails')
+        router.push('/policy-purchase/personal-information/personalDetails');
     }
 
     return(

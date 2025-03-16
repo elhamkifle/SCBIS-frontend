@@ -24,7 +24,7 @@ export default function GeneralVehicleDetailForm() {
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         console.log(formData);
-        router.push('/ownershipAndUsage');
+        router.push('/policy-purchase/vehicle-information/ownershipAndUsage');
     };
 
 
