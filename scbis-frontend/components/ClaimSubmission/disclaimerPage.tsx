@@ -1,18 +1,22 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function ClaimDisclaimer() {
   const [agreed, setAgreed] = useState(false);
   const [error, setError] = useState('');
 
+  const router = useRouter();
+
+  const handlePrevious = () => router.push('/claim-submission/claim-policy-selection');
+
   const handleNext = () => {
     if (!agreed) {
       setError('You must agree to the disclaimer to proceed.');
       return;
     }
-    // Proceed to the next step
-    console.log('User agreed, proceeding...');
+    router.push('/claim-submission/driver-details');
   };
 
   return (
@@ -67,10 +71,19 @@ export default function ClaimDisclaimer() {
 
       {error && <p className="text-red-500 mt-2">{error}</p>}
 
-      <div className="flex justify-end mt-2 w-full">
+        {/* Navigation Buttons */}
+        <div className="w-full max-w-5xl flex justify-between items-center mt-8">
         <button
+          type="button"
+          className="bg-[#3AA4FF] text-white p-7 py-2 rounded"
+          onClick={handlePrevious}
+        >
+          Previous
+        </button>
+        <button
+          type="submit"
+          className="bg-blue-500 text-white p-10 py-2 rounded"
           onClick={handleNext}
-          className="bg-blue-500 text-white p-5 md:px-10 py-2 rounded"
         >
           Next
         </button>

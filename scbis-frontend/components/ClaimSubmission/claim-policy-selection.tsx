@@ -32,13 +32,15 @@ export default function ClaimPolicySelection() {
         setError('');
     };
 
+    const handlePrevious = () => router.push('/claim-submission/vehicle-selection');
+
     const handleNext = () => {
         if (!selectedPolicy) {
             setError('Please select an insurance coverage to continue.');
             return;
         }
         console.log('Selected Vehicle:', selectedPolicy);
-        router.push('/policy-purchase/purchase/policyDuration');
+        router.push('/claim-submission/claim-disclaimer');
     };
 
     return (
@@ -98,14 +100,23 @@ export default function ClaimPolicySelection() {
                 </Dialog>
             </Transition>
 
-            <div className="flex justify-end mt-2 w-full">
-                <button
-                    onClick={handleNext}
-                    className="bg-blue-500 text-white p-5 md:px-10 py-2 rounded"
-                >
-                    Next
-                </button>
-            </div>
+        {/* Navigation Buttons */}
+        <div className="w-full max-w-5xl flex justify-between items-center mt-8">
+        <button
+          type="button"
+          className="bg-[#3AA4FF] text-white p-7 py-2 rounded"
+          onClick={handlePrevious}
+        >
+          Previous
+        </button>
+        <button
+          type="submit"
+          className="bg-blue-500 text-white p-10 py-2 rounded"
+          onClick={handleNext}
+        >
+          Next
+        </button>
+      </div>
         </div>
     );
 }

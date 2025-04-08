@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function ClaimDriverDetails() {
@@ -32,10 +33,15 @@ export default function ClaimDriverDetails() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const router = useRouter();
+
+  const handlePrevious = () => router.push('/claim-submission/claim-disclaimer');
+
+
   const handleNext = () => {
     if (!agreed) {
       setError('You must agree to the disclaimer to proceed.');
-      return;
+      router.push('/claim-submission/accident-details');
     }
 
     // Check if all required fields are filled
@@ -233,23 +239,19 @@ export default function ClaimDriverDetails() {
         </div>
       )}
 
-      <div className="mt-6 flex items-center">
-        <input
-          type="checkbox"
-          id="agree"
-          checked={agreed}
-          onChange={() => setAgreed(!agreed)}
-          className="mr-2"
-        />
-        <label htmlFor="agree" className="text-gray-700">I Agree and Continue</label>
-      </div>
-
-      {error && <p className="text-red-500 mt-2">{error}</p>}
-
-      <div className="mt-4 text-right">
+      {/* Navigation Buttons */}
+      <div className="w-full max-w-5xl flex justify-between items-center mt-8">
         <button
+          type="button"
+          className="bg-[#3AA4FF] text-white p-7 py-2 rounded"
+          onClick={handlePrevious}
+        >
+          Previous
+        </button>
+        <button
+          type="submit"
+          className="bg-blue-500 text-white p-10 py-2 rounded"
           onClick={handleNext}
-          className="bg-blue-600 text-white p-7 py-2 rounded"
         >
           Next
         </button>

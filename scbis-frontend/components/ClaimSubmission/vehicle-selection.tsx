@@ -45,7 +45,7 @@ export default function VehicleSelection() {
             return;
         }
         console.log('Selected Vehicle:', selectedPolicy);
-        router.push('/policy-purchase/purchase/policyDuration'); 
+        router.push('/claim-submission/claim-policy-selection'); 
     };
 
     return (
