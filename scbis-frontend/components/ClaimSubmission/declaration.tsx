@@ -41,7 +41,7 @@ export default function Declaration() {
   };
 
   const handlePrevious = () => {
-    router.push('/policy-purchase/purchase/vehicleInformation');
+    router.push('/claim-submission/damage-details');
   };
 
   const handleNext = () => {
