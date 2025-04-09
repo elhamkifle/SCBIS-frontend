@@ -51,7 +51,7 @@ export default function Header() {
         <Link href="/policy-purchase/personal-information/personalDetails" className="text-white hover:text-green-400">
           Policy Purchase
         </Link>
-        <Link href="#" className="text-white hover:text-green-400">
+        <Link href="/claim-submission/vehicle-selection" className="text-white hover:text-green-400">
           Claim Submission
         </Link>
         <Link href="#" className="text-white hover:text-green-400">
