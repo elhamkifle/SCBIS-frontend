@@ -5,7 +5,7 @@ import { usePersonalDetailStore } from '@/store/customerInformationStore/persona
 
 export default function PersonalDetailForm() {
     const router = useRouter();
-    const { formData, updateFormData } = usePersonalDetailStore();
+    const { formData, updateFormData, logFormData } = usePersonalDetailStore();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         updateFormData({ [e.target.name]: e.target.value });
@@ -13,7 +13,7 @@ export default function PersonalDetailForm() {
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log(formData);
+        logFormData(); // Log the current form data
         router.push('/policy-purchase/personal-information/address');
     };
 
@@ -63,6 +63,7 @@ export default function PersonalDetailForm() {
                         <input
                             type="text"
                             name="firstName"
+                            value={formData.firstName}
                             onChange={handleChange}
                             className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                             required

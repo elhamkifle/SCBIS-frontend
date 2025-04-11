@@ -11,7 +11,7 @@ export default function UploadIDForm() {
     const { files, error, setFiles, setError } = useUploadIDStore();
     const { formData: personalData } = usePersonalDetailStore();
     const { address, logState: logAddressState } = useAddressStore();
-    const handlePrevious = () => router.push('policy-purchase/vehicle-information/ownershipAndUsage');
+    const handlePrevious = () => router.push('/policy-purchase/personal-information/address');
     
     const handleNext = () => {
         if (files.length < 1) {
@@ -19,7 +19,7 @@ export default function UploadIDForm() {
         } else {
             setError('');
             logAllFormData();
-            router.push('/policy-purchase/vehicle-information/purpose');
+            router.push('/preview');
         }
     };
 

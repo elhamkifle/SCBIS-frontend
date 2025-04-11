@@ -1,51 +1,38 @@
 "use client";
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-
+import { usePrivateVehicleCategoryStore } from '@/store/policySelection/privateVehicleCategory';
 
 export default function PrivateVehicleCategory() {
-    
     const router = useRouter();
-    const [carType,setCarType] = useState('')
-    const [error,setError] = useState(false)
-
-    const [formData, setFormData] = useState({
-        make: '',
-        model: '',
-        mfgYear: '',
-        engineCapacity: '',
-        chassisNo: '',
-        engineNo: '',
-        plateNo: '',
-        bodyType: '',
-    });
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
+    const {
+        carType,
+        usageType,
+        error,
+        setCarType,
+        setUsageType,
+        setError,
+        logSelection
+    } = usePrivateVehicleCategoryStore();
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setError(false)
-        console.log(formData);
+        setError(false);
         
         if(!carType){
-            setError(true)
-            return
+            setError(true);
+            return;
         }
 
+        logSelection(); // Log the current selection
         router.push("/policy-purchase/vehicle-information/generalVehicleDetails");
-
-
     };
-
 
     const handlePrevious = () => {
         router.push("/policy-purchase/vehicle-information/purpose");
     };
 
-    return (
+   return (
         <div className="flex flex-col items-center px-4">
 
             <div className="w-full max-w-5xl flex justify-between items-center mt-8">

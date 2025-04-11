@@ -5,6 +5,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import { Info } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { usePolicyStore } from '@/store/policySelection/policySelection';
 
 const covers = [
     {
@@ -60,12 +61,10 @@ export default function PolicySelection() {
     const router = useRouter();
     const [open, setOpen] = useState(false);
     const [selectedCover, setSelectedCover] = useState<{ title: string; info: string } | null>(null);
-    const [selectedPolicy, setSelectedPolicy] = useState('');
-    const [error, setError] = useState('');
+    const { selectedPolicy, error, selectPolicy, setError } = usePolicyStore();
 
     const handleSelect = (policy: string) => {
-        setSelectedPolicy(policy);
-        setError('');
+        selectPolicy(policy);
     };
 
     const handleOpen = (title: string, info: string) => {

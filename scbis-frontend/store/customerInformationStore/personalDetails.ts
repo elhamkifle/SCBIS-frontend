@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 type PersonalDetail = {
   title: string;
@@ -16,6 +17,7 @@ type PersonalDetailStore = {
   formData: PersonalDetail;
   updateFormData: (data: Partial<PersonalDetail>) => void;
   resetForm: () => void;
+  logFormData: () => void;
 };
 
 const initialState: PersonalDetail = {
@@ -30,9 +32,28 @@ const initialState: PersonalDetail = {
   tin: '',
 };
 
-export const usePersonalDetailStore = create<PersonalDetailStore>((set) => ({
-  formData: initialState,
-  updateFormData: (data) =>
-    set((state) => ({ formData: { ...state.formData, ...data } })),
-  resetForm: () => set({ formData: initialState }),
-}));
+export const usePersonalDetailStore = create<PersonalDetailStore>()(
+  persist(
+    (set, get) => ({
+      formData: initialState,
+      
+      updateFormData: (data) => {
+        set((state) => ({ 
+          formData: { ...state.formData, ...data } 
+        }));
+        console.log('Updated personal details:', { ...get().formData, ...data });
+      },
+      
+      resetForm: () => set({ formData: initialState }),
+      
+      logFormData: () => {
+        console.log('Current personal details:', get().formData);
+      },
+    }),
+    {
+      name: 'personal-details-storage',
+      // Optional: Only persist certain fields if needed
+      // partialize: (state) => ({ formData: state.formData })
+    }
+  )
+);
