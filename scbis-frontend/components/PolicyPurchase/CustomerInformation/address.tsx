@@ -8,21 +8,14 @@ export default function AddressForm() {
     const { 
         address, 
         updateAddress, 
-        nextStep, 
-        prevStep,
-        logState 
     } = useAddressStore();
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        logState(); // Log current state before proceeding
-        nextStep();
         router.push('/policy-purchase/personal-information/uploadID');
     };
 
     const handlePrevious = () => {
-        logState(); // Log current state before going back
-        prevStep();
         router.push('/policy-purchase/personal-information/personalDetails');
     };
 

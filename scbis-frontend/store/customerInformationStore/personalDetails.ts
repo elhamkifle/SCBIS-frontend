@@ -17,6 +17,7 @@ type PersonalDetailStore = {
   formData: PersonalDetail;
   updateFormData: (data: Partial<PersonalDetail>) => void;
   resetForm: () => void;
+  clearStorage: () => void; // New method for complete clearing
   logFormData: () => void;
 };
 
@@ -46,14 +47,20 @@ export const usePersonalDetailStore = create<PersonalDetailStore>()(
       
       resetForm: () => set({ formData: initialState }),
       
+      // New method that completely clears localStorage
+      clearStorage: () => {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('personal-details-storage');
+        }
+        set({ formData: initialState });
+      },
+      
       logFormData: () => {
         console.log('Current personal details:', get().formData);
       },
     }),
     {
       name: 'personal-details-storage',
-      // Optional: Only persist certain fields if needed
-      // partialize: (state) => ({ formData: state.formData })
     }
   )
 );

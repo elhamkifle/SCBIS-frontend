@@ -14,12 +14,10 @@ type AddressDetails = {
 };
 
 type AddressStore = {
-  currentStep: number;
   address: AddressDetails;
   updateAddress: (data: Partial<AddressDetails>) => void;
-  nextStep: () => void;
-  prevStep: () => void;
-  logState: () => void; // For debugging
+  resetAddress: () => void; // Method to reset address state
+  logAddressData: () => void; // For debugging
 };
 
 const initialAddressState: AddressDetails = {
@@ -36,30 +34,26 @@ const initialAddressState: AddressDetails = {
 export const useAddressStore = create<AddressStore>()(
   persist(
     (set, get) => ({
-      currentStep: 1,
       address: initialAddressState,
+      
+      // Method to update address state
       updateAddress: (data) => {
         set((state) => ({ 
           address: { ...state.address, ...data } 
         }));
         console.log('Updated address data:', { ...get().address, ...data });
       },
-      nextStep: () => {
-        const newStep = get().currentStep + 1;
-        set({ currentStep: newStep });
-        console.log('Moving to step:', newStep);
-      },
-      prevStep: () => {
-        const newStep = get().currentStep - 1;
-        set({ currentStep: newStep });
-        console.log('Moving to step:', newStep);
-      },
-      logState: () => {
-        console.log('Current form state:', get());
+
+      // Method to reset address state
+      resetAddress: () => set({ address: initialAddressState }),
+
+      // Method for logging address state (for debugging purposes)
+      logAddressData: () => {
+        console.log('Current address state:', get().address);
       },
     }),
     {
-      name: 'multi-step-form-storage',
+      name: 'address-details-storage', // Persist the state in localStorage with this key
     }
   )
 );

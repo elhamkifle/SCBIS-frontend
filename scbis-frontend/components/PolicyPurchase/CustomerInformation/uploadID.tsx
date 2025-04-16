@@ -10,7 +10,7 @@ export default function UploadIDForm() {
     const router = useRouter();
     const { files, error, setFiles, setError } = useUploadIDStore();
     const { formData: personalData } = usePersonalDetailStore();
-    const { address, logState: logAddressState } = useAddressStore();
+    const { address } = useAddressStore();
     const handlePrevious = () => router.push('/policy-purchase/personal-information/address');
     
     const handleNext = () => {
@@ -70,7 +70,6 @@ export default function UploadIDForm() {
     const logAllFormData = () => {
         console.log('=== COMPLETE FORM SUBMISSION DATA ===');
         console.log('Personal Details:', personalData);
-        logAddressState(); // Leverage the existing address store logger
         console.log('Uploaded Files:', files.map(f => ({
             name: f.name,
             type: f.type,
