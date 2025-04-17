@@ -112,9 +112,6 @@ export default function PolicyPreview() {
         <div className="border-b pb-4 mb-4">
           <div className="flex justify-between items-center">
             <h2 className="text-lg font-bold text-blue-600">1. Insurance Purpose</h2>
-            <button onClick={() => toggleEdit('purpose')} className="text-blue-500 hover:text-blue-700">
-              {isEditing.purpose ? <Check size={20} /> : <Edit size={20} />}
-            </button>
           </div>
           
           {isEditing.purpose ? (

@@ -38,9 +38,16 @@ export default function CommercialVehiclePreview() {
       vehicleDetails: vehicleData,
       ownershipDetails: ownershipData
     });
-    
+
     alert('Policy submitted successfully!');
-    router.push('/policy-purchase/confirmation');
+  
+    localStorage.removeItem('insurance-storage');
+    localStorage.removeItem('commercial-vehicle-storage');
+    localStorage.removeItem('commercial-vehicle-two-storage');
+    localStorage.removeItem('general-vehicle-storage');
+    localStorage.removeItem('ownership-usage-storage');
+
+    router.push('/policy-purchase/purchase/policySelection');
   };
 
   const handlePrevious = () => {
@@ -158,9 +165,6 @@ export default function CommercialVehiclePreview() {
         <div className="border-b pb-4 mb-4">
           <div className="flex justify-between items-center">
             <h2 className="text-lg font-bold text-blue-600">2. Commercial Vehicle Categories (Part 1)</h2>
-            <button onClick={() => toggleEdit('category1')} className="text-blue-500 hover:text-blue-700">
-              {isEditing.category1 ? <Check size={20} /> : <Edit size={20} />}
-            </button>
           </div>
           
           {isEditing.category1 ? (

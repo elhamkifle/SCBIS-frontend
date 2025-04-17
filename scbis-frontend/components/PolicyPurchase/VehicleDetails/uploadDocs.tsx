@@ -2,20 +2,29 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useVehiclePurposeStore } from '@/store/vehicleDetails/purpose';
 
 export default function UploadIDForm() {
     const router = useRouter();
     const [files, setFiles] = useState<File[]>([]);
     const [error, setError] = useState<string>('');
+    const { selectedType } = useVehiclePurposeStore(); // 'commercial' or 'private'
 
     const handlePrevious = () => router.push('/policy-purchase/vehicle-information/ownershipAndUsage');
-    
+
     const handleNext = () => {
         if (files.length < 2) {
             setError('❌ Please upload both documents before proceeding.');
         } else {
             setError('');
-            router.push('/policy-purchase/vehicle-information/preview');
+
+            const type = selectedType?.toLowerCase();
+            if (type === 'commercial') {
+                router.push('/policy-purchase/vehicle-information/commercialVehiclePreview');
+            } else {
+                // fallback and private default
+                router.push('/policy-purchase/vehicle-information/preview');
+            }
         }
     };
 
@@ -71,41 +80,28 @@ export default function UploadIDForm() {
                     <button className="bg-[#0F1D3F] sm:text-xs md:text-lg text-white px-4 py-2 rounded">Save as draft</button>
                 </div>
 
+                {/* Progress Bar */}
+                <div className="flex flex-wrap sm:justify-start md:justify-start items-center gap-2 mt-6 mb-4">
+                    {/* Steps */}
+                    {['Purpose', 'Vehicle Category', 'General Vehicle Details', 'Ownership and Usage', 'Upload Docs'].map((label, i) => (
+                        <React.Fragment key={i}>
+                            <div className="flex items-center">
+                                <div className={`w-7 h-7 flex items-center justify-center ${i === 4 ? 'bg-[#1F4878]' : 'bg-green-500'} text-white rounded-full`}>{i + 1}</div>
+                                <span className="ml-2 font-medium text-black text-xs sm:text-base">{label}</span>
+                            </div>
+                            {i !== 4 && <div className="w-7 sm:border-t-2 border-gray-400" />}
+                        </React.Fragment>
+                    ))}
+                </div>
 
-            {/* Progress Bar */}
-            <div className="flex flex-wrap sm:justify-start md:justify-start items-center gap-2 mt-6 mb-4">
-                <div className="flex items-center">
-                    <div className="w-7 h-7 flex items-center justify-center bg-green-500 text-white rounded-full">1</div>
-                    <span className="ml-2 font-medium text-black text-xs sm:text-base">Purpose</span>
-                </div>
-                <div className="w-7 sm:border-t-2 border-gray-400"></div>
-                <div className="flex items-center">
-                    <div className="w-7 h-7 flex items-center justify-center bg-green-500 text-white rounded-full">2</div>
-                    <span className="ml-2 text-black text-xs sm:text-base">Vehicle Category</span>
-                </div>
-                <div className="w-7 sm:border-t-2 border-gray-400"></div>
-                <div className="flex items-center">
-                    <div className="w-7 h-7 flex items-center justify-center bg-green-500 text-white rounded-full">3</div>
-                    <span className="ml-2 text-black text-sm sm:text-base">General Vehicle Details</span>
-                </div>
-                <div className="w-7 sm:border-t-2 border-gray-400"></div>
-                <div className="flex items-center">
-                    <div className="w-7 h-7 flex items-center justify-center bg-green-500 text-white rounded-full">4</div>
-                    <span className="ml-2 text-black text-sm sm:text-base">Ownership and Usage</span>
-                </div>
-                <div className="w-7 sm:border-t-2 border-gray-400"></div>
-                <div className="flex items-center">
-                    <div className="w-7 h-7 flex items-center justify-center bg-[#1F4878] text-white rounded-full">5</div>
-                    <span className="ml-2 text-black text-xs sm:text-base">Upload Docs</span>
-                </div>
-            </div>
-
+                {/* Upload Box */}
                 <div className="bg-white mb-10 p-8 rounded-xl w-full max-w-5xl xl:p-6"
                     style={{ boxShadow: '0px 10px 20px rgba(0, 123, 255, 0.4), 0px 4px 8px rgba(0, 0, 0, 0.1)' }} >
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div className="text-black">
                             <p className="text-xl font-bold mb-4">Rule for Uploading Driver's License and Libre</p>
-                            {[ '✅ Allowed Document Types: Only Kebele ID, National ID or Passport are accepted.',
+                            {[
+                                '✅ Allowed Document Types: Only Kebele ID, National ID or Passport are accepted.',
                                 '✅ File Format: Only PDF, JPG, PNG files are allowed.',
                                 '✅ File Size Limit: Maximum 5MB per file.',
                                 '✅ Image Clarity: The ID must be clear, unedited, and all text must be readable.',
@@ -131,9 +127,11 @@ export default function UploadIDForm() {
                             ))}
                         </div>
                     </div>
+
+                    {/* Navigation buttons */}
                     <div className="col-span-1 md:col-span-3 flex justify-between mt-4">
                         <button type="button" onClick={handlePrevious} className="bg-[#3AA4FF] text-white p-7 py-2 rounded">Previous</button>
-                        <button type="submit" onClick={handleNext} className="bg-green-500 text-white p-7 py-2 rounded">Next Step </button>
+                        <button type="submit" onClick={handleNext} className="bg-green-500 text-white p-7 py-2 rounded">Next Step</button>
                     </div>
                 </div>
             </div>
