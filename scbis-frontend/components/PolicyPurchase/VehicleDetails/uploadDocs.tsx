@@ -8,14 +8,14 @@ export default function UploadIDForm() {
     const [files, setFiles] = useState<File[]>([]);
     const [error, setError] = useState<string>('');
 
-    const handlePrevious = () => router.push('policy-purchase/vehicle-information/ownershipAndUsage');
+    const handlePrevious = () => router.push('/policy-purchase/vehicle-information/ownershipAndUsage');
     
     const handleNext = () => {
         if (files.length < 2) {
             setError('❌ Please upload both documents before proceeding.');
         } else {
             setError('');
-            router.push('/policy-purchase/purchase/policySelection');
+            router.push('/policy-purchase/vehicle-information/preview');
         }
     };
 

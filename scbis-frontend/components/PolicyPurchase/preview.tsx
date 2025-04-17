@@ -189,28 +189,6 @@ export default function PolicyPreview() {
       <h2 className="text-2xl lg:ml-16 mb-4 font-bold">Policy Purchase Preview</h2>
 
       <div className="max-w-5xl mx-auto p-6 px-12 bg-white shadow-lg rounded-lg">
-        {/* Progress Bar */}
-        <div className="flex flex-wrap sm:justify-start md:justify-start items-center gap-4 mt-6 mb-4">
-          <div className="flex items-center">
-            <div className="w-7 h-7 flex items-center justify-center bg-green-500 text-white rounded-full">1</div>
-            <span className="ml-2 font-medium text-black text-xs sm:text-base">Policy Selection</span>
-          </div>
-          <div className="w-7 sm:border-t-2 border-gray-400"></div>
-          <div className="flex items-center">
-            <div className="w-7 h-7 flex items-center justify-center bg-green-500 text-white rounded-full">2</div>
-            <span className="ml-2 text-black text-xs sm:text-base">Duration & Jurisdiction</span>
-          </div>
-          <div className="w-7 sm:border-t-2 border-gray-400"></div>
-          <div className="flex items-center">
-            <div className="w-7 h-7 flex items-center justify-center bg-green-500 text-white rounded-full">3</div>
-            <span className="ml-2 text-black text-sm sm:text-base">Vehicle Information</span>
-          </div>
-          <div className="w-7 sm:border-t-2 border-gray-400"></div>
-          <div className="flex items-center">
-            <div className="w-7 h-7 flex items-center justify-center bg-green-500 text-white rounded-full">4</div>
-            <span className="ml-2 text-black text-sm sm:text-base">Driver Information</span>
-          </div>
-        </div>
 
         {/* Policy Selection Section */}
         <div className="border-b pb-4 mb-4">

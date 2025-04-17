@@ -1,32 +1,21 @@
 "use client";
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useGeneralVehicleStore } from '@/store/vehicleDetails/generalVehicle';
 
 export default function GeneralVehicleDetailForm() {
     const router = useRouter();
-
-    const [formData, setFormData] = useState({
-        make: '',
-        model: '',
-        mfgYear: '',
-        engineCapacity: '',
-        chassisNo: '',
-        engineNo: '',
-        plateNo: '',
-        bodyType: '',
-    });
+    const { formData, setFormData, logFormData } = useGeneralVehicleStore();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        setFormData({ [e.target.name]: e.target.value });
     };
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log(formData);
+        logFormData();
         router.push('/policy-purchase/vehicle-information/ownershipAndUsage');
     };
-
 
     const handlePrevious = () => {
         router.back();
@@ -34,7 +23,6 @@ export default function GeneralVehicleDetailForm() {
 
     return (
         <div className="flex flex-col items-center px-4">
-
             <div className="w-full max-w-5xl flex justify-between items-center mt-8">
                 <h2 className="md:text-xl sm:text-lg font-bold">Policy Purchase</h2>
                 <button className="bg-[#0F1D3F] sm:text-xs md:text-lg text-white px-4 py-2 rounded">Save as draft</button>
@@ -67,8 +55,6 @@ export default function GeneralVehicleDetailForm() {
                     <span className="ml-2 text-black text-xs sm:text-base">Upload Docs</span>
                 </div>
             </div>
-
-
 
             <div className="bg-white mb-10 p-8 rounded-xl w-full max-w-5xl"
                 style={{ boxShadow: '0px 10px 20px rgba(0, 123, 255, 0.4), 0px 4px 8px rgba(0, 0, 0, 0.1)' }}>
