@@ -41,7 +41,7 @@ export default function AdminSidebar() {
         <SidebarGroup
           title="Policy Operations"
           links={[
-            { label: "Incoming Requests", href: "/admin/purchase-requests", icon: ClipboardList },
+            { label: "Incoming Requests", href: "/purchaseRequests", icon: ClipboardList },
             { label: "Premium Calculation", href: "/admin/premium-calc", icon: FileCheck },
             { label: "Payment Confirmations", href: "/admin/payments", icon: Mail },
           ]}
