@@ -31,8 +31,6 @@ const SidebarGroup = ({ title, links }: { title: string; links: { label: string;
 export default function AdminSidebar() {
   return (
     <aside className="w-64 bg-white h-screen shadow-md p-4 space-y-6 flex flex-col">
-      <div className="text-2xl font-bold">Admin Panel</div>
-
       <nav className="flex-1 space-y-4">
         <Link href="/admin/dashboard" className="flex items-center gap-2 text-sm hover:text-blue-600">
           <LayoutDashboard size={18} /> Dashboard

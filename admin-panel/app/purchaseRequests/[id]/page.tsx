@@ -226,22 +226,22 @@ export default function RequestDetailsPage({ params }: { params: Promise<{ id: s
 
       {/* Image Zoom Modal */}
       <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
-        <DialogContent className="max-w-[90vw] h-[90vh]">
-          <DialogHeader>
-            <DialogTitle className="sr-only">Document Preview</DialogTitle>
-          </DialogHeader>
-          <div className="relative w-full h-full">
-            {selectedImage && (
-              <Image
-                src={selectedImage}
-                alt="Zoomed document"
-                fill
-                className="object-contain"
-              />
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+  <DialogContent className="max-w-[90vw] max-h-[90vh]">
+    <DialogHeader>
+      <DialogTitle className="sr-only">Document Preview</DialogTitle>
+    </DialogHeader>
+    <div className="relative w-full h-[95vh] flex items-center justify-center">
+      {selectedImage && (
+        <Image
+          src={selectedImage}
+          alt="Zoomed document"
+          fill
+          className="object-contain"
+        />
+      )}
+    </div>
+  </DialogContent>
+</Dialog>
 
       {/* Rejection Modal */}
       <Dialog open={rejectOpen} onOpenChange={setRejectOpen}>
