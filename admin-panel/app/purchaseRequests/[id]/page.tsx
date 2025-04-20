@@ -14,7 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/components/ui/toast";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params); // Unwrap the params Promise

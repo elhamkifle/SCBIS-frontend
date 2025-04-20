@@ -40,7 +40,7 @@ export default function AdminSidebar() {
           title="Policy Operations"
           links={[
             { label: "Incoming Requests", href: "/purchaseRequests", icon: ClipboardList },
-            { label: "Premium Calculation", href: "/admin/premium-calc", icon: FileCheck },
+            { label: "Premium Calculation", href: "/premiumCalculation", icon: FileCheck },
             { label: "Payment Confirmations", href: "/admin/payments", icon: Mail },
           ]}
         />
