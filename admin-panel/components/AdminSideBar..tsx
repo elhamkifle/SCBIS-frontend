@@ -48,7 +48,7 @@ export default function AdminSidebar() {
         <SidebarGroup
           title="Policy Management"
           links={[
-            { label: "All Policies", href: "/admin/policies", icon: FileText },
+            { label: "All Policies", href: "/policyManagement/all", icon: FileText },
             { label: "Search Policies", href: "/admin/policies/search", icon: FileSearch },
             { label: "Policy Details", href: "/admin/policies/details", icon: FileText },
           ]}
