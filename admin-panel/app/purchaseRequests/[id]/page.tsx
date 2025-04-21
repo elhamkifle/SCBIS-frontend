@@ -23,6 +23,7 @@ export default function RequestDetailsPage({ params }: { params: Promise<{ id: s
   const [rejectOpen, setRejectOpen] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
   const [isRejecting, setIsRejecting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const { toast } = useToast();
 
   // Mock data - replace with actual data fetching
@@ -30,7 +31,7 @@ export default function RequestDetailsPage({ params }: { params: Promise<{ id: s
     policy: {
       type: "Comprehensive Cover",
       duration: "30 Days",
-      coverageArea: "Ethiopia Only"
+      coverageArea: "Ethiopia Only",
     },
     user: {
       title: "Mr.",
@@ -43,8 +44,8 @@ export default function RequestDetailsPage({ params }: { params: Promise<{ id: s
       tinNumber: "123456789",
       identityDocuments: [
         { url: "/docs/id.png", name: "ID" },
-        { url: "/docs/id.png", name: "ID" }
-      ]
+        { url: "/docs/id.png", name: "ID" },
+      ],
     },
     vehicle: {
       make: "Toyota",
@@ -57,21 +58,21 @@ export default function RequestDetailsPage({ params }: { params: Promise<{ id: s
       isDutyFree: false,
       vehicleDocuments: [
         { url: "/docs/libre.png", name: "Vehicle Libre" },
-        { url: "/docs/libre.png", name: "Registration" }
-      ]
+        { url: "/docs/libre.png", name: "Registration" },
+      ],
     },
     ownership: {
       ownerType: "Individual",
       driverType: "Owner",
-      seatingCapacity: 5
+      seatingCapacity: 5,
     },
     driver: {
       licenseGrade: "Grade 3",
       experience: "4 Years",
       under21: false,
       infirmity: false,
-      lessThan6MonthsExp: false
-    }
+      lessThan6MonthsExp: false,
+    },
   };
 
   const handleReject = async () => {
@@ -88,6 +89,7 @@ export default function RequestDetailsPage({ params }: { params: Promise<{ id: s
     setIsRejecting(false);
     setRejectOpen(false);
     setRejectionReason("");
+    setIsSuccess(true); // Show success popup
   };
 
   return (
@@ -210,7 +212,6 @@ export default function RequestDetailsPage({ params }: { params: Promise<{ id: s
           </div>
         </CardContent>
       </Card>
-
       {/* Action Buttons */}
       <div className="flex flex-wrap gap-4 justify-end">
         <Button 
@@ -226,22 +227,22 @@ export default function RequestDetailsPage({ params }: { params: Promise<{ id: s
 
       {/* Image Zoom Modal */}
       <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
-  <DialogContent className="max-w-[90vw] max-h-[90vh]">
-    <DialogHeader>
-      <DialogTitle className="sr-only">Document Preview</DialogTitle>
-    </DialogHeader>
-    <div className="relative w-full h-[95vh] flex items-center justify-center">
-      {selectedImage && (
-        <Image
-          src={selectedImage}
-          alt="Zoomed document"
-          fill
-          className="object-contain"
-        />
-      )}
-    </div>
-  </DialogContent>
-</Dialog>
+        <DialogContent className="max-w-[90vw] max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle className="sr-only">Document Preview</DialogTitle>
+          </DialogHeader>
+          <div className="relative w-full h-[95vh] flex items-center justify-center">
+            {selectedImage && (
+              <Image
+                src={selectedImage}
+                alt="Zoomed document"
+                fill
+                className="object-contain"
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Rejection Modal */}
       <Dialog open={rejectOpen} onOpenChange={setRejectOpen}>
@@ -278,6 +279,42 @@ export default function RequestDetailsPage({ params }: { params: Promise<{ id: s
               {isRejecting ? "Rejecting..." : "Confirm Rejection"}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Success Popup */}
+      <Dialog open={isSuccess} onOpenChange={setIsSuccess}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-center">Operation Successful!</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col items-center justify-center space-y-4">
+            <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center">
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                className="h-8 w-8 text-white" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M5 13l4 4L19 7" 
+                />
+              </svg>
+            </div>
+            <p className="text-center text-gray-600">
+              The insurance request has been successfully rejected.
+            </p>
+            <Button 
+              className="w-full" 
+              onClick={() => setIsSuccess(false)}
+            >
+              OK
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
