@@ -1,6 +1,7 @@
 'use client'
 
-
+import { userHook } from "@/context/userContextProvider"
+import { fstat, truncate } from "fs"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 
@@ -10,26 +11,68 @@ export default function Signup(){
     const [password,setPassword] = useState('')
     const [confirmPass,setConfirmPass] = useState('')
     const [error,setError] = useState(false)
+    const [backEndError,setBackEndError] = useState(false)
+    const [loading,setLoading] = useState(false)
     const router = useRouter()
+    const {user,dispatch} = userHook()
+    console.log(user,"here is the user")
 
-    const handleSubmit = ()=>{
+    const handleSubmit = async ()=>{
         
         setError(false)
+        setBackEndError(false)
+        setLoading(true)
 
         if(!email && !password && !confirmPass){
             setError(true)
+            setLoading(false)
+            setBackEndError(false)
             return
         }
 
         if (password!=confirmPass){
             setError(true)
+            setBackEndError(false)
+            setLoading(false)
             return
         }
 
-        setEmail('')
-        setPassword('')
-        setConfirmPass('')
-        router.push('/verification')
+        dispatch({type:'collect_user_info',payload:{email,password}})
+
+        const res = await fetch('http://localhost:4000/auth/register',{
+            method:"POST",
+            body:JSON.stringify({...user,email:email,password:password}),
+            headers:{
+                'Content-Type':'application/json'
+            }
+        })
+
+        const data = await res.json()
+        
+        if (!res.ok && data.message==="Failed to send OTP. Please try again later."){
+            setBackEndError(false)
+            setError(false)
+            setLoading(false)
+            setEmail('')
+            setPassword('')
+            setConfirmPass('')
+            localStorage.setItem('userData',data)
+            router.push('/policy-purchase/personal-information/personalDetails');
+            return
+        }
+
+        setBackEndError(data.message)
+        setError(false)
+        setLoading(false)
+
+        console.log('here is the data',data)
+
+
+
+
+
+        
+        
     }
 
     return(
@@ -59,18 +102,26 @@ export default function Signup(){
                         
                         <div className="w-full md:w-1/2 flex flex-col gap-3 md:gap-5">
                         <label htmlFor="password" className="text-[302F2F] text-xs font-medium font-inter">Confirm Password</label>
-                        <input onChange={(e)=>setConfirmPass(e.target.value)} className="p-2 rounded"  type="password" id="password" name="password"/>
+                        <input onChange={(e)=>setConfirmPass(e.target.value)} className="p-2 rounded"  type="password" id="confirm-password" name="password"/>
                         </div>
                     </div>
 
                     <div className="flex justify-end items-center gap-[110px] md:gap-[155px]">
                         <div className="flex items-center gap-3">
-                            <p className="w-[30px] py-1 cursor-pointer text-center font-bold bg-[#2752D0] w-1/6  font-inter text-sm text-white rounded">1</p>
-                            <p className="w-[30px] py-1 cursor-pointer text-center font-bold bg-[#3E99E7] w-1/6  font-inter text-sm text-white rounded">2</p>
+                            <p className="w-[30px] py-1 cursor-pointer text-center font-bold bg-[#2752D0]   font-inter text-sm text-white rounded">1</p>
+                            <p className="w-[30px] py-1 cursor-pointer text-center font-bold bg-[#3E99E7]   font-inter text-sm text-white rounded">2</p>
                         </div>
-                        <button onClick={handleSubmit} className="bg-[#23C140] w-1/6  font-inter text-sm text-white p-1 rounded">Signup</button>
+                        <button onClick={handleSubmit} className="bg-[#23C140] w-1/6  font-inter text-sm text-white p-1 rounded">
+
+                            {loading?<p className="text-xs">Loading <span className="loading loading-dots loading-xl"></span></p>:'Signup'}
+
+                        </button>
                     </div>
-                    {error && <p className="text-center f0nt-bold text-base text-[red]">{password!=confirmPass? 'Password not match. Please the passwords that you typed':'Please fill all the required fields.'}</p>}
+                    
+                    {error && <p className="text-center f0nt-bold text-sm text-red-500">{password!=confirmPass? 'Password not match. Please the passwords that you typed':'Please fill all the required fields.'}</p>}
+                    
+                    {backEndError && <p className="text-center f0nt-bold text-sm text-red-500">{backEndError}</p>}
+                
                 </div>
             </div>
         </div>

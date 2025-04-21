@@ -9,20 +9,52 @@ export default function Login(){
     const [email,setEmail] = useState('')
     const [password,setPassword] = useState('')
     const [error,setError] = useState(false)
+    const [backEndError,setBackEndError] = useState(false)
+    const [loading,setLoading] = useState(false)
     const router = useRouter()
 
-    const handleSubmit = ()=>{
+    const handleSubmit = async()=>{
         
         setError(false)
+        setLoading(true)
+        setBackEndError(false)
 
         if(!email && !password){
             setError(true)
+            setLoading(false)
+            setBackEndError(false)
             return
         }
 
-        setEmail('')
-        setPassword('')
-        router.push('/policy-purchase/personal-information/personalDetails');
+        const res = await fetch('http://localhost:4000/auth/login',{
+            method:"POST",
+            body:JSON.stringify({ identifier : email, password : password }),
+            headers:{
+                'Content-Type':'application/json'
+            }
+        })
+
+        const data = await res.json()
+
+        console.log('here is the data',data)
+
+        if (res.ok){
+            setError(false)
+            setLoading(false)
+            setBackEndError(false)
+            setEmail('')
+            setPassword('')
+            // localStorage.clear()
+            localStorage.setItem('userData',JSON.stringify(data))
+            router.push('/policy-purchase/personal-information/personalDetails');
+            return
+        }
+
+        setError(false)
+        setBackEndError(data.message)
+        setLoading(false)
+
+      
     }
 
     const signUp = ()=>{
@@ -48,9 +80,15 @@ export default function Login(){
                         <input onChange={(e)=>setPassword(e.target.value)} className="p-2 rounded"  type="password" id="password" name="password"/>
                     </div>
 
-                    <button onClick={handleSubmit} className="bg-[#1F2168] font-bold font-inter text-lg text-white p-3 rounded">Login</button>
+                    <button onClick={handleSubmit} className="bg-[#1F2168] font-bold font-inter text-lg text-white p-3 rounded">
+
+                        {loading?<p className="text-xs"><span className="loading loading-dots loading-xl"></span></p>:'Login'}
+
+                    </button>
+                    
                     <p className="text-center text-sm text-slate-900 font-bold font-syne">Don't have an account yet? <span onClick={signUp} className="text-orange-600 cursor-pointer hover:text-blue-800 underline">Signup</span> here</p>
-                    {error && <p className="text-center f0nt-bold text-base text-[red]">Please fill all the required fields.</p>}
+                    {error && <p className="text-center f0nt-bold text-base text-red-500">Please fill all the required fields.</p>}
+                    {backEndError && <p className="text-center f0nt-bold text-base text-red-500">{backEndError}</p>}
                 </div>
             </div>
         </div>

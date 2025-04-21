@@ -1,21 +1,66 @@
 'use client';
 
 import React, { useState } from 'react';
+import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import { userHook } from '@/context/userContextProvider';
+
+interface SuccessResult {
+    
+    statusText:string;
+    data:{
+        
+        secure_url:string
+    }
+}
 
 export default function UploadIDForm() {
     const router = useRouter();
     const [files, setFiles] = useState<File[]>([]);
     const [error, setError] = useState<string>('');
+    const {User} = JSON.parse(localStorage.getItem('userData')!)
+    const {user,dispatch} = userHook()
+
+    console.log('user info here',user)
 
     const handlePrevious = () => router.push('policy-purchase/vehicle-information/ownershipAndUsage');
     
-    const handleNext = () => {
+    const handleNext = async () => {
         if (files.length < 1) {
             setError('❌ Please upload an ID before proceeding.');
         } else {
             setError('');
-            router.push('/policy-purchase/vehicle-information/purpose');
+            const formdata = new FormData()
+
+            formdata.append('file',files[0])
+            formdata.append('upload_preset', 'docuploads')
+  
+            let result = {} as SuccessResult;
+  
+            if (files){
+              result = await axios.post(`https://api.cloudinary.com/v1_1/dmzvqehan/upload`,formdata)
+            }
+  
+            if (result && result.statusText==="OK"){
+              dispatch({type:'collect_user_info',payload:{img_url:result.data.secure_url}})
+              console.log("here is the user with image_url",user)
+              
+              const res = await fetch(`http://localhost:4000/user/${User._id}`,{
+                method:'PATCH',
+                body:JSON.stringify(user),
+                headers:{
+                    'Content-Type':'application/json'
+                }
+              })
+
+              const data = await res.json()
+              console.log("here is the updated user data",)
+              if (res.ok){
+                router.push('/policy-purchase/vehicle-information/purpose');
+              }
+              
+            }
+            
         }
     };
 

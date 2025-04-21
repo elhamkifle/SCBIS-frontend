@@ -4,8 +4,9 @@ import "@fontsource/syne"; // Default weight (400)
 import "@fontsource/syne/600.css"; // Specific weight (600)
 import "@fontsource/inter"; // Default weight (400)
 import "@fontsource/inter/600.css"; // Specific weight (600)
-
 import "./globals.css";
+import {UserContextProvider} from '@/context/userContextProvider'
+import { PolicyContextProvider } from "@/context/PolicyContextProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,11 +29,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" data-theme="winter">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <PolicyContextProvider>
+          <UserContextProvider>
+            {children}
+          </UserContextProvider>
+        </PolicyContextProvider>
+        
       </body>
     </html>
   );

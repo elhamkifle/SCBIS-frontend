@@ -45,19 +45,19 @@ export default function Verification(){
                     <p className="text-center text-[#302F2F] text-2xl font-bold font-inter">Enter Code</p>
                     <p className="text-center mb-5 text-[#302f2fa9] text-sm font-bold font-inter">We have sent OTP code to your phone</p>
                     
-                    <div className="w-full flex justify-between">
+                    <div className="w-full flex gap-2 justify-between">
                         
-                        <input onChange={(e)=>setOne(e.target.value)} className="w-[50px] text-center py-2 px-0 text-2xl rounded" type="text"/>
+                        <input onChange={(e)=>setOne(e.target.value)} className="w-8 md:w-[50px] text-center md:py-2 px-0 text-2xl rounded" type="text"/>
                         
-                        <input onChange={(e)=>setTwo(e.target.value)} className="w-[50px] text-center py-2 px-0 text-2xl  rounded"  type="text"/>
+                        <input onChange={(e)=>setTwo(e.target.value)} className="w-8 md:w-[50px] text-center md:py-2 px-0 text-2xl  rounded"  type="text"/>
                         
-                        <input onChange={(e)=>setThree(e.target.value)} className="w-[50px] text-center py-2 px-0 text-2xl  rounded" type="text"/>
+                        <input onChange={(e)=>setThree(e.target.value)} className="w-8 md:w-[50px] text-center md:py-2 px-0 text-2xl  rounded" type="text"/>
                         
-                        <input onChange={(e)=>setFour(e.target.value)} className="w-[50px] text-center py-2 px-0 text-2xl rounded"  type="text" />
+                        <input onChange={(e)=>setFour(e.target.value)} className="w-8 md:w-[50px] text-center md:py-2 px-0 text-2xl rounded"  type="text" />
                         
-                        <input onChange={(e)=>setFive(e.target.value)} className="w-[50px] text-center py-2 px-0 text-2xl rounded" type="text"/>
+                        <input onChange={(e)=>setFive(e.target.value)} className="w-8 md:w-[50px] text-center md:py-2 px-0 text-2xl rounded" type="text"/>
                         
-                        <input onChange={(e)=>setSix(e.target.value)} className="w-[50px] text-center py-2 px-0 text-2xl  rounded"  type="text"/>
+                        <input onChange={(e)=>setSix(e.target.value)} className="w-8 md:w-[50px] text-center md:py-2 px-0 text-2xl  rounded"  type="text"/>
                     </div>
 
                     <button onClick={handleSubmit} className="bg-[#1F2168] mt-10 font-bold font-inter text-lg text-white p-3 rounded">Verify</button>

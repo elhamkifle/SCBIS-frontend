@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { policyHook } from '@/context/PolicyContextProvider';
 
 
 export default function PrivateVehicleCategory() {
@@ -9,31 +10,35 @@ export default function PrivateVehicleCategory() {
     const router = useRouter();
     const [carType,setCarType] = useState('')
     const [error,setError] = useState(false)
+    const [usageType,setUsageType] = useState('')
+    const {policy,dispatch} = policyHook()
 
-    const [formData, setFormData] = useState({
-        make: '',
-        model: '',
-        mfgYear: '',
-        engineCapacity: '',
-        chassisNo: '',
-        engineNo: '',
-        plateNo: '',
-        bodyType: '',
-    });
+    // const [formData, setFormData] = useState({
+    //     make: '',
+    //     model: '',
+    //     mfgYear: '',
+    //     engineCapacity: '',
+    //     chassisNo: '',
+    //     engineNo: '',
+    //     plateNo: '',
+    //     bodyType: '',
+    // });
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
+    // const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    //     setFormData({ ...formData, [e.target.name]: e.target.value });
+    // };
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setError(false)
-        console.log(formData);
+        
         
         if(!carType){
             setError(true)
             return
         }
+
+        dispatch({type:"private_vehicle_info",payload:{usageType:[usageType],vehicleCategory:carType}})
 
         router.push("/policy-purchase/vehicle-information/generalVehicleDetails");
 
@@ -91,47 +96,47 @@ export default function PrivateVehicleCategory() {
                         <div className='flex flex-col gap-3'>
                             <p className='text-sm md:text-base lg:text-lg font-syne mb-2 font-semibold'>Private Vehicles</p>
                             <div className='flex gap-2 items-center '>
-                                <input type="checkbox" name='private-type' id='personal'/>
+                                <input onChange={(e)=>setUsageType('Personal Use')} value={usageType} type="checkbox" name='private-type' id='personal'/>
                                 <label htmlFor="personal" className='font-inter text-sm md:text-xs lg:text-xs'>Private or Personal Use</label>
                             </div>
                             <div className='flex gap-2 items-center'>
-                                <input type="checkbox" name='private-type' id='Business'/>
+                                <input onChange={(e)=>setUsageType('Business Use')} value={usageType} type="checkbox" name='private-type' id='Business'/>
                                 <label htmlFor="personal" className='font-inter text-sm md:text-xs lg:text-xs'>Private Business Use</label>
                             </div>
                         </div>
 
                         <p className='font-syne text-sm md:text-base lg:text-lg font-semibold'>Select one category that best describes your vehicle. (Required)</p>
 
-                        <div className='flex flex-col flex-wrap  sm:flex-row  justify-center gap-8 lg:flex-nowrap gap-5'>
+                        <div className='flex flex-col flex-wrap  sm:flex-row  justify-center gap-8 lg:flex-nowrap'>
                             
-                            <div onClick={(e)=>setCarType('passenger')} className={`w-full border  ${carType==='passenger' ? 'border-green-500':'border-gray-300'} cursor-pointer  sm:w-[45%] lg:w-1/4 rounded-2xl flex flex-col items-center py-5`} style={{ boxShadow: '0 0 8px rgba(0, 123, 255, 0.4)' }}>
+                            <div onClick={(e)=>setCarType('Passenger Car')} className={`w-full border  ${carType==='Passenger Car' ? 'border-green-500':'border-gray-300'} cursor-pointer  sm:w-[45%] lg:w-1/4 rounded-2xl flex flex-col items-center py-5`} style={{ boxShadow: '0 0 8px rgba(0, 123, 255, 0.4)' }}>
 
                                 <img className='' style={{marginTop:'-25px'}} src="/passengercars.svg" alt=""  />
-                                <p className='h-[45px] text-center px-5 mb-[15px] text-sm md:text-base lg:text-lg font-syne mb-2 font-semibold'>Passenger Cars </p>
+                                <p className='h-[45px] text-center px-5 mb-[15px] text-sm md:text-base lg:text-lg font-syne  font-semibold'>Passenger Cars </p>
                                 <p className='text-center px-5 font-inter text-sm md:text-xs lg:text-xs'>For personal & family transport, daily use, and business calls</p>
 
                             </div>
 
-                            <div onClick={(e)=>setCarType('suvs')} className={`w-full border ${carType==='suvs' ? 'border-green-500':'border-gray-300'} cursor-pointer  sm:w-[45%] lg:w-1/4 rounded-2xl flex flex-col items-center py-5`}  style={{ boxShadow: '0 0 8px rgba(0, 123, 255, 0.4)' }}>
+                            <div onClick={(e)=>setCarType('Suvs')} className={`w-full border ${carType==='Suvs' ? 'border-green-500':'border-gray-300'} cursor-pointer  sm:w-[45%] lg:w-1/4 rounded-2xl flex flex-col items-center py-5`}  style={{ boxShadow: '0 0 8px rgba(0, 123, 255, 0.4)' }}>
 
                                 <img className='' style={{marginTop:'-25px'}} src="/suvs.svg" alt=""  />
-                                <p className='h-[45px] text-center px-5 mb-[15px] text-sm md:text-base lg:text-lg font-syne mb-2 font-semibold'>SUVs & Off-Road Vehicles </p>
+                                <p className='h-[45px] text-center px-5 mb-[15px] text-sm md:text-base lg:text-lg font-syne  font-semibold'>SUVs & Off-Road Vehicles </p>
                                 <p className='text-center px-5 font-inter text-sm md:text-xs lg:text-xs'> For rugged terrain, long-distance travel, and city use</p>
 
                             </div>
 
-                            <div onClick={(e)=>setCarType('pickup')} className={`w-full border ${carType==='pickup'? 'border-green-500':'border-gray-300'} cursor-pointer sm:w-[45%] lg:w-1/4 rounded-2xl flex flex-col items-center py-5`} style={{ boxShadow: '0 0 8px rgba(0, 123, 255, 0.4)' }}>
+                            <div onClick={(e)=>setCarType('Pickup Trucks')} className={`w-full border ${carType==='Pickup Trucks'? 'border-green-500':'border-gray-300'} cursor-pointer sm:w-[45%] lg:w-1/4 rounded-2xl flex flex-col items-center py-5`} style={{ boxShadow: '0 0 8px rgba(0, 123, 255, 0.4)' }}>
 
                                 <img className='' style={{marginTop:'-25px'}} src="/pickup.svg" alt=""  />
-                                <p className='h-[45px] text-center px-5 mb-[15px] text-sm md:text-base lg:text-lg font-syne mb-2 font-semibold'>Pickup Trucks & Utility Vehicles </p>
+                                <p className='h-[45px] text-center px-5 mb-[15px] text-sm md:text-base lg:text-lg font-syne  font-semibold'>Pickup Trucks & Utility Vehicles </p>
                                 <p className='text-center px-5 font-inter text-sm md:text-xs lg:text-xs'>For personal goods transport, not commercial delivery</p>
 
                             </div>
 
-                            <div onClick={(e)=>setCarType('minivan')} className={`w-full border ${carType==='minivan' ? 'border-green-500':'border-gray-300'} cursor-pointer  sm:w-[45%] lg:w-1/4 rounded-2xl flex flex-col items-center py-5`} style={{ boxShadow: '0 0 8px rgba(0, 123, 255, 0.4)' }}>
+                            <div onClick={(e)=>setCarType('Mini Vans')} className={`w-full border ${carType==='Mini Vans' ? 'border-green-500':'border-gray-300'} cursor-pointer  sm:w-[45%] lg:w-1/4 rounded-2xl flex flex-col items-center py-5`} style={{ boxShadow: '0 0 8px rgba(0, 123, 255, 0.4)' }}>
 
                                 <img className='' style={{marginTop:'-25px'}} src="/minivan.svg" alt=""  />
-                                <p className='h-[45px] text-center px-5 mb-[15px] text-sm md:text-base lg:text-lg font-syne mb-2 font-semibold'>Vans & Mini-Buses   </p>
+                                <p className='h-[45px] text-center px-5 mb-[15px] text-sm md:text-base lg:text-lg font-syne  font-semibold'>Vans & Mini-Buses   </p>
                                 <p className='text-center px-5 font-inter text-sm md:text-xs lg:text-xs'>For private family/group transport, non-commercial use</p>
 
                             </div>

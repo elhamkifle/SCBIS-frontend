@@ -1,6 +1,6 @@
 'use client'
 
-
+import { userHook } from "@/context/userContextProvider"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 
@@ -12,6 +12,7 @@ export default function Signup(){
     const [pNo,setPNo] = useState('')
     const [error,setError] = useState(false)
     const router = useRouter()
+    const {dispatch} = userHook()
 
     const handleSubmit = ()=>{
         
@@ -21,6 +22,8 @@ export default function Signup(){
             setError(true)
             return
         }
+
+        dispatch({type:'collect_user_info',payload:{fullname:fName + " " + lName,phoneNumber:pNo}})
 
         setFName('')
         setLName('')
@@ -70,8 +73,8 @@ export default function Signup(){
 
                     <div className="flex justify-end items-center gap-[110px] md:gap-[155px]">
                         <div className="flex items-center gap-3">
-                            <p className="w-[30px] py-1 cursor-pointer text-center font-bold bg-[#2752D0] w-1/6  font-inter text-sm text-white rounded">1</p>
-                            <p className="w-[30px] py-1 cursor-pointer text-center font-bold bg-[#3E99E7] w-1/6  font-inter text-sm text-white rounded">2</p>
+                            <p className="py-1 cursor-pointer text-center font-bold bg-[#2752D0] w-[30px]  font-inter text-sm text-white rounded">1</p>
+                            <p className="py-1 cursor-pointer text-center font-bold bg-[#3E99E7] w-[30px]  font-inter text-sm text-white rounded">2</p>
                         </div>
                         <button onClick={handleSubmit} className="bg-[#1F2168] w-1/6  font-inter text-sm text-white p-1 rounded">Next</button>
                     </div>

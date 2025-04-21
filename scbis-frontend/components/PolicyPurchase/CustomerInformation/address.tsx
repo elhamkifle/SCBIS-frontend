@@ -1,14 +1,19 @@
 'use client';
 
+import { userHook } from '@/context/userContextProvider';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function AddressForm() {
     const router = useRouter();
+    const {user,dispatch} = userHook()
+    console.log("here is the user info",user)
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log(formData);
+        // console.log(formData);
+        dispatch({type:"collect_user_info",payload:formData})
+        
         handleNext(); // Move to the next step after submitting
     };
 

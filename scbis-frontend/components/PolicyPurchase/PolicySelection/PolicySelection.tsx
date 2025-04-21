@@ -5,6 +5,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import { Info } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { policyHook } from '@/context/PolicyContextProvider';
 
 const covers = [
     {
@@ -62,6 +63,7 @@ export default function PolicySelection() {
     const [selectedCover, setSelectedCover] = useState<{ title: string; info: string } | null>(null);
     const [selectedPolicy, setSelectedPolicy] = useState('');
     const [error, setError] = useState('');
+    const {dispatch} = policyHook()
 
     const handleSelect = (policy: string) => {
         setSelectedPolicy(policy);
@@ -78,7 +80,8 @@ export default function PolicySelection() {
             setError('Please select a policy type.');
             return;
         }
-        console.log('Selected Policy:', selectedPolicy);
+
+        dispatch({type:'collect_policy_info',payload:{policyType:selectedPolicy}})
         router.push('/policy-purchase/purchase/policyDuration'); 
     };
 

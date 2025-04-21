@@ -2,9 +2,12 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { policyHook } from '@/context/PolicyContextProvider';
 
 export default function GeneralVehicleDetailForm() {
     const router = useRouter();
+    const {policy,dispatch} = policyHook()
+    console.log('commercial vehicle',policy)
 
     const [formData, setFormData] = useState({
         make: '',
@@ -12,8 +15,8 @@ export default function GeneralVehicleDetailForm() {
         mfgYear: '',
         engineCapacity: '',
         chassisNo: '',
-        engineNo: '',
-        plateNo: '',
+        engineNumber: '',
+        plateNumber: '',
         bodyType: '',
     });
 
@@ -24,6 +27,13 @@ export default function GeneralVehicleDetailForm() {
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         console.log(formData);
+        dispatch({
+            
+            type:policy.privateVehicle?'private_vehicle_info':'commercial_vehicle_info',
+
+            payload: {generalDetails:formData}
+        })
+
         router.push('/policy-purchase/vehicle-information/ownershipAndUsage');
     };
 
@@ -106,11 +116,11 @@ export default function GeneralVehicleDetailForm() {
                     </div>
                     <div className='relative w-full'>
                         <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Engine No. *</label>
-                        <input type="text" name="engineNo" value={formData.engineNo} onChange={handleChange} className="w-full p-2 border border-black rounded" required/>
+                        <input type="text" name="engineNumber" value={formData.engineNumber} onChange={handleChange} className="w-full p-2 border border-black rounded" required/>
                     </div>
                     <div className='relative w-full'>
                         <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Plate No. * </label>
-                        <input type="text" name="plateNo" value={formData.plateNo} onChange={handleChange} className="w-full p-2 border border-black rounded" required/>
+                        <input type="text" name="plateNumber" value={formData.plateNumber} onChange={handleChange} className="w-full p-2 border border-black rounded" required/>
                     </div>
                     <div className='relative w-full'>
                         <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Body Type *</label>

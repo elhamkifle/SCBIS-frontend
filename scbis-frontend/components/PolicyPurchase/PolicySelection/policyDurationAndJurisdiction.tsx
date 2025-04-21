@@ -2,15 +2,16 @@
 
 import { useState } from "react";
 import { useRouter } from 'next/navigation';
+import { policyHook } from "@/context/PolicyContextProvider";
 
 const policyDurations = [
-  "3 Days",
-  "1 Week",
-  "15 Days",
-  "1 Month",
-  "3 Months",
-  "6 Months",
-  "1 Year (Recommended)",
+  {duration:"3 Days",numvalue:"3"},
+  {duration:"1 Week",numvalue:"7"},
+  {duration:"15 Days",numvalue:"15"},
+  {duration:"1 Month",numvalue:"30"},
+  {duration:"3 Months",numvalue:"90"},
+  {duration:"6 Months",numvalue:"180"},
+  {duration:"1 Year (Recommended)",numvalue:"365"},
 ];
 
 const coverageAreas = [
@@ -32,18 +33,27 @@ const coverageAreas = [
 export default function PolicyDuration() {
   const [selectedDuration, setSelectedDuration] = useState<string | null>(null); // Allow string or null
   const [selectedCoverage, setSelectedCoverage] = useState<string | null>(null); // Allow string or null
+  const {dispatch} = policyHook()
   const router = useRouter();
 
   const handlePrevious = () => {
     router.push('/policy-purchase/purchase/policySelection');
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (!selectedDuration || !selectedCoverage) {
       alert("Please select a policy duration and coverage area.");
+      
       return;
     }
+
+    dispatch({type:'collect_policy_info',payload:{duration:selectedDuration,coverageArea:selectedCoverage}})
+
+
     router.push('/policy-purchase/purchase/vehicleInformation');
+    
+
+    
   };
 
   return (
@@ -97,20 +107,20 @@ export default function PolicyDuration() {
             Policy Duration (Choose One)
           </h3>
           <div className="mt-3 space-y-2">
-            {policyDurations.map((duration) => (
+            {policyDurations.map((policyDuration) => (
               <label
-                key={duration}
+                key={policyDuration.duration}
                 className="flex items-center space-x-2 cursor-pointer"
               >
                 <input
                   type="radio"
                   name="policyDuration"
-                  value={duration}
-                  checked={selectedDuration === duration}
-                  onChange={() => setSelectedDuration(duration)}
+                  value={policyDuration.numvalue}
+                  checked={selectedDuration === policyDuration.numvalue}
+                  onChange={() => setSelectedDuration(policyDuration.numvalue)}
                   className="form-radio text-blue-600"
                 />
-                <span>{duration}</span>
+                <span>{policyDuration.duration}</span>
               </label>
             ))}
           </div>
@@ -168,6 +178,7 @@ export default function PolicyDuration() {
           Next
         </button>
       </div>
+      
     </div>
   );
 }

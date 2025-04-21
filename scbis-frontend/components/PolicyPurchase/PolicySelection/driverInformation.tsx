@@ -2,6 +2,7 @@
 
 import { useState, ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import { policyHook } from '@/context/PolicyContextProvider';
 
 interface DriverInfo {
   driverLicenseGrade: string;
@@ -32,6 +33,8 @@ interface Errors {
 }
 
 export default function DriverInformation() {
+  const {policy,dispatch} = policyHook()
+  console.log('here is the policy',policy)
   const [formData, setFormData] = useState<FormData>({
     employDriver: '',
     drivers: [{ driverLicenseGrade: '', driverName: '', drivingExperience: '' }],
@@ -44,6 +47,8 @@ export default function DriverInformation() {
   });
 
   const [errors, setErrors] = useState<Errors>({});
+  const [backEndError,setBackEndErorr] = useState<boolean|string>(false)
+  const {refreshToken,accessToken}= JSON.parse(localStorage.getItem('userData')!)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -83,8 +88,9 @@ export default function DriverInformation() {
     router.push('/policy-purchase/purchase/vehicleInformation');
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     const newErrors: Errors = {};
+    setBackEndErorr(false)
 
     // Validate required fields
     if (!formData.employDriver) newErrors.employDriver = 'This field is required';
@@ -115,7 +121,28 @@ export default function DriverInformation() {
 
     // If there are no errors, proceed to the next page
     if (Object.keys(newErrors).length === 0) {
-      router.push('/preview'); // Replace with the actual next page route
+      const res = await fetch("http://localhost:4000/policy/policy-selection",{
+        method:"POST",
+        body:JSON.stringify(policy),
+        headers:{
+          'Content-Type':'application/json',
+          'Authorization':`Bearer ${refreshToken}`
+        }
+      })
+  
+      const data = await res.json()
+      console.log(data)
+      
+      if (res.ok){
+        setBackEndErorr('POlicy created successfuly')
+        window.location.href = 'policy-purchase/purchase/payment';
+        return
+      }
+
+      setBackEndErorr(data.message)
+
+      
+       // Replace with the actual next page route
     }
   };
 
@@ -341,6 +368,8 @@ export default function DriverInformation() {
           Submit
         </button>
       </div>
+
+      {backEndError && <p className='text-red-600 text-xs'>{backEndError}</p>}
     </div>
   );
 }

@@ -2,9 +2,12 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { policyHook } from '@/context/PolicyContextProvider';
 
 export default function OwnershipAndUsageForm() {
     const router = useRouter();
+    const {policy,dispatch} = policyHook()
+    
 
     const [formData, setFormData] = useState({
         ownerType: '',
@@ -21,6 +24,7 @@ export default function OwnershipAndUsageForm() {
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         console.log(formData);
+        dispatch({type:policy.privateVehicle?'private_vehicle_info':'commercial_vehicle_info',payload:{ownershipUsage:{...formData,dutyFree:formData.dutyFree==='Yes' ? true : false}}})
         router.push('/policy-purchase/vehicle-information/uploadDocs');
     };
 
@@ -103,9 +107,9 @@ export default function OwnershipAndUsageForm() {
                             <option value="No">No</option>
                         </select>
                     </div>
-                    <div className="col-span-1 md:col-span-3 flex justify-between mt-6">
-                        <button type="button" className="bg-[#3AA4FF] text-white p-2 px-6 rounded" onClick={handlePrevious}>Previous</button>
-                        <button type="submit" className="bg-blue-500 text-white p-2 px-6 rounded">Next</button>
+                    <div className="col-span-1 md:col-span-3 flex gap-3 md:justify-between mt-6">
+                        <button type="button" className="bg-[#3AA4FF] text-white p-2 px-6 md:px-6 rounded" onClick={handlePrevious}>Previous</button>
+                        <button type="submit" className="bg-blue-500 text-white p-2 px-6 md:px-6 rounded">Next</button>
                     </div>
                 </form>
             </div>

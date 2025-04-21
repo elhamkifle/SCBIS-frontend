@@ -2,20 +2,56 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { policyHook } from '@/context/PolicyContextProvider';
+import axios from 'axios';
+import { p } from 'framer-motion/client';
 
 export default function UploadIDForm() {
     const router = useRouter();
     const [files, setFiles] = useState<File[]>([]);
     const [error, setError] = useState<string>('');
+    const {policy,dispatch} = policyHook()
 
     const handlePrevious = () => router.push('policy-purchase/vehicle-information/ownershipAndUsage');
     
-    const handleNext = () => {
+    const handleNext = async () => {
         if (files.length < 2) {
             setError('❌ Please upload both documents before proceeding.');
         } else {
             setError('');
+
+            async function generateUrl (file:any){
+                
+                const formdata = new FormData()
+                formdata.append('file',file)
+                formdata.append('upload_preset', 'docuploads')
+                const result = await axios.post(`https://api.cloudinary.com/v1_1/dmzvqehan/upload`,formdata)
+
+                if (result.statusText==="OK"){
+                    return result.data.secure_url
+                }
+
+                return ""
+            }
+
+            const docs = []
+
+            for (let i=0;i<files.length;i++){
+                docs.push(generateUrl(files[i]))
+            }
+
+
+            dispatch({type:'collect_policy_info',payload:{document:docs}}) 
+
             router.push('/policy-purchase/purchase/policySelection');
+
+            
+
+
+
+
+
+            
         }
     };
 
@@ -132,9 +168,10 @@ export default function UploadIDForm() {
                         </div>
                     </div>
                     <div className="col-span-1 md:col-span-3 flex justify-between mt-4">
-                        <button type="button" onClick={handlePrevious} className="bg-[#3AA4FF] text-white p-7 py-2 rounded">Previous</button>
-                        <button type="submit" onClick={handleNext} className="bg-green-500 text-white p-7 py-2 rounded">Next Step </button>
+                        <button type="button" onClick={handlePrevious} className="bg-[#3AA4FF] text-white text-sm md:text-base p-2 md:p-7 md:py-2 rounded">Previous</button>
+                        <button type="submit" onClick={handleNext} className="bg-green-500 text-white text-sm md:text-base p-2 md:p-7 md:py-2 rounded">Next Step </button>
                     </div>
+                    
                 </div>
             </div>
         </div>

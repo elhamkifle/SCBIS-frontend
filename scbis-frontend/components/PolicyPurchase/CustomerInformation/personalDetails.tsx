@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { userHook } from '@/context/userContextProvider';
 
 export default function PersonalDetailForm() {
     const router = useRouter();
+    const {user,dispatch} = userHook()
 
     const [formData, setFormData] = useState({
         title: '',
@@ -24,7 +26,10 @@ export default function PersonalDetailForm() {
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log(formData);
+        // console.log(formData);
+        dispatch({type:"collect_user_info",payload:formData})
+        
+
         router.push('/policy-purchase/personal-information/address');
     };
 

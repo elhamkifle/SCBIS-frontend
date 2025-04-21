@@ -2,90 +2,103 @@
 
 import { useState, ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import { policyHook } from '@/context/PolicyContextProvider';
 
 interface FormData {
-  coverRequired: string;
-  make: string;
-  value: string;
-  vehicleInGoodRepair: string;
-  vehicleLeftOvernight: string;
-  soleProperty: string;
-  ownerName: string;
-  ownerAddress: string;
-  privateUse: string;
-  otherUses: string;
-  convicted: string;
-  convictionDetails: string;
-  insuredBefore: string;
-  insurerName: string;
-  companyHistory: string[];
-  hadAccidents: string;
-  accidentDetails: string;
-  claimsInjury: string;
-  claimsInjuryDetails: string;
-  claimsProperty: string;
-  claimsPropertyDetails: string;
-  personalAccident: string;
-  passengersInsured: string;
+  isCoverRequiredForRadios: string,
+  make: string,
+  valueBirr: string,
+  isVehicleInGoodStateOfRepair: string,
+  whereVehicleUsuallyLeftOvernight: string,
+  areVehiclesSoleAndAbsoluteProperty: string,
+  ownerName: string,
+  ownerAddress: string,
+  willBeUSedSolelyForPrivatePurpose: string,
+  otherUsesIfNotPrivate: string,
+  hasDriverBeenConvictedOfOffense: string,
+  convictionParticualrs: string,
+  hasBeenInsuredForAnyMotorVehicle: string,
+  insurerNameIfApplicable: string,
+  hasCompanyEver: string[],
+  hasHadAccidentsInPastTwoYears: string,
+  accidentDetails: string,
+  claimsInjury: string,
+  claimsInjuryDetails: string,
+  hasClaimsByOtherPartiesInPastTwoYearsProperty: string,
+  claimsDetails: string,
+  doYouWishToInsureForPersonalAccidentBenefit: string,
+  doYouWishToInsurePassengersAgainstPersonalAccident: string,
 }
 
 interface Errors {
-  coverRequired?: string;
-  make?: string;
-  value?: string;
-  vehicleInGoodRepair?: string;
-  vehicleLeftOvernight?: string;
-  soleProperty?: string;
-  ownerName?: string;
-  ownerAddress?: string;
-  privateUse?: string;
-  otherUses?: string;
-  convicted?: string;
-  convictionDetails?: string;
-  insuredBefore?: string;
-  insurerName?: string;
-  companyHistory?: string; // Error message for companyHistory
-  hadAccidents?: string;
-  accidentDetails?: string;
-  claimsInjury?: string;
-  claimsInjuryDetails?: string;
-  claimsProperty?: string;
-  claimsPropertyDetails?: string;
-  personalAccident?: string;
-  passengersInsured?: string;
+  isCoverRequiredForRadios?: string,
+  make?: string,
+  valueBirr?: string,
+  isVehicleInGoodStateOfRepair?: string,
+  whereVehicleUsuallyLeftOvernight?: string,
+  areVehiclesSoleAndAbsoluteProperty?: string,
+  ownerName?: string,
+  ownerAddress?: string,
+  willBeUSedSolelyForPrivatePurpose?: string,
+  otherUsesIfNotPrivate?: string,
+  hasDriverBeenConvictedOfOffense?: string,
+  convictionParticualrs?: string,
+  hasBeenInsuredForAnyMotorVehicle?: string,
+  insurerNameIfApplicable?: string,
+  hasCompanyEver?: string,
+  hasHadAccidentsInPastTwoYears?: string,
+  accidentDetails?: string,
+  claimsInjury?: string,
+  claimsInjuryDetails?: string,
+  hasClaimsByOtherPartiesInPastTwoYearsProperty?: string,
+  claimsDetails?: string,
+  doYouWishToInsureForPersonalAccidentBenefit?: string,
+  doYouWishToInsurePassengersAgainstPersonalAccident?: string,
 }
 
 export default function VehicleInformation() {
   const [formData, setFormData] = useState<FormData>({
-    coverRequired: '',
+    isCoverRequiredForRadios: '',
     make: '',
-    value: '',
-    vehicleInGoodRepair: '',
-    vehicleLeftOvernight: '',
-    soleProperty: '',
+    valueBirr: '',
+    isVehicleInGoodStateOfRepair: '',
+    whereVehicleUsuallyLeftOvernight: '',
+    areVehiclesSoleAndAbsoluteProperty: '',
     ownerName: '',
     ownerAddress: '',
-    privateUse: '',
-    otherUses: '',
-    convicted: '',
-    convictionDetails: '',
-    insuredBefore: '',
-    insurerName: '',
-    companyHistory: [],
-    hadAccidents: '',
+    willBeUSedSolelyForPrivatePurpose: '',
+    otherUsesIfNotPrivate: '',
+    hasDriverBeenConvictedOfOffense: '',
+    convictionParticualrs: '',
+    hasBeenInsuredForAnyMotorVehicle: '',
+    insurerNameIfApplicable: '',
+    hasCompanyEver: [],
+    hasHadAccidentsInPastTwoYears: '',
     accidentDetails: '',
     claimsInjury: '',
     claimsInjuryDetails: '',
-    claimsProperty: '',
-    claimsPropertyDetails: '',
-    personalAccident: '',
-    passengersInsured: '',
+    hasClaimsByOtherPartiesInPastTwoYearsProperty: '',
+    claimsDetails: '',
+    doYouWishToInsureForPersonalAccidentBenefit: '',
+    doYouWishToInsurePassengersAgainstPersonalAccident: '',
   });
 
   const [errors, setErrors] = useState<Errors>({});
+  const {dispatch} = policyHook()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+    const valueChanger = ()=>{
+      if (value==='yes'){
+        return true
+      }
+
+      else if(value==='no'){
+        return false
+      }
+
+      else return value
+    }
     setFormData({ ...formData, [name]: value });
     // Clear errors when the user starts typing
     setErrors({ ...errors, [name]: '' });
@@ -95,12 +108,12 @@ export default function VehicleInformation() {
     const { value, checked } = e.target;
     setFormData((prevData) => ({
       ...prevData,
-      companyHistory: checked
-        ? [...prevData.companyHistory, value]
-        : prevData.companyHistory.filter((item) => item !== value),
+      hasCompanyEver: checked
+        ? [...prevData.hasCompanyEver, value]
+        : prevData.hasCompanyEver.filter((item) => item !== value),
     }));
     // Clear errors when the user selects a checkbox
-    setErrors({ ...errors, companyHistory: '' });
+    setErrors({ ...errors, hasCompanyEver: '' });
   };
 
   const router = useRouter();
@@ -113,34 +126,49 @@ export default function VehicleInformation() {
     const newErrors: Errors = {};
 
     // Validate required fields
-    if (!formData.coverRequired) newErrors.coverRequired = 'This field is required';
-    if (formData.coverRequired === 'yes' && !formData.make) newErrors.make = 'This field is required';
-    if (formData.coverRequired === 'yes' && !formData.value) newErrors.value = 'This field is required';
-    if (!formData.vehicleInGoodRepair) newErrors.vehicleInGoodRepair = 'This field is required';
-    if (!formData.vehicleLeftOvernight) newErrors.vehicleLeftOvernight = 'This field is required';
-    if (!formData.soleProperty) newErrors.soleProperty = 'This field is required';
-    if (formData.soleProperty === 'no' && !formData.ownerName) newErrors.ownerName = 'This field is required';
-    if (formData.soleProperty === 'no' && !formData.ownerAddress) newErrors.ownerAddress = 'This field is required';
-    if (!formData.privateUse) newErrors.privateUse = 'This field is required';
-    if (formData.privateUse === 'no' && !formData.otherUses) newErrors.otherUses = 'This field is required';
-    if (!formData.convicted) newErrors.convicted = 'This field is required';
-    if (formData.convicted === 'yes' && !formData.convictionDetails) newErrors.convictionDetails = 'This field is required';
-    if (!formData.insuredBefore) newErrors.insuredBefore = 'This field is required';
-    if (formData.insuredBefore === 'yes' && !formData.insurerName) newErrors.insurerName = 'This field is required';
-    if (formData.companyHistory.length === 0) newErrors.companyHistory = 'This field is required'; // Validation for Question 8
-    if (!formData.hadAccidents) newErrors.hadAccidents = 'This field is required';
-    if (formData.hadAccidents === 'yes' && !formData.accidentDetails) newErrors.accidentDetails = 'This field is required';
+    if (!formData.isCoverRequiredForRadios) newErrors.isCoverRequiredForRadios = 'This field is required';
+    if (formData.isCoverRequiredForRadios === 'yes' && !formData.make) newErrors.make = 'This field is required';
+    if (formData.isCoverRequiredForRadios === 'yes' && !formData.valueBirr) newErrors.valueBirr = 'This field is required';
+    if (!formData.isVehicleInGoodStateOfRepair) newErrors.isVehicleInGoodStateOfRepair = 'This field is required';
+    if (!formData.whereVehicleUsuallyLeftOvernight) newErrors.whereVehicleUsuallyLeftOvernight = 'This field is required';
+    if (!formData.areVehiclesSoleAndAbsoluteProperty) newErrors.areVehiclesSoleAndAbsoluteProperty = 'This field is required';
+    if (formData.areVehiclesSoleAndAbsoluteProperty === 'no' && !formData.ownerName) newErrors.ownerName = 'This field is required';
+    if (formData.areVehiclesSoleAndAbsoluteProperty === 'no' && !formData.ownerAddress) newErrors.ownerAddress = 'This field is required';
+    if (!formData.willBeUSedSolelyForPrivatePurpose) newErrors.willBeUSedSolelyForPrivatePurpose = 'This field is required';
+    if (formData.willBeUSedSolelyForPrivatePurpose === 'no' && !formData.otherUsesIfNotPrivate) newErrors.otherUsesIfNotPrivate = 'This field is required';
+    if (!formData.convictionParticualrs) newErrors.convictionParticualrs = 'This field is required';
+    if (formData.convictionParticualrs === 'yes' && !formData.convictionParticualrs) newErrors.convictionParticualrs = 'This field is required';
+    if (!formData.hasBeenInsuredForAnyMotorVehicle) newErrors.hasBeenInsuredForAnyMotorVehicle = 'This field is required';
+    if (formData.hasBeenInsuredForAnyMotorVehicle === 'yes' && !formData.insurerNameIfApplicable) newErrors.insurerNameIfApplicable = 'This field is required';
+    if (formData.hasCompanyEver.length === 0) newErrors.hasCompanyEver = 'This field is required'; // Validation for Question 8
+    if (!formData.hasHadAccidentsInPastTwoYears) newErrors.hasHadAccidentsInPastTwoYears = 'This field is required';
+    if (formData.hasHadAccidentsInPastTwoYears === 'yes' && !formData.accidentDetails) newErrors.accidentDetails = 'This field is required';
     if (!formData.claimsInjury) newErrors.claimsInjury = 'This field is required';
     if (formData.claimsInjury === 'yes' && !formData.claimsInjuryDetails) newErrors.claimsInjuryDetails = 'This field is required';
-    if (!formData.claimsProperty) newErrors.claimsProperty = 'This field is required';
-    if (formData.claimsProperty === 'yes' && !formData.claimsPropertyDetails) newErrors.claimsPropertyDetails = 'This field is required';
-    if (!formData.personalAccident) newErrors.personalAccident = 'This field is required';
-    if (!formData.passengersInsured) newErrors.passengersInsured = 'This field is required';
+    if (!formData.hasClaimsByOtherPartiesInPastTwoYearsProperty) newErrors.hasClaimsByOtherPartiesInPastTwoYearsProperty = 'This field is required';
+    if (formData.hasClaimsByOtherPartiesInPastTwoYearsProperty === 'yes' && !formData.claimsDetails) newErrors.claimsDetails = 'This field is required';
+    if (!formData.doYouWishToInsureForPersonalAccidentBenefit) newErrors.doYouWishToInsureForPersonalAccidentBenefit = 'This field is required';
+    if (!formData.doYouWishToInsurePassengersAgainstPersonalAccident) newErrors.doYouWishToInsurePassengersAgainstPersonalAccident = 'This field is required';
 
     setErrors(newErrors);
 
     // If there are no errors, proceed to the next page
     if (Object.keys(newErrors).length === 0) {
+      const pd: { [key: string]: boolean | string |string[] } = {}
+      for (let key in formData){
+        if (formData[key as keyof FormData] === 'yes'){
+          pd[key] = true
+        }
+
+        else if (formData[key as keyof FormData] === 'no'){
+          pd[key] = false
+        }
+
+        else {
+          pd[key] = formData[key as keyof FormData]
+        }
+      }
+      dispatch({type:'collect_policy_info',payload:pd})
       router.push('/policy-purchase/purchase/driverInformation');
     }
   };
@@ -183,14 +211,14 @@ export default function VehicleInformation() {
         </label>
         <div className="flex gap-4 mt-4">
           <label>
-            <input type="radio" name="coverRequired" value="yes" onChange={handleChange} /> Yes
+            <input type="radio" name="isCoverRequiredForRadios" value="yes" onChange={handleChange} /> Yes
           </label>
           <label>
-            <input type="radio" name="coverRequired" value="no" onChange={handleChange} /> No
+            <input type="radio" name="isCoverRequiredForRadios" value="no" onChange={handleChange} /> No
           </label>
         </div>
-        {errors.coverRequired && <p className="text-red-500">{errors.coverRequired}</p>}
-        {formData.coverRequired === 'yes' && (
+        {errors. isCoverRequiredForRadios && <p className="text-red-500">{errors.isCoverRequiredForRadios}</p>}
+        {formData. isCoverRequiredForRadios === 'yes' && (
           <div className="mt-4">
             <p>Please State.</p>
             <div className="flex gap-4 mt-2">
@@ -201,8 +229,8 @@ export default function VehicleInformation() {
                 <option value="Kenwood">Kenwood</option>
               </select>
               {errors.make && <p className="text-red-500">{errors.make}</p>}
-              <input type="text" name="value" placeholder="Value (Birr)" className="border p-2 w-full" onChange={handleChange} />
-              {errors.value && <p className="text-red-500">{errors.value}</p>}
+              <input type="text" name="valueBirr" placeholder="Value (Birr)" className="border p-2 w-full" onChange={handleChange} />
+              {errors.valueBirr && <p className="text-red-500">{errors.valueBirr}</p>}
             </div>
           </div>
         )}
@@ -213,13 +241,13 @@ export default function VehicleInformation() {
         <label className="font-semibold">2. Is the vehicle(s) in good state of repair?</label>
         <div className="flex gap-4 mt-4">
           <label>
-            <input type="radio" name="vehicleInGoodRepair" value="yes" onChange={handleChange} /> Yes
+            <input type="radio" name="isVehicleInGoodStateOfRepair" value="yes" onChange={handleChange} /> Yes
           </label>
           <label>
-            <input type="radio" name="vehicleInGoodRepair" value="no" onChange={handleChange} /> No
+            <input type="radio" name="isVehicleInGoodStateOfRepair" value="no" onChange={handleChange} /> No
           </label>
         </div>
-        {errors.vehicleInGoodRepair && <p className="text-red-500">{errors.vehicleInGoodRepair}</p>}
+        {errors.isVehicleInGoodStateOfRepair && <p className="text-red-500">{errors.isVehicleInGoodStateOfRepair}</p>}
       </div>
 
       {/* Question 3 */}
@@ -227,16 +255,16 @@ export default function VehicleInformation() {
         <label className="font-semibold">3. Is the vehicle(s) usually left overnight?</label>
         <div className="flex gap-4 mt-4">
           <label>
-            <input type="radio" name="vehicleLeftOvernight" value="garage" onChange={handleChange} /> In a Garage
+            <input type="radio" name="whereVehicleUsuallyLeftOvernight" value="garage" onChange={handleChange} /> In a Garage
           </label>
           <label>
-            <input type="radio" name="vehicleLeftOvernight" value="open" onChange={handleChange} /> In the Open but on your premises
+            <input type="radio" name="whereVehicleUsuallyLeftOvernight" value="open" onChange={handleChange} /> In the Open but on your premises
           </label>
           <label>
-            <input type="radio" name="vehicleLeftOvernight" value="elsewhere" onChange={handleChange} /> Elsewhere
+            <input type="radio" name="whereVehicleUsuallyLeftOvernight" value="elsewhere" onChange={handleChange} /> Elsewhere
           </label>
         </div>
-        {errors.vehicleLeftOvernight && <p className="text-red-500">{errors.vehicleLeftOvernight}</p>}
+        {errors.whereVehicleUsuallyLeftOvernight && <p className="text-red-500">{errors.whereVehicleUsuallyLeftOvernight}</p>}
       </div>
 
       {/* Question 4 */}
@@ -244,14 +272,14 @@ export default function VehicleInformation() {
         <label className="font-semibold">4. Is the vehicle(s) your sole and absolute property?</label>
         <div className="flex gap-4 mt-4">
           <label>
-            <input type="radio" name="soleProperty" value="yes" onChange={handleChange} /> Yes
+            <input type="radio" name="areVehiclesSoleAndAbsoluteProperty" value="yes" onChange={handleChange} /> Yes
           </label>
           <label>
-            <input type="radio" name="soleProperty" value="no" onChange={handleChange} /> No
+            <input type="radio" name="areVehiclesSoleAndAbsoluteProperty" value="no" onChange={handleChange} /> No
           </label>
         </div>
-        {errors.soleProperty && <p className="text-red-500">{errors.soleProperty}</p>}
-        {formData.soleProperty === 'no' && (
+        {errors.areVehiclesSoleAndAbsoluteProperty && <p className="text-red-500">{errors.areVehiclesSoleAndAbsoluteProperty}</p>}
+        {formData.areVehiclesSoleAndAbsoluteProperty === 'no' && (
           <div className="mt-4">
             <p>Please State.</p>
             <div className="flex gap-4 mt-2">
@@ -282,14 +310,14 @@ export default function VehicleInformation() {
         <p className="text-gray-600 mt-2"> Private purpose: the term "private purposes" means social domestic, pleasure, Professional purposes or business calls of the insured. The term "private Purposes" does not include use for hiring, racing, pace making, speed testing. The carriage of goods in connection with any trade or business or use for any Purpose in connection with Motor trade. </p>
         <div className="flex gap-4 mt-4">
           <label>
-            <input type="radio" name="privateUse" value="yes" onChange={handleChange} /> Yes
+            <input type="radio" name="willBeUSedSolelyForPrivatePurpose" value="yes" onChange={handleChange} /> Yes
           </label>
           <label>
-            <input type="radio" name="privateUse" value="no" onChange={handleChange} /> No
+            <input type="radio" name="willBeUSedSolelyForPrivatePurpose" value="no" onChange={handleChange} /> No
           </label>
         </div>
-        {errors.privateUse && <p className="text-red-500">{errors.privateUse}</p>}
-        {formData.privateUse === 'no' && (
+        {errors.willBeUSedSolelyForPrivatePurpose && <p className="text-red-500">{errors.willBeUSedSolelyForPrivatePurpose}</p>}
+        {formData.willBeUSedSolelyForPrivatePurpose === 'no' && (
           <div className="mt-4">
             <p>Please State other uses.</p>
             <textarea
@@ -298,7 +326,7 @@ export default function VehicleInformation() {
               className="border p-2 w-full mt-2"
               onChange={handleChange}
             ></textarea>
-            {errors.otherUses && <p className="text-red-500">{errors.otherUses}</p>}
+            {errors.otherUsesIfNotPrivate && <p className="text-red-500">{errors.otherUsesIfNotPrivate}</p>}
           </div>
         )}
       </div>
@@ -308,23 +336,23 @@ export default function VehicleInformation() {
         <label className="font-semibold">6, Have you or any other person, who to your knowledge will drive been convicted of any offence in connection with the driving of any motor Vehicle?</label>
         <div className="flex gap-4 mt-4">
           <label>
-            <input type="radio" name="convicted" value="yes" onChange={handleChange} /> Yes
+            <input type="radio" name="hasDriverBeenConvictedOfOffense" value="yes" onChange={handleChange} /> Yes
           </label>
           <label>
-            <input type="radio" name="convicted" value="no" onChange={handleChange} /> No
+            <input type="radio" name="hasDriverBeenConvictedOfOffense" value="no" onChange={handleChange} /> No
           </label>
         </div>
-        {errors.convicted && <p className="text-red-500">{errors.convicted}</p>}
-        {formData.convicted === 'yes' && (
+        {errors.hasDriverBeenConvictedOfOffense && <p className="text-red-500">{errors.hasDriverBeenConvictedOfOffense}</p>}
+        {formData.hasDriverBeenConvictedOfOffense === 'yes' && (
           <div className="mt-4">
             <p>If so, give particulars.</p>
             <textarea
-              name="convictionDetails"
+              name="convictionParticualrs"
               placeholder="Give particulars"
               className="border p-2 w-full mt-2"
               onChange={handleChange}
             ></textarea>
-            {errors.convictionDetails && <p className="text-red-500">{errors.convictionDetails}</p>}
+            {errors.convictionParticualrs && <p className="text-red-500">{errors.convictionParticualrs}</p>}
           </div>
         )}
       </div>
@@ -333,15 +361,15 @@ export default function VehicleInformation() {
       <div className="mb-8">
         <label className="font-semibold">Are you now or have you been insured in respect of any motor vehicle?</label>
         <div className="flex gap-4 mt-4">
-          <label><input type="radio" name="insuredBefore" value="yes" onChange={handleChange} /> Yes</label>
-          <label><input type="radio" name="insuredBefore" value="no" onChange={handleChange} /> No</label>
+          <label><input type="radio" name="hasBeenInsuredForAnyMotorVehicle" value="yes" onChange={handleChange} /> Yes</label>
+          <label><input type="radio" name="hasBeenInsuredForAnyMotorVehicle" value="no" onChange={handleChange} /> No</label>
         </div>
-        {errors.insuredBefore && <p className="text-red-500">{errors.insuredBefore}</p>}
-        {formData.insuredBefore === 'yes' && (
+        {errors.hasBeenInsuredForAnyMotorVehicle && <p className="text-red-500">{errors.hasBeenInsuredForAnyMotorVehicle}</p>}
+        {formData.hasBeenInsuredForAnyMotorVehicle === 'yes' && (
           <div className="mt-4">
             <p>Please State other uses.</p>
-            <input type="text" name="insurerName" placeholder="Name of the insurer" className="border p-2 w-full mt-2" onChange={handleChange} />
-            {errors.insurerName && <p className="text-red-500">{errors.insurerName}</p>}
+            <input type="text" name="insurerNameIfApplicable" placeholder="Name of the insurer" className="border p-2 w-full mt-2" onChange={handleChange} />
+            {errors.insurerNameIfApplicable && <p className="text-red-500">{errors.insurerNameIfApplicable}</p>}
           </div>
         )}
       </div>
@@ -365,24 +393,24 @@ export default function VehicleInformation() {
                 type="checkbox"
                 value={option}
                 onChange={handleCheckboxChange}
-                checked={formData.companyHistory.includes(option)}
+                checked={formData.hasCompanyEver.includes(option)}
               />{' '}
               {option}
             </label>
           ))}
         </div>
-        {errors.companyHistory && <p className="text-red-500">{errors.companyHistory}</p>}
+        {errors.hasCompanyEver && <p className="text-red-500">{errors.hasCompanyEver}</p>}
       </div>
 
       {/* Question 9 */}
       <div className="mb-8">
         <label className="font-semibold">Have you or any driver had any accidents in the past 2 years?</label>
         <div className="flex gap-4 mt-4">
-          <label><input type="radio" name="hadAccidents" value="yes" onChange={handleChange} /> Yes</label>
-          <label><input type="radio" name="hadAccidents" value="no" onChange={handleChange} /> No</label>
+          <label><input type="radio" name="hasHadAccidentsInPastTwoYears" value="yes" onChange={handleChange} /> Yes</label>
+          <label><input type="radio" name="hasHadAccidentsInPastTwoYears" value="no" onChange={handleChange} /> No</label>
         </div>
-        {errors.hadAccidents && <p className="text-red-500">{errors.hadAccidents}</p>}
-        {formData.hadAccidents === 'yes' && (
+        {errors.hasHadAccidentsInPastTwoYears && <p className="text-red-500">{errors.hasHadAccidentsInPastTwoYears}</p>}
+        {formData.hasHadAccidentsInPastTwoYears === 'yes' && (
           <div className="mt-4">
             <p>If so, please provide details briefly: </p>
             <textarea name="accidentDetails" placeholder="Provide details of the accidents" className="border p-2 w-full mt-2" onChange={handleChange}></textarea>
@@ -412,15 +440,15 @@ export default function VehicleInformation() {
       <div className="mb-8">
         <label className="font-semibold">Have there been any claims against you by other parties for property damage related to vehicle accidents in the past 2 years?</label>
         <div className="flex gap-4 mt-4">
-          <label><input type="radio" name="claimsProperty" value="yes" onChange={handleChange} /> Yes</label>
-          <label><input type="radio" name="claimsProperty" value="no" onChange={handleChange} /> No</label>
+          <label><input type="radio" name="hasClaimsByOtherPartiesInPastTwoYearsProperty" value="yes" onChange={handleChange} /> Yes</label>
+          <label><input type="radio" name="hasClaimsByOtherPartiesInPastTwoYearsProperty" value="no" onChange={handleChange} /> No</label>
         </div>
-        {errors.claimsProperty && <p className="text-red-500">{errors.claimsProperty}</p>}
-        {formData.claimsProperty === 'yes' && (
+        {errors.hasClaimsByOtherPartiesInPastTwoYearsProperty && <p className="text-red-500">{errors.hasClaimsByOtherPartiesInPastTwoYearsProperty}</p>}
+        {formData.hasClaimsByOtherPartiesInPastTwoYearsProperty === 'yes' && (
           <div className="mt-4">
             <p>If so, please provide details briefly: </p>
-            <textarea name="claimsPropertyDetails" placeholder="Provide details" className="border p-2 w-full mt-2" onChange={handleChange}></textarea>
-            {errors.claimsPropertyDetails && <p className="text-red-500">{errors.claimsPropertyDetails}</p>}
+            <textarea name="claimsDetails" placeholder="Provide details" className="border p-2 w-full mt-2" onChange={handleChange}></textarea>
+            {errors.claimsDetails && <p className="text-red-500">{errors.claimsDetails}</p>}
           </div>
         )}
       </div>
@@ -429,20 +457,20 @@ export default function VehicleInformation() {
       <div className="mb-8">
         <label className="font-semibold">Do you wish to insure for personal Accident Benefit?</label>
         <div className="flex gap-4 mt-4">
-          <label><input type="radio" name="personalAccident" value="yes" onChange={handleChange} /> Yes</label>
-          <label><input type="radio" name="personalAccident" value="no" onChange={handleChange} /> No</label>
+          <label><input type="radio" name="doYouWishToInsureForPersonalAccidentBenefit" value="yes" onChange={handleChange} /> Yes</label>
+          <label><input type="radio" name="doYouWishToInsureForPersonalAccidentBenefit" value="no" onChange={handleChange} /> No</label>
         </div>
-        {errors.personalAccident && <p className="text-red-500">{errors.personalAccident}</p>}
+        {errors.doYouWishToInsureForPersonalAccidentBenefit && <p className="text-red-500">{errors.doYouWishToInsureForPersonalAccidentBenefit}</p>}
       </div>
 
       {/* Question 13 */}
       <div className="mb-8">
         <label className="font-semibold">Are passengers to be insured against personal Accident?</label>
         <div className="flex gap-4 mt-4">
-          <label><input type="radio" name="passengersInsured" value="yes" onChange={handleChange} /> Yes</label>
-          <label><input type="radio" name="passengersInsured" value="no" onChange={handleChange} /> No</label>
+          <label><input type="radio" name="doYouWishToInsurePassengersAgainstPersonalAccident" value="yes" onChange={handleChange} /> Yes</label>
+          <label><input type="radio" name="doYouWishToInsurePassengersAgainstPersonalAccident" value="no" onChange={handleChange} /> No</label>
         </div>
-        {errors.passengersInsured && <p className="text-red-500">{errors.passengersInsured}</p>}
+        {errors.doYouWishToInsurePassengersAgainstPersonalAccident && <p className="text-red-500">{errors.doYouWishToInsurePassengersAgainstPersonalAccident}</p>}
       </div>
 
       <div className="w-full max-w-5xl flex justify-between items-center mt-8">

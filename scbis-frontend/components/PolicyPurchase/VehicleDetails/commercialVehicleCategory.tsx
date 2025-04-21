@@ -1,21 +1,41 @@
 'use client'
-import React from 'react'
+import React, { useState } from 'react'
 import { useRouter } from 'next/navigation';
+import { p } from 'framer-motion/client';
+import { policyHook } from '@/context/PolicyContextProvider';
 
 export default function CommercialVehicleCategory()  {
     const router = useRouter()
+    const [selectedVehicle, setSlectedVehicle] = useState<string[]>([])
+    const [error,setError] = useState(false)
+    const {policy,dispatch} = policyHook()
 
     const handlePrevious = () => {
         router.push('/policy-purchase/vehicle-information/purpose');
     };
 
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        setSlectedVehicle([ ...selectedVehicle, ...e.target.value.split(' ') ]);
+    };
+
     const handleNext = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault()
+        if (selectedVehicle.length===0){
+            setError(true)
+            return
+        }
+
+        dispatch({type:'commercial_vehicle_info',payload:{
+            vehcileType:selectedVehicle[0] + " " +selectedVehicle[1],
+            subCategory:selectedVehicle[2] + " " + selectedVehicle[3]
+        }})
+        
         router.push('/policy-purchase/vehicle-information/generalVehicleDetails');
     };
 
     const handleForward = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault()
+        
         router.push('/policy-purchase/vehicle-information/commercialVehicleCategory2');
     };
 
@@ -66,7 +86,7 @@ export default function CommercialVehicleCategory()  {
 
                 <p className='font-syne text-sm md:text-base lg:text-lg font-semibold'>Select one category that best describes your vehicle. (Required)</p>
 
-                <div className='flex flex-col flex-wrap  sm:flex-row  gap-8 lg:flex-nowrap gap-5'>
+                <div className='flex flex-col flex-wrap  sm:flex-row  lg:flex-nowrap gap-5'>
                     <div className='w-full flex flex-col md:block md:w-1/2'>
                         <p className='font-syne text-sm text-[#1A73E8] text-center font-bold'>Passenger Carrying Vehicles (PCV)</p>
                         <div className='flex flex-col justify-between md:flex-row'>
@@ -76,16 +96,16 @@ export default function CommercialVehicleCategory()  {
                                     <p className='font-syne text-sm font-semibold'>Taxi</p>
                             
                                     <div className='flex gap-2 items-center'>
-                                        <input type="checkbox" />
+                                        <input value={'Passanger Carrying Taxi SmallSizedBuses'} onChange={handleChange} type="checkbox" />
                                         <label htmlFor="" className='font-inter text-sm md:text-xs lg:text-xs'>Small Sized Buses</label>
                                     </div>
                             
                                     <div className='flex gap-2 items-center'>
-                                        <input type="checkbox" />
+                                        <input value={'Passanger Carrying Taxi MediumSizedBuses'} onChange={handleChange} type="checkbox" />
                                         <label htmlFor="" className='font-inter text-sm md:text-xs lg:text-xs'>Medium Sized Buses</label>
                                     </div>
                                     <div className='flex gap-2 items-center'>
-                                        <input type="checkbox" />
+                                        <input value={'Passanger Carrying Taxi LargeSizedBuses'} onChange={handleChange} type="checkbox" />
                                         <label htmlFor="" className='font-inter text-sm md:text-xs lg:text-xs'>Large Sized Buses</label>
                                     </div>
                                 </div>
@@ -94,12 +114,12 @@ export default function CommercialVehicleCategory()  {
                                     <p className='font-syne text-sm font-semibold'>Minibus</p>
                             
                                     <div className='flex gap-2 items-center'>
-                                        <input type="checkbox" />
+                                        <input value={'Passanger Carrying Minibus OwnService'} onChange={handleChange} type="checkbox" />
                                         <label htmlFor="" className='font-inter text-sm md:text-xs lg:text-xs'>Own Service</label>
                                     </div>
                             
                                     <div className='flex gap-2 items-center'>
-                                        <input type="checkbox" />
+                                        <input value={'Passanger Carrying Minibus PublicService'} onChange={handleChange} type="checkbox" />
                                         <label htmlFor="" className='font-inter text-sm md:text-xs lg:text-xs'>Public Service</label>
                                     </div>
                                 </div>
@@ -113,16 +133,16 @@ export default function CommercialVehicleCategory()  {
 
                             
                                     <div className='flex gap-2 items-center'>
-                                        <input type="checkbox" />
+                                        <input value={'Passanger Carrying Buses SmallSizedBuses'} onChange={handleChange} type="checkbox" />
                                         <label htmlFor="" className='font-inter text-sm md:text-xs lg:text-xs'>Small Sized Buses</label>
                                     </div>
                             
                                     <div className='flex gap-2 items-center'>
-                                        <input type="checkbox" />
+                                        <input value={'Passanger Carrying Buses MediumSizedBuses'} onChange={handleChange} type="checkbox" />
                                         <label htmlFor="" className='font-inter text-sm md:text-xs lg:text-xs'>Medium Sized Buses</label>
                                     </div>
                                     <div className='flex gap-2 items-center'>
-                                        <input type="checkbox" />
+                                        <input value={'Passanger Carrying Buses LargeSizedBuses'} onChange={handleChange} type="checkbox" />
                                         <label htmlFor="" className='font-inter text-sm md:text-xs lg:text-xs'>Large Sized Buses</label>
                                     </div>
                                 </div>
@@ -133,17 +153,17 @@ export default function CommercialVehicleCategory()  {
                                     
                             
                                     <div className='flex gap-2 items-center'>
-                                        <input type="checkbox" />
+                                        <input value={'Passanger Carrying Public SmallSizedBuses'} onChange={handleChange} type="checkbox" />
                                         <label htmlFor="" className='font-inter text-sm md:text-xs lg:text-xs'>Small Sized Buses</label>
                                     </div>
                             
                                     <div className='flex gap-2 items-center'>
-                                        <input type="checkbox" />
+                                        <input value={'Passanger Carrying Public MediumSizedBuses'} onChange={handleChange} type="checkbox" />
                                         <label htmlFor="" className='font-inter text-sm md:text-xs lg:text-xs'>Medium Sized Buses</label>
                                     </div>
 
                                     <div className='flex gap-2 items-center'>
-                                        <input type="checkbox" />
+                                        <input value={'Passanger Carrying Public LargeSizedBuses'} onChange={handleChange} type="checkbox" />
                                         <label htmlFor="" className='font-inter text-sm md:text-xs lg:text-xs'>Large Sized Buses</label>
                                     </div>
 
@@ -162,32 +182,32 @@ export default function CommercialVehicleCategory()  {
                                     <p className='font-syne text-xs text-[#1A73E8] font-semibold'>own Goods</p>
                             
                                     <div className='flex gap-2 items-center'>
-                                        <input type="checkbox" />
+                                        <input value={'Goods Carrying Dry-Goods Pick-Ups'} onChange={handleChange} type="checkbox" />
                                         <label htmlFor="" className='font-inter text-sm md:text-xs lg:text-xs'>Pick-Ups</label>
                                     </div>
                             
                                     <div className='flex gap-2 items-center'>
-                                        <input type="checkbox" />
+                                        <input value={'Goods Carrying Dry-Goods Small-Goods-Carrying'} onChange={handleChange} type="checkbox" />
                                         <label htmlFor="" className='font-inter text-sm md:text-xs lg:text-xs'>Small Goods Carrying</label>
                                     </div>
 
                                     <div className='flex gap-2 items-center'>
-                                        <input type="checkbox" />
+                                        <input value={'Goods Carrying Dry-Goods Medium-Goods-Carrying'} onChange={handleChange} type="checkbox" />
                                         <label htmlFor="" className='font-inter text-sm md:text-xs lg:text-xs'>Medium Goods Carrying</label>
                                     </div>
 
                                     <div className='flex gap-2 items-center'>
-                                        <input type="checkbox" />
+                                        <input value={'Goods Carrying Dry-Goods Large-Goods-carrying'} onChange={handleChange} type="checkbox" />
                                         <label htmlFor="" className='font-inter text-sm md:text-xs lg:text-xs'>Large Goods Carrying</label>
                                     </div>
 
                                     <div className='flex gap-2 items-center'>
-                                        <input type="checkbox" />
+                                        <input value={'Goods Carrying Dry-Goods Tarilers'} onChange={handleChange} type="checkbox" />
                                         <label htmlFor="" className='font-inter text-sm md:text-xs lg:text-xs'>Trailers</label>
                                     </div>
 
                                     <div className='flex gap-2 items-center'>
-                                        <input type="checkbox" />
+                                        <input value={'Goods Carrying Dry-Goods Semi Trailers'} onChange={handleChange} type="checkbox" />
                                         <label htmlFor="" className='font-inter text-sm md:text-xs lg:text-xs'>Semi Trailers</label>
                                     </div>
                                 </div>
@@ -201,22 +221,22 @@ export default function CommercialVehicleCategory()  {
 
                             
                                     <div className='flex gap-2 items-center'>
-                                        <input type="checkbox" />
+                                        <input value={'Goods Carrying General-Cartage Pick-Ups'} onChange={handleChange} type="checkbox" />
                                         <label htmlFor="" className='font-inter text-sm md:text-xs lg:text-xs'>Pick-Ups</label>
                                     </div>
                             
                                     <div className='flex gap-2 items-center'>
-                                        <input type="checkbox" />
+                                        <input value={'Goods Carrying General-Cartage Small-Goods-Carrying'} onChange={handleChange} type="checkbox" />
                                         <label htmlFor="" className='font-inter text-sm md:text-xs lg:text-xs'>Small Goods Carrying</label>
                                     </div>
 
                                     <div className='flex gap-2 items-center'>
-                                        <input type="checkbox" />
+                                        <input value={'Goods Carrying General-Cartage Medium-Goods-Carrying'} onChange={handleChange} type="checkbox" />
                                         <label htmlFor="" className='font-inter text-sm md:text-xs lg:text-xs'>Medium Goods Carrying</label>
                                     </div>
 
                                     <div className='flex gap-2 items-center'>
-                                        <input type="checkbox" />
+                                        <input value={'Goods Carrying General-Cartage Large-Goods-Carrying'} onChange={handleChange} type="checkbox" />
                                         <label htmlFor="" className='font-inter text-sm md:text-xs lg:text-xs'>Large Goods Carrying</label>
                                     </div>
                                 </div>
@@ -237,6 +257,7 @@ export default function CommercialVehicleCategory()  {
                 </div>
                 <button type="submit" className="bg-blue-500 text-white p-5 md:px-10 py-2 rounded" onClick={(e)=>handleNext(e)}>Next</button>
             </div>
+            {error && <p className='w-full text-center text-red-600'>Please choose a vehicle category</p>}
         </form>
     </div>
 </div>

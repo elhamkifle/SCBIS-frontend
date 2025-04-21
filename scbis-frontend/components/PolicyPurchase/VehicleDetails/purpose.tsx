@@ -2,11 +2,13 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { policyHook } from '@/context/PolicyContextProvider';
 
 export default function ChoosePurposeForm() {
     const router = useRouter();
     const [selectedType, setSelectedType] = useState('');
     const [error, setError] = useState('');
+    const {dispatch} = policyHook()
 
     const handleSelect = (type: string) => {
         setSelectedType(type);
@@ -18,9 +20,10 @@ export default function ChoosePurposeForm() {
             setError('Please select an insurance type.');
             return;
         }
-        console.log('Selected Insurance Type:', selectedType);
+        
+        dispatch({type:'collect_policy_info',payload:{vehicleType:selectedType}})
         router.push(
-            selectedType === "private"
+            selectedType === "Private"
               ? "/policy-purchase/vehicle-information/privateVehicleCategory"
               : "/policy-purchase/vehicle-information/commercialVehicleCategory"
           );    };
@@ -66,7 +69,7 @@ export default function ChoosePurposeForm() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:px-12 mt-3">
-                <div className={`px-12 py-8 border rounded-xl cursor-pointer shadow-lg ${selectedType === 'private' ? 'border-green-500' : 'border-gray-300'}`} onClick={() => handleSelect('private')} style={{ boxShadow: '0px 10px 20px rgba(0, 123, 255, 0.4), 0px 4px 8px rgba(0, 0, 0, 0.1)' }} >
+                <div className={`px-12 py-8 border rounded-xl cursor-pointer shadow-lg ${selectedType === 'Private' ? 'border-green-500' : 'border-gray-300'}`} onClick={() => handleSelect('Private')} style={{ boxShadow: '0px 10px 20px rgba(0, 123, 255, 0.4), 0px 4px 8px rgba(0, 0, 0, 0.1)' }} >
                     <h3 className="text-xl text-center font-bold text-blue-600 mb-6">Private </h3>
                     <h4 className='font-bold'> What's Included</h4>
                     <p className="mt-2">✅ Vehicles registered for private individuals.</p>
@@ -77,7 +80,7 @@ export default function ChoosePurposeForm() {
                     <p> ❌ Racing, speed testing, or commercial driving school vehicles. </p>
                     <p> ❌ Vehicles rented or leased for income generation.</p>
                 </div>
-                <div className={`px-12 py-8 border rounded-xl cursor-pointer shadow-lg ${selectedType === 'commercial' ? 'border-green-500' : 'border-gray-300'}`} onClick={() => handleSelect('commercial')} style={{ boxShadow: '0px 10px 20px rgba(0, 123, 255, 0.4), 0px 4px 8px rgba(0, 0, 0, 0.1)' }} >
+                <div className={`px-12 py-8 border rounded-xl cursor-pointer shadow-lg ${selectedType === 'Commercial' ? 'border-green-500' : 'border-gray-300'}`} onClick={() => handleSelect('Commercial')} style={{ boxShadow: '0px 10px 20px rgba(0, 123, 255, 0.4), 0px 4px 8px rgba(0, 0, 0, 0.1)' }} >
                     <h3 className="text-xl text-center font-bold text-blue-600 mb-6">Commercial</h3>
                     <h4 className='font-bold'> What's Included</h4> 
                     <p className="mt-2">✅ Vehicles registered for business transport.</p>
