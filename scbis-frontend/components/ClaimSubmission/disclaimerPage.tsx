@@ -9,14 +9,14 @@ export default function ClaimDisclaimer() {
 
   const router = useRouter();
 
-  const handlePrevious = () => router.push('/claim-submission/claim-policy-selection');
+  const handlePrevious = () => router.push('/claim-submission/damage-details');
 
   const handleNext = () => {
     if (!agreed) {
       setError('You must agree to the disclaimer to proceed.');
       return;
     }
-    router.push('/claim-submission/driver-details');
+    router.push('/preview');
   };
 
   return (
