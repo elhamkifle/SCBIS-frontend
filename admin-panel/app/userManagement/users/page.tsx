@@ -16,8 +16,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import Link from "next/link";
 
 const mockUsers = [
   {
@@ -132,6 +133,12 @@ export default function UsersPage() {
               <p><strong>Policies:</strong> {selectedUser.policyCount}</p>
               <p><strong>Joined:</strong> {selectedUser.joined}</p>
             </div>
+            <DialogFooter className="mt-4">
+              <Link href={`/userManagement/users/${selectedUser.id}`} passHref>
+                <Button variant="secondary">View More</Button>
+              </Link>
+              <Button onClick={() => setSelectedUser(null)}>Close</Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       )}
