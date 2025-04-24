@@ -106,9 +106,10 @@ export default function UsersPage() {
                         >
                           View
                         </Button>
-                        <Button variant="destructive" size="sm">
+                        {/* <Button variant="destructive" size="sm">
                           {user.status === "Blocked" ? "Unblock" : "Block"}
-                        </Button>
+                        </Button> */}
+                        
                       </div>
                     </TableCell>
                   </TableRow>
