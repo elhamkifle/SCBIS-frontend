@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { saveAs } from "file-saver";
+import { Dialog, DialogTitle } from "@radix-ui/react-dialog";
+import { DialogContent, DialogHeader } from "@/components/ui/dialog";
 
 export default function UserDetailsPage() {
   const { id } = useParams();
@@ -55,14 +57,17 @@ export default function UserDetailsPage() {
       woreda: "Woreda 2",
       kebele: "Kebele 3",
       houseNumber: "1234",
-      profileImageUrl: "/profile-placeholder.png",
+      profileImageUrl: "/docs/id.png",
       walletAddress: "0xabc123456789ef00000000000000000000000000",
       accountCreatedAt: "2024-01-01",
       lastActive: "2025-04-23",
       notes: "Important client. Requested premium waiver.",
       policies: [
         { id: "p-001", type: "Car Insurance", status: "Active", startDate: "2024-04-01", endDate: "2025-04-01" },
-        { id: "p-002", type: "Car Insurance", status: "Expired", startDate: "2023-04-01", endDate: "2024-04-01" }
+        { id: "p-002", type: "Car Insurance", status: "Expired", startDate: "2023-04-01", endDate: "2024-04-01" },
+        { id: "p-003", type: "Car Insurance", status: "Expired", startDate: "2023-04-01", endDate: "2024-04-01" },
+        { id: "p-004", type: "Car Insurance", status: "Expired", startDate: "2023-04-01", endDate: "2024-04-01" },
+        { id: "p-005", type: "Car Insurance", status: "Expired", startDate: "2023-04-01", endDate: "2024-04-01" }
       ],
       claims: [
         { id: "c-001", type: "Collision", status: "Closed", submittedAt: "2024-06-12" },
@@ -74,6 +79,7 @@ export default function UserDetailsPage() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   useEffect(() => {
     const foundUser = mockUsers.find((user) => user.id === id);
@@ -128,7 +134,28 @@ Claims: ${user?.claims.length}
 
       <Card>
         <CardContent className="p-6 flex gap-6">
-          <img src={user.profileImageUrl} alt="User ID" className="w-32 h-32 rounded-lg object-cover border" />
+          <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
+            <DialogContent className="max-w-[90vw] max-h-[90vh]">
+              <DialogHeader>
+          <DialogTitle className="sr-only">Profile Image Preview</DialogTitle>
+              </DialogHeader>
+              <div className="relative w-full h-[95vh] flex items-center justify-center">
+          {selectedImage && (
+            <img
+              src={selectedImage}
+              alt="Zoomed profile"
+              className="object-contain max-h-full max-w-full"
+            />
+          )}
+              </div>
+            </DialogContent>
+          </Dialog>
+          <img
+            src={user.profileImageUrl}
+            alt="User ID"
+            className="w-32 h-32 rounded-lg object-cover border cursor-pointer"
+            onClick={() => setSelectedImage(user.profileImageUrl)}
+          />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
             <Detail label="Full Name" value={user.fullname} />
             <Detail label="Phone Number" value={user.phoneNumber} />
@@ -164,14 +191,19 @@ Claims: ${user?.claims.length}
       <Card>
         <CardContent className="p-6 space-y-4">
           <h2 className="text-xl font-semibold mb-2">Policy History</h2>
-          {user.policies.map((policy) => (
-            <div key={policy.id} className="p-3 border rounded-md">
-              <p><strong>Type:</strong> {policy.type}</p>
-              <p><strong>Status:</strong> {policy.status}</p>
-              <p><strong>Start Date:</strong> {policy.startDate}</p>
-              <p><strong>End Date:</strong> {policy.endDate}</p>
-            </div>
+          {user.policies.slice(0, 3).map((policy) => (
+        <div key={policy.id} className="p-3 border rounded-md">
+          <p><strong>Type:</strong> {policy.type}</p>
+          <p><strong>Status:</strong> {policy.status}</p>
+          <p><strong>Start Date:</strong> {policy.startDate}</p>
+          <p><strong>End Date:</strong> {policy.endDate}</p>
+        </div>
           ))}
+          {user.policies.length > 3 && (
+        <Button variant="outline" onClick={() => router.push(`/userManagement/users/${user.id}/policies`)}>
+          View More
+        </Button>
+          )}
         </CardContent>
       </Card>
 
