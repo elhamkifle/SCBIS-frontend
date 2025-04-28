@@ -15,9 +15,13 @@ import {
   DialogTrigger,
   DialogContent,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
+  DialogFooter,
+  DialogClose
 } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Pencil, Trash2 } from "lucide-react";
 
 interface PermissionGroup {
   [key: string]: string[];
@@ -65,98 +69,199 @@ export default function RolesPermissionsPage() {
     description: "",
     permissions: []
   });
-  const [selectedRole, setSelectedRole] = useState<Role | null>(null);
-  const [open, setOpen] = useState(false);
+  const [editingRole, setEditingRole] = useState<Role | null>(null);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [dialogType, setDialogType] = useState<"create" | "edit">("create");
 
   const handleCreateRole = () => {
     const updated = [...roles, { ...newRole, id: roles.length + 1 }];
     setRoles(updated);
     setNewRole({ name: "", description: "", permissions: [] });
-    setOpen(false);
+    setOpenDialog(false);
   };
 
-  const togglePermission = (perm: string) => {
-    setNewRole((prev) => {
-      const exists = prev.permissions.includes(perm);
-      const updatedPerms = exists
-        ? prev.permissions.filter((p) => p !== perm)
-        : [...prev.permissions, perm];
-      return { ...prev, permissions: updatedPerms };
-    });
+  const handleUpdateRole = () => {
+    if (!editingRole) return;
+    
+    const updated = roles.map(role => 
+      role.id === editingRole.id ? editingRole : role
+    );
+    setRoles(updated);
+    setEditingRole(null);
+    setOpenDialog(false);
   };
 
+  const handleDeleteRole = (id: number) => {
+    setRoles(roles.filter(role => role.id !== id));
+  };
+
+  const togglePermission = (perm: string, isEditing: boolean = false) => {
+    if (isEditing && editingRole) {
+      setEditingRole(prev => {
+        if (!prev) return null;
+        const exists = prev.permissions.includes(perm);
+        const updatedPerms = exists
+          ? prev.permissions.filter((p) => p !== perm)
+          : [...prev.permissions, perm];
+        return { ...prev, permissions: updatedPerms };
+      });
+    } else {
+      setNewRole(prev => {
+        const exists = prev.permissions.includes(perm);
+        const updatedPerms = exists
+          ? prev.permissions.filter((p) => p !== perm)
+          : [...prev.permissions, perm];
+        return { ...prev, permissions: updatedPerms };
+      });
+    }
+  };
+
+  const openEditDialog = (role: Role) => {
+    setEditingRole(role);
+    setDialogType("edit");
+    setOpenDialog(true);
+  };
+
+  const openCreateDialog = () => {
+    setNewRole({ name: "", description: "", permissions: [] });
+    setDialogType("create");
+    setOpenDialog(true);
+  };
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold mb-4">Roles & Permissions</h1>
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={openDialog} onOpenChange={setOpenDialog}>
           <DialogTrigger asChild>
-            <Button>Add Role</Button>
+            <Button onClick={openCreateDialog}>Add Role</Button>
           </DialogTrigger>
-          <DialogContent className="max-w-xl">
+          <DialogContent className="max-w-xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-xl font-bold mb-4">Create New Role</DialogTitle>
+              <DialogTitle className="text-xl font-bold mb-4">
+                {dialogType === "create" ? "Create New Role" : "Edit Role"}
+              </DialogTitle>
             </DialogHeader>
-            <Label>Role Name</Label>
-            <Input
-              value={newRole.name}
-              onChange={(e) => setNewRole({ ...newRole, name: e.target.value })}
-              placeholder="e.g. Claims Officer"
-            />
-            <Label className="mt-4">Description</Label>
-            <Input
-              value={newRole.description}
-              onChange={(e) => setNewRole({ ...newRole, description: e.target.value })}
-              placeholder="Short description"
-            />
-            <div className="mt-4">
-              <h3 className="font-medium mb-2">Assign Permissions</h3>
-              {Object.entries(mockPermissions).map(([group, perms]) => (
-                <div key={group} className="mb-2">
-                  <h4 className="font-semibold text-gray-700 mb-1">{group}</h4>
-                  <div className="grid grid-cols-2 gap-2">
-                    {perms.map((perm) => (
-                      <Label key={perm} className="flex items-center gap-2">
-                        <Checkbox
-                          checked={newRole.permissions.includes(perm)}
-                          onCheckedChange={() => togglePermission(perm)}
-                        />
-                        {perm.replace(/_/g, " ")}
-                      </Label>
-                    ))}
+            <div className="space-y-4">
+              <div>
+                <Label>Role Name</Label>
+                <Input
+                  value={dialogType === "edit" ? editingRole?.name || "" : newRole.name}
+                  onChange={(e) => 
+                    dialogType === "edit" 
+                      ? setEditingRole(prev => prev ? {...prev, name: e.target.value} : null)
+                      : setNewRole({ ...newRole, name: e.target.value })
+                  }
+                  placeholder="e.g. Claims Officer"
+                />
+              </div>
+              
+              <div>
+                <Label>Description</Label>
+                <Input
+                  value={dialogType === "edit" ? editingRole?.description || "" : newRole.description}
+                  onChange={(e) => 
+                    dialogType === "edit"
+                      ? setEditingRole(prev => prev ? {...prev, description: e.target.value} : null)
+                      : setNewRole({ ...newRole, description: e.target.value })
+                  }
+                  placeholder="Short description"
+                />
+              </div>
+              
+              <div className="mt-4">
+                <h3 className="font-medium mb-2">Assign Permissions</h3>
+                {Object.entries(mockPermissions).map(([group, perms]) => (
+                  <div key={group} className="mb-4 p-3 border rounded-lg">
+                    <h4 className="font-semibold text-gray-700 mb-2">{group}</h4>
+                    <div className="grid grid-cols-2 gap-2">
+                      {perms.map((perm) => (
+                        <Label key={perm} className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded">
+                          <Checkbox
+                            checked={
+                              dialogType === "edit" 
+                                ? editingRole?.permissions.includes(perm) || false
+                                : newRole.permissions.includes(perm)
+                            }
+                            onCheckedChange={() => togglePermission(perm, dialogType === "edit")}
+                          />
+                          <span className="capitalize">{perm.replace(/_/g, " ")}</span>
+                        </Label>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-            <div className="mt-6 flex justify-end">
-              <Button onClick={handleCreateRole}>Save Role</Button>
-            </div>
+            
+            <DialogFooter className="mt-4">
+              <DialogClose asChild>
+                <Button variant="outline">Cancel</Button>
+              </DialogClose>
+              <Button 
+                onClick={dialogType === "create" ? handleCreateRole : handleUpdateRole}
+                disabled={
+                  dialogType === "create" 
+                    ? !newRole.name.trim() 
+                    : !editingRole?.name.trim()
+                }
+              >
+                {dialogType === "create" ? "Create Role" : "Save Changes"}
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
 
       <Tabs defaultValue="list">
-        <TabsList>
+        <TabsList className="grid w-full grid-cols-2 max-w-md">
           <TabsTrigger value="list">Roles Overview</TabsTrigger>
           <TabsTrigger value="assign">Assign Roles to Users</TabsTrigger>
         </TabsList>
 
         <TabsContent value="list">
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mt-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mt-6">
             {roles.map((role) => (
-              <Card key={role.id} className="hover:shadow-xl transition">
-                <CardHeader>
-                  <CardTitle>{role.name}</CardTitle>
+              <Card key={role.id} className="hover:shadow-lg transition-shadow border-gray-200">
+                <CardHeader className="pb-3">
+                  <div className="flex justify-between items-start">
+                    <CardTitle className="text-lg">{role.name}</CardTitle>
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="p-2 text-gray-500 hover:text-primary"
+                        onClick={() => openEditDialog(role)}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="p-2 text-gray-500 hover:text-destructive"
+                        onClick={() => handleDeleteRole(role.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-600">{role.description}</p>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-600 mb-2">{role.description}</p>
-                  <h4 className="font-semibold text-sm text-gray-500">Permissions</h4>
-                  <ul className="text-sm text-gray-700 list-disc list-inside">
-                    {role.permissions.map((p, idx) => (
-                      <li key={idx}>{p.replace(/_/g, " ")}</li>
-                    ))}
-                  </ul>
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-medium text-gray-500">Permissions</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {role.permissions.map((p, idx) => (
+                        <Badge 
+                          key={idx} 
+                          variant="outline"
+                          className="text-xs capitalize"
+                        >
+                          {p.replace(/_/g, " ")}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             ))}
@@ -164,21 +269,26 @@ export default function RolesPermissionsPage() {
         </TabsContent>
 
         <TabsContent value="assign">
-          <Card className="mt-4">
+          <Card className="mt-6">
             <CardHeader>
               <CardTitle>Assign Users to Roles</CardTitle>
+              <p className="text-sm text-gray-600">Search for users and assign them to different roles</p>
             </CardHeader>
-            <CardContent className="space-y-2">
-              <Label>Email or Phone Number</Label>
-              <Input placeholder="user@example.com or 09..." />
-              <Label>Select Role</Label>
-              <select className="border rounded px-3 py-2 w-full">
-                {roles.map((r) => (
-                  <option key={r.id}>{r.name}</option>
-                ))}
-              </select>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label>Email or Phone Number</Label>
+                <Input placeholder="user@example.com or 09..." className="max-w-md" />
+              </div>
+              <div className="space-y-2">
+                <Label>Select Role</Label>
+                <select className="border rounded px-3 py-2 max-w-md w-full">
+                  {roles.map((r) => (
+                    <option key={r.id}>{r.name}</option>
+                  ))}
+                </select>
+              </div>
               <div className="flex justify-end mt-4">
-                <Button>Assign</Button>
+                <Button>Assign Role</Button>
               </div>
             </CardContent>
           </Card>
