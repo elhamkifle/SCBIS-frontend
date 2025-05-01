@@ -41,7 +41,7 @@ export default function Declaration() {
     }
     
     setError('');
-    router.push('/claim-submission/confirmation');
+    router.push('/claim-submission/preview');
   };
 
   return (

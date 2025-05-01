@@ -16,7 +16,7 @@ export default function ClaimDisclaimer() {
       setError('You must agree to the disclaimer to proceed.');
       return;
     }
-    router.push('/preview');
+    router.push('/claim-submission/driver-details');
   };
 
   return (
