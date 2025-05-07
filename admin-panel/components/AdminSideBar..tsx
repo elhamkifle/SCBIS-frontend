@@ -10,16 +10,27 @@ const SidebarGroup = ({ title, links }: { title: string; links: { label: string;
   const [open, setOpen] = useState(true);
 
   return (
-    <div>
-      <button onClick={() => setOpen(!open)} className="flex items-center justify-between w-full text-xs text-gray-500 uppercase tracking-wide px-2 py-1">
-        {title}
-        <ChevronDown className={`transition-transform ${open ? "rotate-180" : ""}`} size={16} />
+    <div className="mb-3">
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center justify-between w-full text-xs font-semibold text-gray-500 uppercase tracking-wide px-3 py-2 hover:bg-gray-100 rounded-lg transition-all"
+      >
+        <span>{title}</span>
+        <ChevronDown
+          className={`transition-transform duration-300 ${open ? "rotate-180" : ""}`}
+          size={16}
+        />
       </button>
       {open && (
-        <div className="pl-4 space-y-2">
+        <div className="pl-2 mt-1 space-y-1">
           {links.map((link) => (
-            <Link key={link.href} href={link.href} className="flex items-center gap-2 text-sm text-gray-700 hover:text-blue-600">
-              <link.icon size={18} /> {link.label}
+            <Link
+              key={link.href}
+              href={link.href}
+              className="flex items-center gap-3 text-sm text-gray-700 hover:bg-gradient-to-r from-gray-50 to-blue-50 px-3 py-2 rounded-lg transition-all group"
+            >
+              <link.icon size={18} className="text-gray-400 group-hover:text-blue-500 transition-colors" />
+              <span className="group-hover:text-blue-600 font-medium transition-colors">{link.label}</span>
             </Link>
           ))}
         </div>
@@ -30,25 +41,32 @@ const SidebarGroup = ({ title, links }: { title: string; links: { label: string;
 
 export default function AdminSidebar() {
   return (
-    <aside className="w-64 bg-white h-screen shadow-md p-4 space-y-6 flex flex-col">
-      <nav className="flex-1 space-y-4">
-        <Link href="/admin/dashboard" className="flex items-center gap-2 text-sm hover:text-blue-600">
-          <LayoutDashboard size={18} /> Dashboard
+    <aside className="w-64 bg-white h-screen border-r border-gray-200 p-4 flex flex-col shadow-sm">
+      <div className="mb-6 px-2 pt-1">
+        <h2 className="text-xl font-bold text-gray-800 tracking-tight">Admin Panel</h2>
+      </div>
+
+      <nav className="flex-1 space-y-4 overflow-y-auto">
+        <Link
+          href="/admin/dashboard"
+          className="flex items-center gap-3 text-sm font-medium text-gray-700 hover:bg-gradient-to-r from-gray-50 to-blue-50 px-3 py-2 rounded-lg transition-all group"
+        >
+          <LayoutDashboard size={18} className="text-blue-500 group-hover:text-blue-600 transition-colors" />
+          <span className="group-hover:text-blue-600 transition-colors">Dashboard</span>
         </Link>
 
         <SidebarGroup
           title="Policy Operations"
           links={[
             { label: "Incoming Requests", href: "/purchaseRequests", icon: ClipboardList },
-            { label: "Premium Calculation", href: "/premiumCalculation", icon: FileCheck },
-            { label: "Payment Confirmations", href: "/admin/payments", icon: Mail },
+            { label: "Premium Calculation", href: "/premiumCalculation", icon: FileCheck }
           ]}
         />
 
         <SidebarGroup
           title="Policy Management"
           links={[
-            { label: "All Policies", href: "/admin/policies", icon: FileText },
+            { label: "All Policies", href: "/policyManagement/all", icon: FileText },
             { label: "Search Policies", href: "/admin/policies/search", icon: FileSearch },
             { label: "Policy Details", href: "/admin/policies/details", icon: FileText },
           ]}
@@ -76,15 +94,19 @@ export default function AdminSidebar() {
         <SidebarGroup
           title="User Management"
           links={[
-            { label: "Users", href: "/admin/users", icon: Users },
-            { label: "Roles & Permissions", href: "/admin/roles", icon: Settings },
+            { label: "Users", href: "userManagement/users", icon: Users },
+            { label: "Roles & Permissions", href: "/userManagement/rolesAndPermissions", icon: Settings },
           ]}
         />
       </nav>
 
-      <div className="text-sm text-gray-400 border-t pt-4">
-        <Link href="/admin/settings" className="flex items-center gap-2 hover:text-blue-600">
-          <Settings size={18} /> Settings
+      <div className="mt-auto pt-4 border-t border-gray-100">
+        <Link
+          href="/settings"
+          className="flex items-center gap-3 text-sm text-gray-700 hover:bg-gray-100 px-3 py-2 rounded-lg transition-all group"
+        >
+          <Settings size={18} className="text-gray-400 group-hover:text-blue-500 transition-colors" />
+          <span className="group-hover:text-blue-600 font-medium transition-colors">Settings</span>
         </Link>
       </div>
     </aside>
