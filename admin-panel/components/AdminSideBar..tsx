@@ -67,8 +67,6 @@ export default function AdminSidebar() {
           title="Policy Management"
           links={[
             { label: "All Policies", href: "/policyManagement/all", icon: FileText },
-            { label: "Search Policies", href: "/admin/policies/search", icon: FileSearch },
-            { label: "Policy Details", href: "/admin/policies/details", icon: FileText },
           ]}
         />
 
