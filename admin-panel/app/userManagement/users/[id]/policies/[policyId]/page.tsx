@@ -76,7 +76,17 @@ export default function PolicyDetailsPage() {
 
   // Get the policy details
   const policy = mockPolicyDetails[policyId as string];
-
+  if (!policyId) {
+    return (
+      <div className="p-6">
+        <h1 className="text-2xl font-bold text-gray-800">Invalid Policy ID</h1>
+        <p className="text-gray-600 mt-2">The policy ID is missing or invalid.</p>
+        <Button variant="outline" className="mt-4" onClick={() => router.back()}>
+          Go Back
+        </Button>
+      </div>
+    );
+  }
   if (!policy) {
     return (
       <div className="p-6">
