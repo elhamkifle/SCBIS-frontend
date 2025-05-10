@@ -203,39 +203,39 @@ export default function ClaimPreview() {
     const accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2N2ZkNTRlY2QzZGM1MzIxYTkwOWIyNDYiLCJyb2xlcyI6WyJ1c2VyIl0sImlhdCI6MTc0Njg5NDgzMSwiZXhwIjoxNzQ2ODk4NDMxfQ.oAQyZ5boJnsWWvFZm3aSehnD9JFaamufPIaoVmLU0CA"; // Provided accessToken
 
     try {
-      // // Sending the claim data using Axios
-      // const response = await axios.post("https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/claims", claimData, {
-      //   headers: {
-      //     'Authorization': `Bearer ${accessToken}`,
-      //     'Content-Type': 'application/json',
-      //   }
-      // });
+      // Sending the claim data using Axios
+      const response = await axios.post("https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/claims", claimData, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        }
+      });
 
-      // console.log(response);
+      console.log(response);
   
-      // const storesToClear = [
-      //   'accident-details-storage',
-      //   'claim-policy-selection-storage',
-      //   'damage-details-storage',
-      //   'declaration-storage',
-      //   'claim-disclaimer-storage',
-      //   'driver-details-storage',
-      //   'liability-information-storage',
-      //   'vehicle-selection-storage',
-      //   'witness-information-storage'
-      // ];
+      const storesToClear = [
+        'accident-details-storage',
+        'claim-policy-selection-storage',
+        'damage-details-storage',
+        'declaration-storage',
+        'claim-disclaimer-storage',
+        'driver-details-storage',
+        'liability-information-storage',
+        'vehicle-selection-storage',
+        'witness-information-storage'
+      ];
   
-      // storesToClear.forEach(storeName => {
-      //   localStorage.removeItem(storeName);
-      // });
+      storesToClear.forEach(storeName => {
+        localStorage.removeItem(storeName);
+      });
   
-      // useAccidentDetailsStore.getState().clearAllData();
-      // useClaimPolicyStore.getState().clearAllData();
-      // useDriverDetailsStore.getState().clearAllData();
-      // useLiabilityInformationStore.getState().clearAllData();
-      // useVehicleSelectionStore.getState().clearAllData();
-      // useWitnessInformationStore.getState().clearAllData();
-      // useDeclarationStore.getState().clearAllData();
+      useAccidentDetailsStore.getState().clearAllData();
+      useClaimPolicyStore.getState().clearAllData();
+      useDriverDetailsStore.getState().clearAllData();
+      useLiabilityInformationStore.getState().clearAllData();
+      useVehicleSelectionStore.getState().clearAllData();
+      useWitnessInformationStore.getState().clearAllData();
+      useDeclarationStore.getState().clearAllData();
   
       alert("Claim submitted successfully!")
   
