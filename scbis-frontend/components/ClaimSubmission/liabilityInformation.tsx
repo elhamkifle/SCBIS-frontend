@@ -8,15 +8,15 @@ export default function LiabilityInformation() {
   const {
     responsibleParty,
     otherInsuredStatus,
-    insuranceCompanyName,
+    OtherInsuranceCompanyName,
     policeInvolved,
-    officerName,
+    policeOfficerName,
     policeStation,
     setResponsibleParty,
     setOtherInsuredStatus,
-    setInsuranceCompanyName,
+    setOtherInsuranceCompanyName,
     setPoliceInvolved,
-    setOfficerName,
+    setpoliceOfficerName,
     setPoliceStation,
     clearAllData
   } = useLiabilityInformationStore();
@@ -108,8 +108,8 @@ export default function LiabilityInformation() {
               <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Name of the Insurance Company</label>
               <input
                 type="text"
-                value={insuranceCompanyName}
-                onChange={(e) => setInsuranceCompanyName(e.target.value)}
+                value={OtherInsuranceCompanyName}
+                onChange={(e) => setOtherInsuranceCompanyName(e.target.value)}
                 className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400" 
               />
             </div>
@@ -143,8 +143,8 @@ export default function LiabilityInformation() {
                 <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Police Officer's Name</label>
                 <input
                   type="text"
-                  value={officerName}
-                  onChange={(e) => setOfficerName(e.target.value)}
+                  value={policeOfficerName}
+                  onChange={(e) => setpoliceOfficerName(e.target.value)}
                   className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
               </div>

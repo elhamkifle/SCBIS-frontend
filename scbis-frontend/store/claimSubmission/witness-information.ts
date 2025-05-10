@@ -9,18 +9,18 @@ interface Witness {
 interface WitnessInformationState {
   aloneInVehicle: string;
   vehicleOccupants: Witness[];
-  independentWitnessPresence: string;
+  independentWitnessPresent: string;
   independentWitnesses: Witness[];
-  witnessReason: string;
+  whyNoWitness: string;
   setAloneInVehicle: (status: string) => void;
   addVehicleOccupant: () => void;
   updateVehicleOccupant: (index: number, field: keyof Witness, value: string) => void;
   removeVehicleOccupant: (index: number) => void;
-  setIndependentWitnessPresence: (presence: string) => void;
+  setindependentWitnessPresent: (presence: string) => void;
   addIndependentWitness: () => void;
   updateIndependentWitness: (index: number, field: keyof Witness, value: string) => void;
   removeIndependentWitness: (index: number) => void;
-  setWitnessReason: (reason: string) => void;
+  setwhyNoWitness: (reason: string) => void;
   clearAllData: () => void;
 }
 
@@ -34,9 +34,9 @@ export const useWitnessInformationStore = create<WitnessInformationState>()(
     (set) => ({
       aloneInVehicle: '',
       vehicleOccupants: [{ ...initialWitness }],
-      independentWitnessPresence: '',
+      independentWitnessPresent: '',
       independentWitnesses: [{ ...initialWitness }],
-      witnessReason: '',
+      whyNoWitness: '',
       setAloneInVehicle: (status) => set({ aloneInVehicle: status }),
       addVehicleOccupant: () => 
         set((state) => ({
@@ -52,8 +52,8 @@ export const useWitnessInformationStore = create<WitnessInformationState>()(
         set((state) => ({
           vehicleOccupants: state.vehicleOccupants.filter((_, i) => i !== index)
         })),
-      setIndependentWitnessPresence: (presence) => 
-        set({ independentWitnessPresence: presence }),
+      setindependentWitnessPresent: (presence) => 
+        set({ independentWitnessPresent: presence }),
       addIndependentWitness: () => 
         set((state) => ({
           independentWitnesses: [...state.independentWitnesses, { ...initialWitness }]
@@ -68,14 +68,14 @@ export const useWitnessInformationStore = create<WitnessInformationState>()(
         set((state) => ({
           independentWitnesses: state.independentWitnesses.filter((_, i) => i !== index)
         })),
-      setWitnessReason: (reason) => set({ witnessReason: reason }),
+      setwhyNoWitness: (reason) => set({ whyNoWitness: reason }),
       clearAllData: () => 
         set({
           aloneInVehicle: '',
           vehicleOccupants: [{ ...initialWitness }],
-          independentWitnessPresence: '',
+          independentWitnessPresent: '',
           independentWitnesses: [{ ...initialWitness }],
-          witnessReason: ''
+          whyNoWitness: ''
         })
     }),
     {

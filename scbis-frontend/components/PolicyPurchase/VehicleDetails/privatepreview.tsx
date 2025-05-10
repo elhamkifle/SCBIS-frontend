@@ -123,8 +123,8 @@ export default function PolicyPreview() {
                   onChange={(e) => setSelectedType(e.target.value)}
                   className="w-full p-2 border border-black rounded"
                 >
-                  <option value="private">Private</option>
-                  <option value="commercial">Commercial</option>
+                  <option value="known">Known Driver</option>
+                  <option value="any">Any Driver </option>
                 </select>
               </div>
             </div>
@@ -354,8 +354,8 @@ export default function PolicyPreview() {
                   onChange={handleOwnershipChange}
                   className="w-full p-2 border border-black rounded"
                 >
-                  <option value="Private">Private</option>
-                  <option value="Commercial">Commercial</option>
+                  <option value="known">Known Driver</option>
+                  <option value="any">Any Driver </option>
                 </select>
               </div>
               

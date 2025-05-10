@@ -15,4 +15,11 @@ html, body, #root {
     background: #302f2fa9;
 }
 
-
+@layer base {
+    h2 {
+      @apply font-syne font-bold text-xl md:text-xl lg:text-xl;
+    }
+    h3 {
+        @apply font-syne font-bold text-xl md:text-xl lg:text-xl;
+    }
+  }

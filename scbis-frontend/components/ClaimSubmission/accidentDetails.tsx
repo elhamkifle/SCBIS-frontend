@@ -8,29 +8,62 @@ export default function AccidentDetails() {
   const router = useRouter();
   const {
     otherVehicles,
-    position,
+    positionOnRoad,
     roadSurface,
     trafficCondition,
-    description,
+    additionalDescription,
     timeOfDay,
+    dateOfAccident,
+    timeOfAccident,
+    speed,
+    location,
+    hornSounded,
     headlightsOn,
+    wereYouInVehicle,
     visibilityObstructions,
-    accidentLocation,
+    intersectionType,
     error,
     addVehicle,
     removeVehicle,
     updateVehicle,
-    setPosition,
+    setpositionOnRoad,
     setRoadSurface,
     setTrafficCondition,
-    setDescription,
+    setadditionalDescription,
     setTimeOfDay,
+    setdateOfAccident,
+    settimeOfAccident,
+    setspeed,
+    setlocation,
+    sethornSounded,
     setHeadlightsOn,
+    setwereYouInVehicle,
     setVisibilityObstructions,
-    setAccidentLocation,
+    setintersectionType,
     setError,
     clearAllData
   } = useAccidentDetailsStore();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+
+    const setters: Record<string, (val: any) => void> = {
+      dateOfAccident: setdateOfAccident,
+      timeOfAccident: settimeOfAccident,
+      speed: (val) => setspeed(Number(val)), // Convert to number
+    };
+
+    if (name in setters) {
+      setters[name](value);
+    }
+  };
+
+  // Handler for nested `location` fields
+  const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setlocation({ ...location, [name]: value });
+  };
+
 
   // Local state for file handling (not persisted in Zustand)
   const [files, setFiles] = useState<File[]>([]);
@@ -89,7 +122,7 @@ export default function AccidentDetails() {
     }
     
     // Validate other form fields if needed
-    if (!position || !roadSurface || !trafficCondition) {
+    if (!positionOnRoad || !roadSurface || !trafficCondition) {
       setError('Please fill all required fields');
       return;
     }
@@ -108,12 +141,12 @@ export default function AccidentDetails() {
       <div className="w-full flex justify-between items-center mt-2 mb-10">
         <h2 className="md:text-xl sm:text-lg font-bold">Claim Submission</h2>
         <div className="flex gap-2">
-          <button 
+          {/* <button 
             className="bg-gray-500 sm:text-xs md:text-lg text-white px-4 py-2 rounded"
             onClick={clearAllData}
           >
             Clear Data
-          </button>
+          </button> */}
           <button className="bg-[#0F1D3F] sm:text-xs md:text-lg text-white px-4 py-2 rounded">
             Save as draft
           </button>
@@ -142,6 +175,68 @@ export default function AccidentDetails() {
           <span className="ml-2 text-black text-sm sm:text-base">Witness Information</span>
         </div>
       </div>
+
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="relative w-full">
+          <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Date of Accident *</label>
+          <input
+            type="date"
+            name="dateOfAccident"
+            value={dateOfAccident}
+            onChange={handleChange}
+            className="w-full p-2 border border-black rounded"
+            required
+          />
+        </div>
+
+        {/* Time of Accident */}
+        <div className="relative w-full">
+          <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Time of Accident *</label>
+          <input
+            type="time"
+            name="timeOfAccident"
+            value={timeOfAccident}
+            onChange={handleChange}
+            className="w-full p-2 border border-black rounded"
+            required
+          />
+        </div>
+
+        {/* Speed */}
+        <div className="relative w-full">
+          <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Speed (km/h) *</label>
+          <input
+            type="number"
+            name="speed"
+            value={speed}
+            onChange={handleChange}
+            className="w-full p-2 border border-black rounded"
+            required
+          />
+        </div>
+
+        </div> 
+        <h3> Address </h3>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
+        {['city', 'subCity', 'kebele', 'sefer'].map((field) => (
+          <div className="relative w-full" key={field}>
+            <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1 capitalize">
+              {field} *
+            </label>
+            <input
+              type="text"
+              name={field}
+              value={location[field as keyof typeof location]}
+              onChange={handleLocationChange}
+              className="w-full p-2 border border-black rounded"
+              required
+            />
+          </div>
+        ))}
+      </div>
+
       
       {/* Position of Vehicle on Road */}
       <div className="mt-8">
@@ -151,10 +246,10 @@ export default function AccidentDetails() {
             <label key={pos} className="flex items-center">
               <input 
                 type="radio" 
-                name="position" 
+                name="positionOnRoad" 
                 value={pos} 
-                onChange={() => setPosition(pos)} 
-                checked={position === pos} 
+                onChange={() => setpositionOnRoad(pos)} 
+                checked={positionOnRoad === pos} 
                 className="mr-2" 
               />
               {pos}
@@ -272,6 +367,25 @@ export default function AccidentDetails() {
         </div>
       </div>
 
+      <div className="mt-4">
+          <h3 className="font-semibold"> Were you in the vehicle?</h3>
+          <div className="flex flex-wrap lg:flex-nowrap gap-4">
+            {['Yes', 'No'].map((option) => (
+              <label key={option} className="flex items-center">
+                <input 
+                  type="radio" 
+                  name="wereYouInVehicle" 
+                  value={option} 
+                  onChange={() => setwereYouInVehicle(option)} 
+                  checked={wereYouInVehicle === option} 
+                  className="mr-2" 
+                />
+                {option}
+              </label>
+            ))}
+          </div>
+        </div>
+
       {/* Time of Day */}
       <div className="mt-4">
         <h3 className="font-semibold">What was the time of day?</h3>
@@ -314,6 +428,25 @@ export default function AccidentDetails() {
         </div>
       )}
 
+    <div className="mt-4">
+          <h3 className="font-semibold">Was horn sounded?</h3>
+          <div className="flex flex-wrap lg:flex-nowrap gap-4">
+            {['Yes', 'No'].map((option) => (
+              <label key={option} className="flex items-center">
+                <input 
+                  type="radio" 
+                  name="hornSounded" 
+                  value={option} 
+                  onChange={() => sethornSounded(option)} 
+                  checked={hornSounded === option} 
+                  className="mr-2" 
+                />
+                {option}
+              </label>
+            ))}
+          </div>
+        </div>
+
       {/* Visibility Obstructions */}
       <div className="mt-4">
         <h3 className="font-semibold">Were there any obstructions to visibility?</h3>
@@ -338,14 +471,14 @@ export default function AccidentDetails() {
       <div className="mt-4">
         <h3 className="font-semibold">Did the accident occur at</h3>
         <div className="flex flex-wrap lg:flex-nowrap gap-4">
-          {['An Intersection', 'A Round About', 'Neither'].map((location) => (
+          {['Intersection', 'A Round About', 'Neither'].map((location) => (
             <label key={location} className="flex items-center">
               <input 
                 type="radio" 
-                name="accidentLocation" 
+                name="intersectionType" 
                 value={location} 
-                onChange={() => setAccidentLocation(location)} 
-                checked={accidentLocation === location} 
+                onChange={() => setintersectionType(location)} 
+                checked={intersectionType === location} 
                 className="mr-2" 
               />
               {location}
@@ -358,8 +491,8 @@ export default function AccidentDetails() {
       <div className="mt-6">
         <h3 className="font-semibold">Please provide any additional detailed description of how the accident occurred</h3>
         <textarea 
-          value={description} 
-          onChange={(e) => setDescription(e.target.value)} 
+          value={additionalDescription} 
+          onChange={(e) => setadditionalDescription(e.target.value)} 
           className="md:w-1/2 w-full p-2 border rounded mt-2" 
           rows={3} 
           placeholder="Enter details here..."

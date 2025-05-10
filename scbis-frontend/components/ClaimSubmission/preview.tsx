@@ -1,5 +1,7 @@
 'use client';
 
+import axios from 'axios';
+
 import { useRouter } from 'next/navigation';
 import { Edit, Check } from 'lucide-react';
 import { useState } from 'react';
@@ -10,37 +12,50 @@ import { useAccidentDetailsStore } from '@/store/claimSubmission/accident-detail
 import { useLiabilityInformationStore } from '@/store/claimSubmission/liability-information';
 import { useWitnessInformationStore } from '@/store/claimSubmission/witness-information';
 import { useDeclarationStore } from '@/store/claimSubmission/declaration';
+import { useDamageDetailsStore } from '@/store/claimSubmission/damage-details';
 
 export default function ClaimPreview() {
   const router = useRouter();
-  
+
   // Get all data from stores and their update functions
   const { selectedVehicle, selectVehicle, vehicles } = useVehicleSelectionStore();
   const { selectedPolicy, policies, selectPolicy } = useClaimPolicyStore();
-  const { 
-    isDriverSame, 
-    formData: driverData, 
+  const {
+    isDriverSameAsInsured,
+    formData: driver,
     setDriverSame,
-    updateFormData: updateDriverData 
+    updateFormData: updateDriverData
   } = useDriverDetailsStore();
   const {
-    position,
+    positionOnRoad,
     roadSurface,
     trafficCondition,
-    description,
+    additionalDescription,
     timeOfDay,
+    hornSounded,
     headlightsOn,
+    wereYouInVehicle,
+    dateOfAccident,
+    timeOfAccident,
+    speed,
+    location,
     visibilityObstructions,
-    accidentLocation,
+    intersectionType,
     otherVehicles,
-    setPosition,
+    setpositionOnRoad,
     setRoadSurface,
     setTrafficCondition,
-    setDescription,
+    setadditionalDescription,
     setTimeOfDay,
+    setdateOfAccident,
+    settimeOfAccident,
+    setspeed,
+    setlocation,
+    sethornSounded,
     setHeadlightsOn,
+    setwereYouInVehicle,
     setVisibilityObstructions,
-    setAccidentLocation,
+    setintersectionType,
     addVehicle,
     removeVehicle,
     updateVehicle
@@ -48,43 +63,57 @@ export default function ClaimPreview() {
   const {
     responsibleParty,
     otherInsuredStatus,
-    insuranceCompanyName,
+    OtherInsuranceCompanyName,
     policeInvolved,
-    officerName,
+    policeOfficerName,
     policeStation,
     setResponsibleParty,
     setOtherInsuredStatus,
-    setInsuranceCompanyName,
+    setOtherInsuranceCompanyName,
     setPoliceInvolved,
-    setOfficerName,
+    setpoliceOfficerName,
     setPoliceStation
   } = useLiabilityInformationStore();
   const {
     aloneInVehicle,
     vehicleOccupants,
-    independentWitnessPresence,
+    independentWitnessPresent,
     independentWitnesses,
-    witnessReason,
+    whyNoWitness,
     setAloneInVehicle,
     addVehicleOccupant,
     removeVehicleOccupant,
     updateVehicleOccupant,
-    setIndependentWitnessPresence,
+    setindependentWitnessPresent,
     addIndependentWitness,
     removeIndependentWitness,
     updateIndependentWitness,
-    setWitnessReason
+    setwhyNoWitness
   } = useWitnessInformationStore();
   const {
-    driverName,
-    insuredName,
-    date,
-    agreed,
-    setDriverName,
-    setInsuredName,
-    setDate,
-    setAgreed
+    driverFullName,
+    insuredFullName,
+    signatureDate,
+    agreedToDeclaration,
+    setdriverFullName,
+    setinsuredFullName,
+    setsignatureDate,
+    setagreedToDeclaration
   } = useDeclarationStore();
+
+  const {
+    vehicleDamageDesc,
+    thirdPartyDamageDesc,
+    injuriesAny,
+    injuredPersons,
+    error,
+    setvehicleDamageDesc,
+    setthirdPartyDamageDesc,
+    setinjuriesAny,
+    setInjuredPersons,
+    setError,
+    clearAllData
+  } = useDamageDetailsStore();
 
   const [isEditing, setIsEditing] = useState({
     policy: false,
@@ -92,80 +121,132 @@ export default function ClaimPreview() {
     driver: false,
     accident: false,
     liability: false,
-    witness: false
+    witness: false,
+    damage: false
   });
 
   const toggleEdit = (section: keyof typeof isEditing) => {
     setIsEditing(prev => ({ ...prev, [section]: !prev[section] }));
   };
 
-  const handleSubmit = () => {
-    console.log('Submitting claim with all data:', {
-      selectedVehicle,
-      selectedPolicy,
-      driverData: {
-        isDriverSame,
-        ...driverData
+  const handleSubmit = async () => {
+    const claimData = {
+      policyId: "67fd5e03c2f1bd131f38a8ab",
+      isDriverSameAsInsured,
+      driver: {
+        ...driver
       },
       accidentDetails: {
-        position,
+        positionOnRoad,
         roadSurface,
         trafficCondition,
-        description,
+        additionalDescription,
         timeOfDay,
-        headlightsOn,
+        hornSounded: typeof hornSounded === 'string'
+          ? hornSounded.toLowerCase() === 'yes'
+          : hornSounded === true,
+        headlightsOn: typeof headlightsOn === 'string'
+          ? headlightsOn.toLowerCase() === 'yes'
+          : headlightsOn === true,
+        wereYouInVehicle: typeof wereYouInVehicle === 'string'
+          ? wereYouInVehicle.toLowerCase() === 'yes'
+          : wereYouInVehicle === true,
         visibilityObstructions,
-        accidentLocation,
+        intersectionType,
         otherVehicles,
+        dateOfAccident,
+        timeOfAccident,
+        speed,
+        location,
       },
-      liabilityInformation: {
+      liability: {
         responsibleParty,
         otherInsuredStatus,
-        insuranceCompanyName,
-        policeInvolved,
-        officerName,
+        OtherInsuranceCompanyName,
+        policeInvolved: typeof policeInvolved === 'string'
+          ? policeInvolved.toLowerCase() === 'yes'
+          : policeInvolved === true,
+        policeOfficerName,
         policeStation
       },
-      witnessInformation: {
-        aloneInVehicle,
+      witness: {
+        aloneInVehicle: typeof aloneInVehicle === 'string'
+          ? aloneInVehicle.toLowerCase() === 'yes'
+          : aloneInVehicle === true,
         vehicleOccupants,
-        independentWitnessPresence,
+        independentWitnessPresent: typeof independentWitnessPresent === 'string' && independentWitnessPresent.toLowerCase().includes('yes'),
         independentWitnesses,
-        witnessReason
+        whyNoWitness
       },
       declaration: {
-        driverName,
-        insuredName,
-        date,
-        agreed
+        driverFullName,
+        insuredFullName,
+        signatureDate,
+        agreedToDeclaration
+      },
+      damage: {
+        sketchFiles: [],
+        vehicleDamageFiles: [],
+        vehicleDamageDesc,
+        thirdPartyDamageFiles: [],
+        thirdPartyDamageDesc,
+        injuriesAny,
+        injuredPersons: [injuredPersons],
       }
-    });
+    }
 
-    const storesToClear = [
-      'accident-details-storage',
-      'claim-policy-selection-storage',
-      'damage-details-storage',
-      'declaration-storage',
-      'claim-disclaimer-storage',
-      'driver-details-storage',
-      'liability-information-storage',
-      'vehicle-selection-storage',
-      'witness-information-storage'
-    ];
+    console.log(claimData);
+
+    const accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2N2ZkNTRlY2QzZGM1MzIxYTkwOWIyNDYiLCJyb2xlcyI6WyJ1c2VyIl0sImlhdCI6MTc0Njg5NDgzMSwiZXhwIjoxNzQ2ODk4NDMxfQ.oAQyZ5boJnsWWvFZm3aSehnD9JFaamufPIaoVmLU0CA"; // Provided accessToken
+
+    try {
+      // Sending the claim data using Axios
+      const response = await axios.post("https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/claims", claimData, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        }
+      });
+
+      console.log(response);
   
-    storesToClear.forEach(storeName => {
-      localStorage.removeItem(storeName);
-    });
+      const storesToClear = [
+        'accident-details-storage',
+        'claim-policy-selection-storage',
+        'damage-details-storage',
+        'declaration-storage',
+        'claim-disclaimer-storage',
+        'driver-details-storage',
+        'liability-information-storage',
+        'vehicle-selection-storage',
+        'witness-information-storage'
+      ];
+  
+      storesToClear.forEach(storeName => {
+        localStorage.removeItem(storeName);
+      });
+  
+      useAccidentDetailsStore.getState().clearAllData();
+      useClaimPolicyStore.getState().clearAllData();
+      useDriverDetailsStore.getState().clearAllData();
+      useLiabilityInformationStore.getState().clearAllData();
+      useVehicleSelectionStore.getState().clearAllData();
+      useWitnessInformationStore.getState().clearAllData();
+      useDeclarationStore.getState().clearAllData();
+  
+      alert("Claim submitted successfully!")
+  
+    } catch (error:any) {
+      if (error.response) {
+        console.log('Error response:', error.response.data); // Response from the server
+      } else if (error.request) {
+        console.log('Error request:', error.request); // Request was sent, but no response was received
+      } else {
+        console.log('Error message:', error.message); // Any other error
+      }
+    }
 
-    useAccidentDetailsStore.getState().clearAllData();
-    useClaimPolicyStore.getState().clearAllData();
-    useDriverDetailsStore.getState().clearAllData();
-    useLiabilityInformationStore.getState().clearAllData();
-    useVehicleSelectionStore.getState().clearAllData();
-    useWitnessInformationStore.getState().clearAllData();
-    useDeclarationStore.getState().clearAllData();
-    
-    alert("Claim submitted successfully!") 
+
   };
 
   const handlePrevious = () => {
@@ -180,13 +261,12 @@ export default function ClaimPreview() {
         </span>
       );
     }
-  
+
     const displayValue = typeof value === 'boolean' ? (value ? 'Yes' : 'No') : value;
     const isYes = displayValue === 'Yes' || displayValue === 'yes';
     return (
-      <span className={`px-2 py-1 rounded-full text-sm font-medium ${
-        isYes ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-      }`}>
+      <span className={`px-2 py-1 rounded-full text-sm font-medium ${isYes ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+        }`}>
         {isYes ? 'Yes' : 'No'}
       </span>
     );
@@ -203,8 +283,8 @@ export default function ClaimPreview() {
   };
 
   // Fix for select elements by ensuring values are never null
-  const safeDriverGrade = driverData.grade || '';
-  const safeExpirationDate = driverData.expirationDate || '';
+  const safeDriverGrade = driver.grade || '';
+  const safeExpirationDate = driver.expirationDate || '';
 
 
   return (
@@ -240,41 +320,41 @@ export default function ClaimPreview() {
             {isEditing.driver ? <Check size={20} /> : <Edit size={20} />}
           </button>
         </div>
-        
+
         {isEditing.driver ? (
           <div className="mt-4 p-4 border rounded-lg">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex items-center space-x-4">
                 <label className="flex items-center">
-                  <input 
-                    type="radio" 
-                    name="driverSame" 
-                    checked={isDriverSame === true}
-                    onChange={() => setDriverSame(true)} 
+                  <input
+                    type="radio"
+                    name="driverSame"
+                    checked={isDriverSameAsInsured === true}
+                    onChange={() => setDriverSame(true)}
                     className="mr-2"
                   />
                   Same as insured
                 </label>
                 <label className="flex items-center">
-                  <input 
-                    type="radio" 
-                    name="driverSame" 
-                    checked={isDriverSame === false}
-                    onChange={() => setDriverSame(false)} 
+                  <input
+                    type="radio"
+                    name="driverSame"
+                    checked={isDriverSameAsInsured === false}
+                    onChange={() => setDriverSame(false)}
                     className="mr-2"
                   />
                   Different driver
                 </label>
               </div>
 
-              {!isDriverSame && (
+              {!isDriverSameAsInsured && (
                 <>
                   <div className="relative">
                     <label className="block text-sm font-medium mb-1">First Name</label>
                     <input
                       type="text"
                       name="firstName"
-                      value={driverData.firstName}
+                      value={driver.firstName}
                       onChange={handleDriverDataChange}
                       className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                     />
@@ -284,7 +364,7 @@ export default function ClaimPreview() {
                     <input
                       type="text"
                       name="lastName"
-                      value={driverData.lastName}
+                      value={driver.lastName}
                       onChange={handleDriverDataChange}
                       className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                     />
@@ -294,7 +374,7 @@ export default function ClaimPreview() {
                     <input
                       type="text"
                       name="age"
-                      value={driverData.age}
+                      value={driver.age}
                       onChange={handleDriverDataChange}
                       className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                     />
@@ -304,7 +384,7 @@ export default function ClaimPreview() {
                     <input
                       type="text"
                       name="city"
-                      value={driverData.city}
+                      value={driver.city}
                       onChange={handleDriverDataChange}
                       className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                     />
@@ -314,7 +394,7 @@ export default function ClaimPreview() {
                     <input
                       type="text"
                       name="subCity"
-                      value={driverData.subCity}
+                      value={driver.subCity}
                       onChange={handleDriverDataChange}
                       className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                     />
@@ -324,7 +404,7 @@ export default function ClaimPreview() {
                     <input
                       type="text"
                       name="kebele"
-                      value={driverData.kebele}
+                      value={driver.kebele}
                       onChange={handleDriverDataChange}
                       className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                     />
@@ -334,7 +414,7 @@ export default function ClaimPreview() {
                     <input
                       type="text"
                       name="phoneNumber"
-                      value={driverData.phoneNumber}
+                      value={driver.phoneNumber}
                       onChange={handleDriverDataChange}
                       className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                     />
@@ -344,7 +424,7 @@ export default function ClaimPreview() {
                     <input
                       type="text"
                       name="licenseNo"
-                      value={driverData.licenseNo}
+                      value={driver.licenseNo}
                       onChange={handleDriverDataChange}
                       className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                     />
@@ -353,7 +433,7 @@ export default function ClaimPreview() {
                     <label className="block text-sm font-medium mb-1">Grade</label>
                     <select
                       name="grade"
-                      value={driverData.grade}
+                      value={driver.grade}
                       onChange={handleDriverDataChange}
                       className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                     >
@@ -367,7 +447,7 @@ export default function ClaimPreview() {
                     <input
                       type="date"
                       name="expirationDate"
-                      value={driverData.expirationDate}
+                      value={driver.expirationDate}
                       onChange={handleDriverDataChange}
                       className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                     />
@@ -379,22 +459,22 @@ export default function ClaimPreview() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 px-4">
             <div>
-              <strong>Same as insured customer:</strong> 
-              <YesNoDisplay value={isDriverSame} />
+              <strong>Same as insured customer:</strong>
+              <YesNoDisplay value={isDriverSameAsInsured} />
             </div>
-            
-            {!isDriverSame && (
+
+            {!isDriverSameAsInsured && (
               <>
-                <div><strong>First Name:</strong> {driverData.firstName}</div>
-                <div><strong>Last Name:</strong> {driverData.lastName}</div>
-                <div><strong>Age:</strong> {driverData.age}</div>
-                <div><strong>City:</strong> {driverData.city}</div>
-                <div><strong>Subcity:</strong> {driverData.subCity}</div>
-                <div><strong>Kebele:</strong> {driverData.kebele}</div>
-                <div><strong>Phone Number:</strong> {driverData.phoneNumber}</div>
-                <div><strong>License No:</strong> {driverData.licenseNo}</div>
-                <div><strong>Grade:</strong> {driverData.grade}</div>
-                <div><strong>Expiration Date:</strong> {driverData.expirationDate}</div>
+                <div><strong>First Name:</strong> {driver.firstName}</div>
+                <div><strong>Last Name:</strong> {driver.lastName}</div>
+                <div><strong>Age:</strong> {driver.age}</div>
+                <div><strong>City:</strong> {driver.city}</div>
+                <div><strong>Subcity:</strong> {driver.subCity}</div>
+                <div><strong>Kebele:</strong> {driver.kebele}</div>
+                <div><strong>Phone Number:</strong> {driver.phoneNumber}</div>
+                <div><strong>License No:</strong> {driver.licenseNo}</div>
+                <div><strong>Grade:</strong> {driver.grade}</div>
+                <div><strong>Expiration Date:</strong> {driver.expirationDate}</div>
               </>
             )}
           </div>
@@ -409,20 +489,95 @@ export default function ClaimPreview() {
             {isEditing.accident ? <Check size={20} /> : <Edit size={20} />}
           </button>
         </div>
-        
+
         {isEditing.accident ? (
           <div className="mt-4 p-4 border rounded-lg space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div>
+                <h3 className="font-semibold mb-2">Date of Accident</h3>
+                <input
+                  type="date"
+                  value={dateOfAccident}
+                  onChange={(e) => setdateOfAccident(e.target.value)}
+                  className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </div>
+
+              <div>
+                <h3 className="font-semibold mb-2">Time of Accident</h3>
+                <input
+                  type="time"
+                  value={timeOfAccident}
+                  onChange={(e) => settimeOfAccident(e.target.value)}
+                  className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </div>
+
+              <div>
+                <h3 className="font-semibold mb-2">Speed</h3>
+                <input
+                  type="number"
+                  value={speed}
+                  onChange={(e) => setspeed(Number(e.target.value))}
+                  className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div>
+                <h3 className="font-semibold mb-2">City</h3>
+                <input
+                  type="text"
+                  value={location.city || ''}
+                  onChange={(e) => setlocation({ ...location, city: e.target.value })}
+                  className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </div>
+
+              <div>
+                <h3 className="font-semibold mb-2">Sub-City</h3>
+                <input
+                  type="text"
+                  value={location.subCity || ''}
+                  onChange={(e) => setlocation({ ...location, subCity: e.target.value })}
+                  className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </div>
+
+              <div>
+                <h3 className="font-semibold mb-2">Kebele</h3>
+                <input
+                  type="text"
+                  value={location.kebele || ''}
+                  onChange={(e) => setlocation({ ...location, kebele: e.target.value })}
+                  className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </div>
+
+              <div>
+                <h3 className="font-semibold mb-2">Sefer</h3>
+                <input
+                  type="text"
+                  value={location.sefer || ''}
+                  onChange={(e) => setlocation({ ...location, sefer: e.target.value })}
+                  className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </div>
+            </div>
+
+
             <div>
               <h3 className="font-semibold mb-2">Position of Vehicle on Road</h3>
               <div className="flex flex-wrap gap-4">
                 {['Left Side of Lane', 'Center of Lane', 'Right of Lane', 'Accident Was Not on a Road'].map((pos) => (
                   <label key={pos} className="flex items-center">
-                    <input 
-                      type="radio" 
-                      name="position" 
-                      value={pos} 
-                      checked={position === pos}
-                      onChange={() => setPosition(pos)}
+                    <input
+                      type="radio"
+                      name="position"
+                      value={pos}
+                      checked={positionOnRoad === pos}
+                      onChange={() => setpositionOnRoad(pos)}
                       className="mr-2"
                     />
                     {pos}
@@ -436,10 +591,10 @@ export default function ClaimPreview() {
               <div className="flex flex-wrap gap-4">
                 {['Asphalt', 'Cobble Stone', 'Concrete', 'Other'].map((surface) => (
                   <label key={surface} className="flex items-center">
-                    <input 
-                      type="radio" 
-                      name="roadSurface" 
-                      value={surface} 
+                    <input
+                      type="radio"
+                      name="roadSurface"
+                      value={surface}
                       checked={roadSurface === surface}
                       onChange={() => setRoadSurface(surface)}
                       className="mr-2"
@@ -455,10 +610,10 @@ export default function ClaimPreview() {
               <div className="flex flex-wrap gap-4">
                 {['Not Crowded', 'Light Traffic', 'Moderate Traffic', 'Heavy Traffic'].map((traffic) => (
                   <label key={traffic} className="flex items-center">
-                    <input 
-                      type="radio" 
-                      name="trafficCondition" 
-                      value={traffic} 
+                    <input
+                      type="radio"
+                      name="trafficCondition"
+                      value={traffic}
                       checked={trafficCondition === traffic}
                       onChange={() => setTrafficCondition(traffic)}
                       className="mr-2"
@@ -470,14 +625,33 @@ export default function ClaimPreview() {
             </div>
 
             <div>
+              <h3 className="font-semibold mb-2">Were you in the vehicle?</h3>
+              <div className="flex flex-wrap gap-4">
+                {['Yes', 'No'].map((option) => (
+                  <label key={option} className="flex items-center">
+                    <input
+                      type="radio"
+                      name="wereYouInVehicle"
+                      value={option}
+                      checked={wereYouInVehicle === option}
+                      onChange={() => setwereYouInVehicle(option)}
+                      className="mr-2"
+                    />
+                    {option}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div>
               <h3 className="font-semibold mb-2">Time of Day</h3>
               <div className="flex flex-wrap gap-4">
                 {['Day Time', 'Night Time'].map((time) => (
                   <label key={time} className="flex items-center">
-                    <input 
-                      type="radio" 
-                      name="timeOfDay" 
-                      value={time} 
+                    <input
+                      type="radio"
+                      name="timeOfDay"
+                      value={time}
                       checked={timeOfDay === time}
                       onChange={() => setTimeOfDay(time)}
                       className="mr-2"
@@ -494,10 +668,10 @@ export default function ClaimPreview() {
                 <div className="flex flex-wrap gap-4">
                   {['Yes', 'No'].map((option) => (
                     <label key={option} className="flex items-center">
-                      <input 
-                        type="radio" 
-                        name="headlightsOn" 
-                        value={option} 
+                      <input
+                        type="radio"
+                        name="headlightsOn"
+                        value={option}
                         checked={headlightsOn === option}
                         onChange={() => setHeadlightsOn(option)}
                         className="mr-2"
@@ -510,14 +684,33 @@ export default function ClaimPreview() {
             )}
 
             <div>
+              <h3 className="font-semibold mb-2">Was horn sounded? </h3>
+              <div className="flex flex-wrap gap-4">
+                {['No', 'Yes'].map((hornSounded) => (
+                  <label key={hornSounded} className="flex items-center">
+                    <input
+                      type="radio"
+                      name="hornSounded"
+                      value={hornSounded}
+                      checked={hornSounded === hornSounded}
+                      onChange={() => sethornSounded(hornSounded)}
+                      className="mr-2"
+                    />
+                    {hornSounded}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div>
               <h3 className="font-semibold mb-2">Visibility Obstructions</h3>
               <div className="flex flex-wrap gap-4">
                 {['No', 'Light Rain', 'Heavy Rain', 'Fog'].map((obstruction) => (
                   <label key={obstruction} className="flex items-center">
-                    <input 
-                      type="radio" 
-                      name="visibilityObstructions" 
-                      value={obstruction} 
+                    <input
+                      type="radio"
+                      name="visibilityObstructions"
+                      value={obstruction}
                       checked={visibilityObstructions === obstruction}
                       onChange={() => setVisibilityObstructions(obstruction)}
                       className="mr-2"
@@ -531,14 +724,14 @@ export default function ClaimPreview() {
             <div>
               <h3 className="font-semibold mb-2">Accident Location</h3>
               <div className="flex flex-wrap gap-4">
-                {['An Intersection', 'A Round About', 'Neither'].map((location) => (
+                {['Intersection', 'A Round About', 'Neither'].map((location) => (
                   <label key={location} className="flex items-center">
-                    <input 
-                      type="radio" 
-                      name="accidentLocation" 
-                      value={location} 
-                      checked={accidentLocation === location}
-                      onChange={() => setAccidentLocation(location)}
+                    <input
+                      type="radio"
+                      name="intersectionType"
+                      value={location}
+                      checked={intersectionType === location}
+                      onChange={() => setintersectionType(location)}
                       className="mr-2"
                     />
                     {location}
@@ -550,8 +743,8 @@ export default function ClaimPreview() {
             <div>
               <h3 className="font-semibold mb-2">Description</h3>
               <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                value={additionalDescription}
+                onChange={(e) => setadditionalDescription(e.target.value)}
                 className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                 rows={4}
               />
@@ -604,20 +797,31 @@ export default function ClaimPreview() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 px-4">
-            <div><strong>Position on Road:</strong> {position}</div>
+            <div><strong>Date of Accident:</strong> {dateOfAccident}</div>
+            <div><strong>Time of Accident:</strong> {timeOfAccident}</div>
+            <div><strong>Speed:</strong> {speed}</div>
+
+            <div><strong>City:</strong> {location.city}</div>
+            <div><strong>SubCity:</strong> {location.subCity}</div>
+            <div><strong>Kebele:</strong> {location.kebele}</div>
+            <div><strong>Sefer:</strong> {location.sefer}</div>
+
+            <div><strong>Position on Road:</strong> {positionOnRoad}</div>
             <div><strong>Road Surface:</strong> {roadSurface}</div>
             <div><strong>Traffic Condition:</strong> {trafficCondition}</div>
             <div><strong>Time of Day:</strong> {timeOfDay}</div>
+            <div><strong>In vehicle:</strong> <YesNoDisplay value={wereYouInVehicle} /></div>
             {timeOfDay === 'Night Time' && (
               <div><strong>Headlights On:</strong> <YesNoDisplay value={headlightsOn} /></div>
             )}
+            <div><strong>Horn Sounded:</strong> {hornSounded}</div>
             <div><strong>Visibility Obstructions:</strong> {visibilityObstructions}</div>
-            <div><strong>Accident Location:</strong> {accidentLocation}</div>
+            <div><strong>Accident Location:</strong> {intersectionType}</div>
             <div className="col-span-2">
-              <strong>Description:</strong> 
-              <p className="whitespace-pre-line">{description}</p>
+              <strong>Description:</strong>
+              <p className="whitespace-pre-line">{additionalDescription}</p>
             </div>
-            
+
             {otherVehicles.length > 0 && (
               <div className="col-span-2">
                 <strong>Other Vehicles Involved:</strong>
@@ -642,7 +846,7 @@ export default function ClaimPreview() {
             {isEditing.liability ? <Check size={20} /> : <Edit size={20} />}
           </button>
         </div>
-        
+
         {isEditing.liability ? (
           <div className="mt-4 p-4 border rounded-lg space-y-6">
             <div>
@@ -650,10 +854,10 @@ export default function ClaimPreview() {
               <div className="flex flex-wrap gap-4">
                 {['Myself', 'The other person'].map((option) => (
                   <label key={option} className="flex items-center">
-                    <input 
-                      type="radio" 
-                      name="responsibleParty" 
-                      value={option} 
+                    <input
+                      type="radio"
+                      name="responsibleParty"
+                      value={option}
                       checked={responsibleParty === option}
                       onChange={() => setResponsibleParty(option)}
                       className="mr-2"
@@ -669,10 +873,10 @@ export default function ClaimPreview() {
               <div className="flex flex-wrap gap-4">
                 {['I dont know', 'Yes , they are'].map((option) => (
                   <label key={option} className="flex items-center">
-                    <input 
-                      type="radio" 
-                      name="otherInsuredStatus" 
-                      value={option} 
+                    <input
+                      type="radio"
+                      name="otherInsuredStatus"
+                      value={option}
                       checked={otherInsuredStatus === option}
                       onChange={() => setOtherInsuredStatus(option)}
                       className="mr-2"
@@ -687,8 +891,8 @@ export default function ClaimPreview() {
                     <label className="block text-sm font-medium mb-1">Insurance Company Name</label>
                     <input
                       type="text"
-                      value={insuranceCompanyName}
-                      onChange={(e) => setInsuranceCompanyName(e.target.value)}
+                      value={OtherInsuranceCompanyName}
+                      onChange={(e) => setOtherInsuranceCompanyName(e.target.value)}
                       className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                     />
                   </div>
@@ -701,10 +905,10 @@ export default function ClaimPreview() {
               <div className="flex flex-wrap gap-4">
                 {['Yes', 'No'].map((option) => (
                   <label key={option} className="flex items-center">
-                    <input 
-                      type="radio" 
-                      name="policeInvolved" 
-                      value={option} 
+                    <input
+                      type="radio"
+                      name="policeInvolved"
+                      value={option}
                       checked={policeInvolved === option}
                       onChange={() => setPoliceInvolved(option)}
                       className="mr-2"
@@ -719,8 +923,8 @@ export default function ClaimPreview() {
                     <label className="block text-sm font-medium mb-1">Officer Name</label>
                     <input
                       type="text"
-                      value={officerName}
-                      onChange={(e) => setOfficerName(e.target.value)}
+                      value={policeOfficerName}
+                      onChange={(e) => setpoliceOfficerName(e.target.value)}
                       className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                     />
                   </div>
@@ -743,15 +947,112 @@ export default function ClaimPreview() {
             <div>
               <strong>Other Vehicle Insured:</strong> {otherInsuredStatus}
               {otherInsuredStatus === 'Yes , they are' && (
-                <p><strong>Insurance Company:</strong> {insuranceCompanyName}</p>
+                <p><strong>Insurance Company:</strong> {OtherInsuranceCompanyName}</p>
               )}
             </div>
             <div>
               <strong>Police Involved:</strong> {policeInvolved}
               {policeInvolved === 'Yes' && (
                 <>
-                  <p><strong>Officer Name:</strong> {officerName}</p>
+                  <p><strong>Officer Name:</strong> {policeOfficerName}</p>
                   <p><strong>Police Station:</strong> {policeStation}</p>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Damage Information Section */}
+      <div className="border-b pb-4 mb-4">
+        <div className="flex justify-between items-center">
+          <h2 className="text-lg font-bold text-blue-600">6. Damage Information</h2>
+          <button onClick={() => toggleEdit('damage')} className="text-blue-500 hover:text-blue-700">
+            {isEditing.damage ? <Check size={20} /> : <Edit size={20} />}
+          </button>
+        </div>
+
+        {isEditing.damage ? (
+          <div className="mt-4 p-4 border rounded-lg space-y-6">
+            <div>
+              <h3 className="font-semibold mb-2">Vehicle Damage Description</h3>
+              <textarea
+                value={vehicleDamageDesc}
+                onChange={(e) => setvehicleDamageDesc(e.target.value)}
+                className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                rows={4}
+                placeholder="Describe the damage to your vehicle..."
+              />
+            </div>
+
+            <div>
+              <h3 className="font-semibold mb-2">Third Party Property Damage</h3>
+              <textarea
+                value={thirdPartyDamageDesc}
+                onChange={(e) => setthirdPartyDamageDesc(e.target.value)}
+                className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                rows={4}
+                placeholder="Describe any damage to other property..."
+              />
+            </div>
+
+            <div>
+              <h3 className="font-semibold mb-2">Were there any injuries?</h3>
+              <div className="flex flex-wrap gap-4">
+                {['Yes', 'No'].map((option) => (
+                  <label key={option} className="flex items-center">
+                    <input
+                      type="radio"
+                      name="injuriesAny"
+                      value={option}
+                      checked={(injuriesAny && option === 'Yes') || (!injuriesAny && option === 'No')}
+                      onChange={() => setinjuriesAny(option === 'Yes')}
+                      className="mr-2"
+                    />
+                    {option}
+                  </label>
+                ))}
+              </div>
+              {injuriesAny && (
+                <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="relative">
+                    <label className="block text-sm font-medium mb-1">Injured Person's Name</label>
+                    <input
+                      type="text"
+                      value={injuredPersons.name}
+                      onChange={(e) => setInjuredPersons({ name: e.target.value })}
+                      className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    />
+                  </div>
+                  <div className="relative">
+                    <label className="block text-sm font-medium mb-1">Injured Person's Address</label>
+                    <input
+                      type="text"
+                      value={injuredPersons.address}
+                      onChange={(e) => setInjuredPersons({ address: e.target.value })}
+                      className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 mt-4 px-4">
+            <div>
+              <strong>Vehicle Damage Description:</strong>
+              <p className="mt-1 whitespace-pre-wrap">{vehicleDamageDesc || 'Not provided'}</p>
+            </div>
+            <div>
+              <strong>Third Party Property Damage:</strong>
+              <p className="mt-1 whitespace-pre-wrap">{thirdPartyDamageDesc || 'Not provided'}</p>
+            </div>
+            <div>
+              <strong>Injuries:</strong> {injuriesAny ? 'Yes' : 'No'}
+              {injuriesAny && (
+                <>
+                  <p className="mt-1"><strong>Injured Person:</strong> {injuredPersons.name}</p>
+                  <p><strong>Address:</strong> {injuredPersons.address}</p>
                 </>
               )}
             </div>
@@ -767,7 +1068,7 @@ export default function ClaimPreview() {
             {isEditing.witness ? <Check size={20} /> : <Edit size={20} />}
           </button>
         </div>
-        
+
         {isEditing.witness ? (
           <div className="mt-4 p-4 border rounded-lg space-y-6">
             <div>
@@ -775,10 +1076,10 @@ export default function ClaimPreview() {
               <div className="flex flex-wrap gap-4">
                 {['Yes I was', 'No I wasn\'t alone'].map((option) => (
                   <label key={option} className="flex items-center">
-                    <input 
-                      type="radio" 
-                      name="aloneInVehicle" 
-                      value={option} 
+                    <input
+                      type="radio"
+                      name="aloneInVehicle"
+                      value={option}
                       checked={aloneInVehicle === option}
                       onChange={() => setAloneInVehicle(option)}
                       className="mr-2"
@@ -829,12 +1130,12 @@ export default function ClaimPreview() {
               <div className="flex flex-wrap gap-4">
                 {['Yes', 'Yes. I dont have their names', 'No, there were no witnesses'].map((option) => (
                   <label key={option} className="flex items-center">
-                    <input 
-                      type="radio" 
-                      name="independentWitnessPresence" 
-                      value={option} 
-                      checked={independentWitnessPresence === option}
-                      onChange={() => setIndependentWitnessPresence(option)}
+                    <input
+                      type="radio"
+                      name="independentWitnessPresent"
+                      value={option}
+                      checked={independentWitnessPresent === option}
+                      onChange={() => setindependentWitnessPresent(option)}
                       className="mr-2"
                     />
                     {option}
@@ -843,7 +1144,7 @@ export default function ClaimPreview() {
               </div>
             </div>
 
-            {independentWitnessPresence === 'Yes' && (
+            {independentWitnessPresent === 'Yes' && (
               <div>
                 <h3 className="font-semibold mb-2">Witness Details</h3>
                 {independentWitnesses.map((witness, index) => (
@@ -878,12 +1179,12 @@ export default function ClaimPreview() {
               </div>
             )}
 
-            {independentWitnessPresence === 'Yes. I dont have their names' && (
+            {independentWitnessPresent === 'Yes. I dont have their names' && (
               <div>
                 <h3 className="font-semibold mb-2">Reason</h3>
                 <textarea
-                  value={witnessReason}
-                  onChange={(e) => setWitnessReason(e.target.value)}
+                  value={whyNoWitness}
+                  onChange={(e) => setwhyNoWitness(e.target.value)}
                   className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                   rows={3}
                 />
@@ -895,7 +1196,7 @@ export default function ClaimPreview() {
             <div>
               <strong>Alone in Vehicle:</strong> {aloneInVehicle}
             </div>
-            
+
             {aloneInVehicle === 'No I wasn\'t alone' && vehicleOccupants.length > 0 && (
               <div className="col-span-2">
                 <strong>Vehicle Occupants:</strong>
@@ -907,11 +1208,11 @@ export default function ClaimPreview() {
                 ))}
               </div>
             )}
-            
+
             <div className="col-span-2">
-              <strong>Independent Witnesses:</strong> {independentWitnessPresence}
-              
-              {independentWitnessPresence === 'Yes' && independentWitnesses.length > 0 && (
+              <strong>Independent Witnesses:</strong> {independentWitnessPresent}
+
+              {independentWitnessPresent === 'Yes' && independentWitnesses.length > 0 && (
                 <div className="mt-2">
                   {independentWitnesses.map((witness, index) => (
                     <div key={index} className="mt-2 p-2 border rounded">
@@ -921,11 +1222,11 @@ export default function ClaimPreview() {
                   ))}
                 </div>
               )}
-              
-              {independentWitnessPresence === 'Yes. I dont have their names' && (
+
+              {independentWitnessPresent === 'Yes. I dont have their names' && (
                 <div className="mt-2">
                   <strong>Reason:</strong>
-                  <p className="whitespace-pre-line">{witnessReason}</p>
+                  <p className="whitespace-pre-line">{whyNoWitness}</p>
                 </div>
               )}
             </div>

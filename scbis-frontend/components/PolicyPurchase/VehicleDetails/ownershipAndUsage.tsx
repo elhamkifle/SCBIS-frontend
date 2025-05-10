@@ -72,8 +72,8 @@ export default function OwnershipAndUsageForm() {
                         <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Driver Type *</label>
                         <select name="driverType" value={formData.driverType} onChange={handleChange} className="w-full p-2 border border-black rounded" required>
                             <option value="">Select</option>
-                            <option value="Private">Private</option>
-                            <option value="Commercial">Commercial</option>
+                            <option value="known">Known Driver</option>
+                            <option value="any">Any Driver</option>
                         </select>
                     </div>
                     <div className="relative w-full">

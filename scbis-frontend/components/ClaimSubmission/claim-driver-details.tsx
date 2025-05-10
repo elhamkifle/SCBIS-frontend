@@ -15,7 +15,7 @@ const ethiopianCities = [
 export default function ClaimDriverDetails() {
   const router = useRouter();
   const {
-    isDriverSame,
+    isDriverSameAsInsured,
     agreed,
     formData,
     setDriverSame,
@@ -34,15 +34,31 @@ export default function ClaimDriverDetails() {
   const handleNext = () => {
 
     // Only validate form if driver is not the same
-    if (isDriverSame === false) {
-      const requiredFields = ['firstName', 'lastName', 'age', 'city', 'subCity', 'kebele', 'phoneNumber', 'licenseNo', 'grade', 'expirationDate'];
-      const isFormValid = requiredFields.every(field => formData[field as keyof typeof formData].trim() !== '');
-
+    if (isDriverSameAsInsured === false) {
+      const requiredFields = [
+        'firstName',
+        'lastName',
+        'age',
+        'city',
+        'subCity',
+        'kebele',
+        'phoneNumber',
+        'licenseNo',
+        'grade',
+        'expirationDate'
+      ];
+    
+      const isFormValid = requiredFields.every(field => {
+        const value = formData[field as keyof typeof formData];
+        return String(value).trim() !== '';
+      });
+    
       if (!isFormValid) {
         setError('All fields are required when driver is not the insured customer.');
         return;
       }
     }
+    
 
     console.log('Form Data:', formData);
     router.push('/claim-submission/accident-details');
@@ -89,7 +105,7 @@ export default function ClaimDriverDetails() {
             <input 
               type="radio" 
               name="driver" 
-              checked={isDriverSame === true}
+              checked={isDriverSameAsInsured === true}
               onChange={() => setDriverSame(true)} 
             />
             <p>Yes</p>
@@ -98,7 +114,7 @@ export default function ClaimDriverDetails() {
             <input 
               type="radio" 
               name="driver" 
-              checked={isDriverSame === false}
+              checked={isDriverSameAsInsured === false}
               onChange={() => setDriverSame(false)} 
             />
             <p>No</p>
@@ -106,7 +122,7 @@ export default function ClaimDriverDetails() {
         </div>
       </div>
 
-      {isDriverSame === false && (
+      {isDriverSameAsInsured === false && (
         <div className="mt-2 p-4">
           <h3 className="text-lg">Please State the Driver's</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">

@@ -7,28 +7,47 @@ interface OtherVehicle {
   driverPhone: string;
 }
 
+interface Location {
+  city: string;
+  subCity: string;
+  kebele: string;
+  sefer: string;
+}
+
 interface AccidentDetailsState {
   otherVehicles: OtherVehicle[];
-  position: string;
+  dateOfAccident: string;
+  timeOfAccident: string;
+  speed: number;
+  location: Location;
+  positionOnRoad: string;
   roadSurface: string;
   trafficCondition: string;
-  description: string;
+  additionalDescription: string;
   timeOfDay: string;
+  hornSounded: string;
   headlightsOn: string;
+  wereYouInVehicle: string;
   visibilityObstructions: string;
-  accidentLocation: string;
+  intersectionType: string;
   error: string;
   addVehicle: () => void;
   removeVehicle: (index: number) => void;
   updateVehicle: (index: number, data: Partial<OtherVehicle>) => void;
-  setPosition: (position: string) => void;
-  setRoadSurface: (surface: string) => void;
-  setTrafficCondition: (condition: string) => void;
-  setDescription: (description: string) => void;
-  setTimeOfDay: (time: string) => void;
+  setpositionOnRoad: (positionOnRoad: string) => void;
+  setRoadSurface: (roadsurface: string) => void;
+  setTrafficCondition: (trafficCondition: string) => void;
+  setadditionalDescription: (description: string) => void;
+  setTimeOfDay: (timeOfDay: string) => void;
+  sethornSounded: (hornSounded: string) => void;
+  setdateOfAccident: (dateOfAccident: string) => void;
+  settimeOfAccident: (timeOfAccident: string) => void;
+  setspeed: (speed: number) => void;
+  setlocation: (location: Location) => void;
   setHeadlightsOn: (status: string) => void;
+  setwereYouInVehicle: (wereYouInVehicle: string) => void;
   setVisibilityObstructions: (obstruction: string) => void;
-  setAccidentLocation: (location: string) => void;
+  setintersectionType: (location: string) => void;
   setError: (error: string) => void;
   clearAllData: () => void;
 }
@@ -56,14 +75,25 @@ export const useAccidentDetailsStore = create<AccidentDetailsState>()(
   persist(
     (set) => ({
       otherVehicles: [{ ...initialOtherVehicle }],
-      position: '',
+      positionOnRoad: '',
       roadSurface: '',
       trafficCondition: '',
-      description: '',
+      additionalDescription: '',
       timeOfDay: '',
+      hornSounded: '',
       headlightsOn: '',
+      wereYouInVehicle: '',
       visibilityObstructions: '',
-      accidentLocation: '',
+      intersectionType: '',
+      dateOfAccident: '',
+      timeOfAccident: '',
+      speed: 0,
+      location: {
+        city: '',
+        subCity: '',
+        kebele: '',
+        sefer: ''
+      },      
       error: '',
       addVehicle: () => 
         set((state) => ({ 
@@ -79,28 +109,45 @@ export const useAccidentDetailsStore = create<AccidentDetailsState>()(
           updatedVehicles[index] = { ...updatedVehicles[index], ...data };
           return { otherVehicles: updatedVehicles };
         }),
-      setPosition: (position) => set({ position }),
+      setdateOfAccident: (dateOfAccident) => set({ dateOfAccident }),
+      settimeOfAccident: (timeOfAccident) => set({ timeOfAccident }),
+      setspeed: (speed) => set({ speed }),
+      setlocation: (location) => set({ location }),
+      setpositionOnRoad: (positionOnRoad) => set({ positionOnRoad }),
       setRoadSurface: (roadSurface) => set({ roadSurface }),
       setTrafficCondition: (trafficCondition) => set({ trafficCondition }),
-      setDescription: (description) => set({ description }),
+      setadditionalDescription: (additionalDescription) => set({ additionalDescription }),
       setTimeOfDay: (timeOfDay) => set({ timeOfDay }),
+      sethornSounded: (hornSounded) => set({hornSounded}), 
       setHeadlightsOn: (headlightsOn) => set({ headlightsOn }),
+      setwereYouInVehicle: (wereYouInVehicle) => set({wereYouInVehicle}),
       setVisibilityObstructions: (visibilityObstructions) => set({ visibilityObstructions }),
-      setAccidentLocation: (accidentLocation) => set({ accidentLocation }),
+      setintersectionType: (intersectionType) => set({ intersectionType }),
       setError: (error) => set({ error }),
       clearAllData: () => 
         set({ 
           otherVehicles: [{ ...initialOtherVehicle }],
-          position: '',
+          positionOnRoad: '',
           roadSurface: '',
           trafficCondition: '',
-          description: '',
+          additionalDescription: '',
           timeOfDay: '',
+          hornSounded: '',
           headlightsOn: '',
+          wereYouInVehicle: '',
           visibilityObstructions: '',
-          accidentLocation: '',
+          intersectionType: '',
+          dateOfAccident: '',
+          timeOfAccident: '',
+          speed: 0,
+          location: {
+            city: '',
+            subCity: '',
+            kebele: '',
+            sefer: ''
+          },
           error: ''
-        })
+        })      
     }),
     {
       name: 'accident-details-storage',

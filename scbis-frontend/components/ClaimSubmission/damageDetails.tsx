@@ -7,15 +7,15 @@ import { useState } from 'react';
 export default function DamageDetails() {
   const router = useRouter();
   const {
-    vehicleDesc,
-    thirdPartyDesc,
-    injury,
-    injuredPerson,
+    vehicleDamageDesc,
+    thirdPartyDamageDesc,
+    injuriesAny,
+    injuredPersons,
     error,
-    setVehicleDesc,
-    setThirdPartyDesc,
-    setInjury,
-    setInjuredPerson,
+    setvehicleDamageDesc,
+    setthirdPartyDamageDesc,
+    setinjuriesAny,
+    setInjuredPersons,
     setError,
     clearAllData
   } = useDamageDetailsStore();
@@ -24,15 +24,15 @@ export default function DamageDetails() {
   const [thirdPartyFiles, setThirdPartyFiles] = useState<File[]>([]);
 
   const handleNext = () => {
-    if (!vehicleFiles.length && !vehicleDesc.trim()) {
+    if (!vehicleFiles.length && !vehicleDamageDesc.trim()) {
       return setError('❌ Please upload a photo or provide a description of the damage to your vehicle.');
     }
 
-    if (!thirdPartyFiles.length && !thirdPartyDesc.trim()) {
+    if (!thirdPartyFiles.length && !thirdPartyDamageDesc.trim()) {
       return setError('❌ Please upload a photo or provide a description of the third-party damage.');
     }
 
-    if (injury && (!injuredPerson.name.trim() || !injuredPerson.address.trim())) {
+    if (injuriesAny && (!injuredPersons.name.trim() || !injuredPersons.address.trim())) {
       return setError('❌ Please provide name and address of the injured person.');
     }
 
@@ -106,8 +106,8 @@ export default function DamageDetails() {
             <label className="font-semibold block mb-2">Details of damage to your vehicle</label>
             <textarea
               className="w-full border border-gray-300 rounded-md p-2"
-              value={vehicleDesc}
-              onChange={(e) => setVehicleDesc(e.target.value)}
+              value={vehicleDamageDesc}
+              onChange={(e) => setvehicleDamageDesc(e.target.value)}
             />
           </div>
         </div>
@@ -121,8 +121,8 @@ export default function DamageDetails() {
             <label className="font-semibold block mb-2">Details of damage to Third Party's property & Vehicle</label>
             <textarea
               className="w-full border border-gray-300 rounded-md p-2"
-              value={thirdPartyDesc}
-              onChange={(e) => setThirdPartyDesc(e.target.value)}
+              value={thirdPartyDamageDesc}
+              onChange={(e) => setthirdPartyDamageDesc(e.target.value)}
             />
           </div>
         </div>
@@ -134,9 +134,9 @@ export default function DamageDetails() {
           <label className="flex items-center">
             <input 
               type="radio" 
-              name="injury" 
-              onChange={() => setInjury(true)} 
-              checked={injury} 
+              name="injuriesAny" 
+              onChange={() => setinjuriesAny(true)} 
+              checked={injuriesAny} 
               className="mr-2" 
             /> 
             Yes
@@ -144,15 +144,15 @@ export default function DamageDetails() {
           <label className="flex items-center">
             <input 
               type="radio" 
-              name="injury" 
-              onChange={() => setInjury(false)} 
-              checked={!injury} 
+              name="injuriesAny" 
+              onChange={() => setinjuriesAny(false)} 
+              checked={!injuriesAny} 
               className="mr-2" 
             /> 
             No
           </label>
         </div>
-        {injury && (
+        {injuriesAny && (
           <>
             <label className='font-semibold'>If so, please state</label>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
@@ -160,16 +160,16 @@ export default function DamageDetails() {
                 <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Name of the Person</label>
                 <input
                   className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-                  value={injuredPerson.name}
-                  onChange={(e) => setInjuredPerson({ name: e.target.value })}
+                  value={injuredPersons.name}
+                  onChange={(e) => setInjuredPersons({ name: e.target.value })}
                 />
               </div>
               <div className="relative w-full">
                 <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Address of the Person</label>
                 <input
                   className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-                  value={injuredPerson.address}
-                  onChange={(e) => setInjuredPerson({ address: e.target.value })}
+                  value={injuredPersons.address}
+                  onChange={(e) => setInjuredPersons({ address: e.target.value })}
                 />
               </div>
             </div>

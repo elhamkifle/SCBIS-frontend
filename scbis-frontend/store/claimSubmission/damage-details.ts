@@ -7,15 +7,15 @@ interface InjuredPerson {
 }
 
 interface DamageDetailsState {
-  vehicleDesc: string;
-  thirdPartyDesc: string;
-  injury: boolean;
-  injuredPerson: InjuredPerson;
+  vehicleDamageDesc: string;
+  thirdPartyDamageDesc: string;
+  injuriesAny: boolean;
+  injuredPersons: InjuredPerson;
   error: string;
-  setVehicleDesc: (desc: string) => void;
-  setThirdPartyDesc: (desc: string) => void;
-  setInjury: (status: boolean) => void;
-  setInjuredPerson: (person: Partial<InjuredPerson>) => void;
+  setvehicleDamageDesc: (desc: string) => void;
+  setthirdPartyDamageDesc: (desc: string) => void;
+  setinjuriesAny: (status: boolean) => void;
+  setInjuredPersons: (person: Partial<InjuredPerson>) => void;
   setError: (error: string) => void;
   clearAllData: () => void;
 }
@@ -23,24 +23,24 @@ interface DamageDetailsState {
 export const useDamageDetailsStore = create<DamageDetailsState>()(
   persist(
     (set) => ({
-      vehicleDesc: '',
-      thirdPartyDesc: '',
-      injury: false,
-      injuredPerson: { name: '', address: '' },
+      vehicleDamageDesc: '',
+      thirdPartyDamageDesc: '',
+      injuriesAny: false,
+      injuredPersons: { name: '', address: '' },
       error: '',
-      setVehicleDesc: (desc) => set({ vehicleDesc: desc }),
-      setThirdPartyDesc: (desc) => set({ thirdPartyDesc: desc }),
-      setInjury: (status) => set({ injury: status }),
-      setInjuredPerson: (person) => 
+      setvehicleDamageDesc: (desc) => set({ vehicleDamageDesc: desc }),
+      setthirdPartyDamageDesc: (desc) => set({ thirdPartyDamageDesc: desc }),
+      setinjuriesAny: (status) => set({ injuriesAny: status }),
+      setInjuredPersons: (person) => 
         set((state) => ({ 
-          injuredPerson: { ...state.injuredPerson, ...person } 
+          injuredPersons: { ...state.injuredPersons, ...person } 
         })),
       setError: (error) => set({ error }),
       clearAllData: () => set({ 
-        vehicleDesc: '',
-        thirdPartyDesc: '',
-        injury: false,
-        injuredPerson: { name: '', address: '' },
+        vehicleDamageDesc: '',
+        thirdPartyDamageDesc: '',
+        injuriesAny: false,
+        injuredPersons: { name: '', address: '' },
         error: ''
       })
     }),

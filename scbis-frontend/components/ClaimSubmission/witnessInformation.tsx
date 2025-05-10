@@ -8,18 +8,18 @@ export default function WitnessInformation() {
   const {
     aloneInVehicle,
     vehicleOccupants,
-    independentWitnessPresence,
+    independentWitnessPresent,
     independentWitnesses,
-    witnessReason,
+    whyNoWitness,
     setAloneInVehicle,
     addVehicleOccupant,
     updateVehicleOccupant,
     removeVehicleOccupant,
-    setIndependentWitnessPresence,
+    setindependentWitnessPresent,
     addIndependentWitness,
     updateIndependentWitness,
     removeIndependentWitness,
-    setWitnessReason,
+    setwhyNoWitness,
     clearAllData
   } = useWitnessInformationStore();
 
@@ -138,10 +138,10 @@ export default function WitnessInformation() {
             <label key={option} className="flex items-center">
               <input
                 type="radio"
-                name="independentWitnessPresence"
+                name="independentWitnessPresent"
                 value={option}
-                onChange={() => setIndependentWitnessPresence(option)}
-                checked={independentWitnessPresence === option}
+                onChange={() => setindependentWitnessPresent(option)}
+                checked={independentWitnessPresent === option}
                 className="mr-2"
               />
               {option}
@@ -149,7 +149,7 @@ export default function WitnessInformation() {
           ))}
         </div>
 
-        {independentWitnessPresence === 'Yes' && (
+        {independentWitnessPresent === 'Yes' && (
           <div className="mt-4">
             <h4 className="font-semibold">Give name and addresses of witnesses.</h4>
             {independentWitnesses.map((witness, index) => (
@@ -199,13 +199,13 @@ export default function WitnessInformation() {
           </div>
         )}
 
-        {independentWitnessPresence === 'Yes. I dont have their names' && (
+        {independentWitnessPresent === 'Yes. I dont have their names' && (
           <div className="mt-4">
             <h4 className="font-semibold">If No, why?</h4>
             <textarea
               placeholder="Reason"
-              value={witnessReason}
-              onChange={(e) => setWitnessReason(e.target.value)}
+              value={whyNoWitness}
+              onChange={(e) => setwhyNoWitness(e.target.value)}
               className="md:w-1/2 w-full p-2 border rounded"
               rows={3}
             />

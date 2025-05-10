@@ -4,7 +4,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 interface DriverDetails {
   firstName: string;
   lastName: string;
-  age: string;
+  age: number;
   city: string;
   subCity: string;
   kebele: string;
@@ -15,7 +15,7 @@ interface DriverDetails {
 }
 
 interface DriverDetailsState {
-  isDriverSame: boolean | null;
+  isDriverSameAsInsured: boolean | null;
   agreed: boolean;
   formData: DriverDetails;
   setDriverSame: (value: boolean | null) => void;
@@ -27,7 +27,7 @@ interface DriverDetailsState {
 const initialFormData: DriverDetails = {
   firstName: '',
   lastName: '',
-  age: '',
+  age: 0,
   city: '',
   subCity: '',
   kebele: '',
@@ -40,17 +40,17 @@ const initialFormData: DriverDetails = {
 export const useDriverDetailsStore = create<DriverDetailsState>()(
   persist(
     (set) => ({
-      isDriverSame: null,
+      isDriverSameAsInsured: null,
       agreed: false,
       formData: initialFormData,
-      setDriverSame: (value) => set({ isDriverSame: value }),
+      setDriverSame: (value) => set({ isDriverSameAsInsured: value }),
       setAgreed: (value) => set({ agreed: value }),
       updateFormData: (data) => 
         set((state) => ({ 
           formData: { ...state.formData, ...data } 
         })),
       clearAllData: () => set({ 
-        isDriverSame: null, 
+        isDriverSameAsInsured: null, 
         agreed: false, 
         formData: initialFormData 
       }),

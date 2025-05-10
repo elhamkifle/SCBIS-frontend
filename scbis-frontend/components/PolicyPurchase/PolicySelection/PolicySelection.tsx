@@ -6,6 +6,7 @@ import { Fragment } from 'react';
 import { Info } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { usePolicyStore } from '@/store/policyPurchase/policySelection';
+import Image from 'next/image';
 
 const covers = [
   {
@@ -23,13 +24,13 @@ This mandatory insurance covers your legal responsibility for death, bodily inju
 📌 Covers injuries, death, and property damage caused to third parties.
 
 📌 Does NOT cover damages to your own vehicle.`,
-    icon: '🚗💥',
+    image: '/thirdparty.jpeg',
   },
   {
     title: 'Own Damage Cover',
     description: 'Protects your vehicle from specific risks',
     benefits: [
-      "Covers your car’s damages, fire, and theft.",
+      "Covers your car's damages, fire, and theft.",
       "Ideal if you're seeking coverage for your vehicle without the full extent of a comprehensive policy.",
     ],
     info: `
@@ -38,7 +39,7 @@ Protects your vehicle from specific risks, covering damages caused by accidents,
 📌 Covers damages to your own vehicle from accidents, fire, and theft.
 📌 Does NOT cover third-party liability, natural disasters, or vandalism.
 📌 More affordable than comprehensive insurance.`,
-    icon: '🚘🔥',
+    image: '/owndamage.jpeg',
   },
   {
     title: 'Comprehensive Cover',
@@ -53,7 +54,7 @@ Provides extensive protection for your vehicle and third-party liabilities. This
 📌 Provides full protection for your vehicle and third parties.
 📌 Covers accidents, theft, fire, and natural disasters.
 📌 Higher premium, but best for expensive vehicles & full security.`,
-    icon: '🛡️🚗',
+    image: '/comprehensive.jpeg',
   },
 ];
 
@@ -95,7 +96,7 @@ export default function PolicySelection() {
         <h2 className="md:text-xl sm:text-lg font-bold">Policy Purchase</h2>
         <button
           className="bg-[#0F1D3F] sm:text-xs md:text-lg text-white px-4 py-2 rounded"
-          onClick={resetPolicy} // Reset policy store when saving as draft
+          onClick={resetPolicy}
         >
           Save as draft
         </button>
@@ -124,22 +125,31 @@ export default function PolicySelection() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl">
         {covers.map((cover, index) => (
           <div
             key={index}
-            className={`bg-white p-6 rounded-2xl shadow-lg flex flex-col justify-between space-y-4 text-center md:mb-[20px] md:min-h-[400px] cursor-pointer ${selectedPolicy === cover.title ? 'border-2 border-green-500' : 'border border-gray-300'
-              }`}
+            className={`bg-white p-6 rounded-2xl shadow-lg flex flex-col justify-between space-y-4 text-center md:mb-[20px] md:min-h-[400px] cursor-pointer ${
+              selectedPolicy === cover.title ? 'border-2 border-green-500' : 'border border-gray-300'
+            }`}
             style={{ boxShadow: '0px 10px 20px rgba(0, 123, 255, 0.4), 0px 4px 8px rgba(0, 0, 0, 0.1)' }}
             onClick={() => handleSelect(cover.title)}
           >
-            <div className="text-4xl">{cover.icon}</div>
+            <div className="flex justify-center">
+              <Image 
+                src={cover.image} 
+                alt={cover.title}
+                width={120}
+                height={120}
+                className="object-contain"
+              />
+            </div>
             <h3 className="text-xl font-semibold">{cover.title}</h3>
             <p className="text-md">{cover.description}</p>
             <ul className="text-left space-y-2">
               {cover.benefits.map((benefit, i) => (
                 <li key={i} className="flex items-start space-x-2 block">
-                  ✅<ul>{benefit}</ul>
+                  ✅<span>{benefit}</span>
                 </li>
               ))}
             </ul>
@@ -180,7 +190,7 @@ export default function PolicySelection() {
         </Dialog>
       </Transition>
 
-      <div className="flex justify-between w-full">
+      <div className="flex justify-between w-full max-w-6xl mt-8">
         <button className="border border-black px-4 py-2 rounded-lg">Learn More</button>
         <button
           onClick={handleNext}

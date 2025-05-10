@@ -7,14 +7,14 @@ import { useState } from 'react';
 export default function Declaration() {
   const router = useRouter();
   const {
-    driverName,
-    insuredName,
-    date,
-    agreed,
-    setDriverName,
-    setInsuredName,
-    setDate,
-    setAgreed,
+    driverFullName,
+    insuredFullName,
+    signatureDate,
+    agreedToDeclaration,
+    setdriverFullName,
+    setinsuredFullName,
+    setsignatureDate,
+    setagreedToDeclaration,
     clearAllData
   } = useDeclarationStore();
 
@@ -23,19 +23,19 @@ export default function Declaration() {
   const handlePrevious = () => router.push('/claim-submission/damage-details');
   
   const handleNext = () => {
-    if (!driverName.trim()) {
+    if (!driverFullName.trim()) {
       setError('Please enter driver\'s full name');
       return;
     }
-    if (!insuredName.trim()) {
+    if (!insuredFullName.trim()) {
       setError('Please enter insured\'s full name');
       return;
     }
-    if (!date) {
+    if (!signatureDate) {
       setError('Please select a date');
       return;
     }
-    if (!agreed) {
+    if (!agreedToDeclaration) {
       setError('You must agree to continue');
       return;
     }
@@ -69,9 +69,9 @@ export default function Declaration() {
               <label className="block text-sm font-medium  mb-1">Driver's Full Name</label>
               <input
                 type="text"
-                value={driverName}
+                value={driverFullName}
                 onChange={(e) => {
-                  setDriverName(e.target.value);
+                  setdriverFullName(e.target.value);
                   setError('');
                 }}
                 className="w-full p-2 border-b border-black focus:outline-none focus:border-blue-500"
@@ -82,9 +82,9 @@ export default function Declaration() {
               <label className="block text-sm font-medium mb-1">Insured's Full Name</label>
               <input
                 type="text"
-                value={insuredName}
+                value={insuredFullName}
                 onChange={(e) => {
-                  setInsuredName(e.target.value);
+                  setinsuredFullName(e.target.value);
                   setError('');
                 }}
                 className="w-full p-2 border-b border-black focus:outline-none focus:border-blue-500"
@@ -95,9 +95,9 @@ export default function Declaration() {
               <label className="block text-sm font-medium mb-1">Date</label>
               <input
                 type="date"
-                value={date}
+                value={signatureDate}
                 onChange={(e) => {
-                  setDate(e.target.value);
+                  setsignatureDate(e.target.value);
                   setError('');
                 }}
                 className="w-full p-2 border-b border-black focus:outline-none focus:border-blue-500"
@@ -109,9 +109,9 @@ export default function Declaration() {
             <input
               type="checkbox"
               id="agree"
-              checked={agreed}
+              checked={agreedToDeclaration}
               onChange={(e) => {
-                setAgreed(e.target.checked);
+                setagreedToDeclaration(e.target.checked);
                 setError('');
               }}
               className="mr-2"

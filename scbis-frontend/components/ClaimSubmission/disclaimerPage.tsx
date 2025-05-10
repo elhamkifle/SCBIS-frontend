@@ -9,7 +9,7 @@ export default function ClaimDisclaimer() {
 
   const router = useRouter();
 
-  const handlePrevious = () => router.push('/claim-submission/damage-details');
+  const handlePrevious = () => router.push('/claim-submission//claim-policy-selection');
 
   const handleNext = () => {
     if (!agreed) {

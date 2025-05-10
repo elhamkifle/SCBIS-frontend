@@ -18,7 +18,7 @@ export default function GeneralVehicleDetailForm() {
     };
 
     const handlePrevious = () => {
-        router.back();
+        router.back()
     };
 
     return (
