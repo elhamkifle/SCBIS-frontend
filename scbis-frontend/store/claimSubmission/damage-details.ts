@@ -11,11 +11,21 @@ interface DamageDetailsState {
   thirdPartyDamageDesc: string;
   injuriesAny: boolean;
   injuredPersons: InjuredPerson;
+  vehicleDamageFiles: string[]; 
+  thirdPartyDamageFiles: string[]; 
+
   error: string;
+
   setvehicleDamageDesc: (desc: string) => void;
   setthirdPartyDamageDesc: (desc: string) => void;
   setinjuriesAny: (status: boolean) => void;
   setInjuredPersons: (person: Partial<InjuredPerson>) => void;
+
+  addVehicleDamageFile: (url: string) => void; 
+  removeVehicleDamageFile: (index: number) => void; 
+  addThirdPartyDamageFile: (url: string) => void; 
+  removeThirdPartyDamageFile: (index: number) => void; 
+
   setError: (error: string) => void;
   clearAllData: () => void;
 }
@@ -27,22 +37,52 @@ export const useDamageDetailsStore = create<DamageDetailsState>()(
       thirdPartyDamageDesc: '',
       injuriesAny: false,
       injuredPersons: { name: '', address: '' },
+      vehicleDamageFiles: [],
+      thirdPartyDamageFiles: [],
       error: '',
+
       setvehicleDamageDesc: (desc) => set({ vehicleDamageDesc: desc }),
       setthirdPartyDamageDesc: (desc) => set({ thirdPartyDamageDesc: desc }),
       setinjuriesAny: (status) => set({ injuriesAny: status }),
-      setInjuredPersons: (person) => 
-        set((state) => ({ 
-          injuredPersons: { ...state.injuredPersons, ...person } 
+      setInjuredPersons: (person) =>
+        set((state) => ({
+          injuredPersons: { ...state.injuredPersons, ...person },
         })),
+
+      addVehicleDamageFile: (url) =>
+        set((state) => ({
+          vehicleDamageFiles: [...state.vehicleDamageFiles, url],
+        })),
+      removeVehicleDamageFile: (index) =>
+        set((state) => {
+          const updated = [...state.vehicleDamageFiles];
+          updated.splice(index, 1);
+          return { vehicleDamageFiles: updated };
+        }),
+
+      addThirdPartyDamageFile: (url) =>
+        set((state) => ({
+          thirdPartyDamageFiles: [...state.thirdPartyDamageFiles, url],
+        })),
+      removeThirdPartyDamageFile: (index) =>
+        set((state) => {
+          const updated = [...state.thirdPartyDamageFiles];
+          updated.splice(index, 1);
+          return { thirdPartyDamageFiles: updated };
+        }),
+
       setError: (error) => set({ error }),
-      clearAllData: () => set({ 
-        vehicleDamageDesc: '',
-        thirdPartyDamageDesc: '',
-        injuriesAny: false,
-        injuredPersons: { name: '', address: '' },
-        error: ''
-      })
+
+      clearAllData: () =>
+        set({
+          vehicleDamageDesc: '',
+          thirdPartyDamageDesc: '',
+          injuriesAny: false,
+          injuredPersons: { name: '', address: '' },
+          vehicleDamageFiles: [],
+          thirdPartyDamageFiles: [],
+          error: '',
+        }),
     }),
     {
       name: 'damage-details-storage',

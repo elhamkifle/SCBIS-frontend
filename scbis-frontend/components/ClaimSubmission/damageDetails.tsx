@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useDamageDetailsStore } from '@/store/claimSubmission/damage-details';
 import { useState } from 'react';
+import axios from 'axios';
 
 export default function DamageDetails() {
   const router = useRouter();
@@ -16,14 +17,33 @@ export default function DamageDetails() {
     setthirdPartyDamageDesc,
     setinjuriesAny,
     setInjuredPersons,
+    addVehicleDamageFile,
+    addThirdPartyDamageFile,
     setError,
     clearAllData
   } = useDamageDetailsStore();
 
   const [vehicleFiles, setVehicleFiles] = useState<File[]>([]);
   const [thirdPartyFiles, setThirdPartyFiles] = useState<File[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const handleNext = () => {
+  const uploadToCloudinary = async (file: File) => {
+    const formdata = new FormData();
+    formdata.append('file', file);
+    formdata.append('upload_preset', 'docuploads');
+
+    try {
+      const result = await axios.post(`https://api.cloudinary.com/v1_1/dmzvqehan/upload`, formdata);
+      if (result.status === 200) {
+        return result.data.secure_url;
+      }
+    } catch (err) {
+      console.error('Cloudinary upload error:', err);
+    }
+    return null;
+  };
+
+  const handleNext = async () => {
     if (!vehicleFiles.length && !vehicleDamageDesc.trim()) {
       return setError('❌ Please upload a photo or provide a description of the damage to your vehicle.');
     }
@@ -37,6 +57,25 @@ export default function DamageDetails() {
     }
 
     setError('');
+    setLoading(true);
+
+    // Upload vehicle files
+    for (const file of vehicleFiles) {
+      const url = await uploadToCloudinary(file);
+      if (url) {
+        addVehicleDamageFile(url);
+      }
+    }
+
+    // Upload third-party files
+    for (const file of thirdPartyFiles) {
+      const url = await uploadToCloudinary(file);
+      if (url) {
+        addThirdPartyDamageFile(url);
+      }
+    }
+
+    setLoading(false);
     router.push('/claim-submission/declaration');
   };
 

@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useAccidentDetailsStore } from '@/store/claimSubmission/accident-details';
+import axios from 'axios';
 
 export default function AccidentDetails() {
   const router = useRouter();
@@ -22,6 +23,7 @@ export default function AccidentDetails() {
     wereYouInVehicle,
     visibilityObstructions,
     intersectionType,
+    sketchFiles,
     error,
     addVehicle,
     removeVehicle,
@@ -40,6 +42,7 @@ export default function AccidentDetails() {
     setwereYouInVehicle,
     setVisibilityObstructions,
     setintersectionType,
+    addSketchFile,
     setError,
     clearAllData
   } = useAccidentDetailsStore();
@@ -115,21 +118,51 @@ export default function AccidentDetails() {
 
   const handlePrevious = () => router.push('/claim-submission/driver-details');
     
-  const handleNext = () => {
+  const handleNext = async () => {
     if (files.length < 1) {
       setFileError('❌ Please upload an ID before proceeding.');
       return;
     }
-    
-    // Validate other form fields if needed
+  
+    // Validate required fields
     if (!positionOnRoad || !roadSurface || !trafficCondition) {
       setError('Please fill all required fields');
       return;
     }
-
-    setError('');
-    router.push('/claim-submission/liability-information');
-  };
+  
+    try {
+      setError('');
+      setFileError('');
+  
+      const uploadedUrls: string[] = [];
+  
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', 'docuploads'); // your Cloudinary preset
+  
+        const res = await axios.post(
+          'https://api.cloudinary.com/v1_1/dmzvqehan/upload', // replace with your cloud name
+          formData
+        );
+  
+        if (res.status === 200) {
+          uploadedUrls.push(res.data.secure_url);
+        } else {
+          throw new Error('Upload failed');
+        }
+      }
+  
+      // Save uploaded URLs in Zustand
+      const { addSketchFile } = useAccidentDetailsStore.getState();
+      uploadedUrls.forEach((url) => addSketchFile(url));
+  
+      router.push('/claim-submission/liability-information');
+    } catch (error) {
+      console.error('Upload error:', error);
+      setFileError('❌ Upload failed. Please try again.');
+    }
+  }  
 
   const handleDeleteFile = () => {
     setFiles([]);
