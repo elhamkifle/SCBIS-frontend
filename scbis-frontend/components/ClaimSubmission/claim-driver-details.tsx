@@ -99,7 +99,7 @@ export default function ClaimDriverDetails() {
       </div>
 
       <div className="mt-6 p-4">
-        <h3 className="text-lg">1. Was the driver at the moment of accident the same as the insured customer?</h3>
+        <p className="text-lg">1. Was the driver at the moment of accident the same as the insured customer?</p>
         <div className="mt-2 flex space-x-6">
           <label className="flex items-center space-x-2">
             <input 
@@ -124,7 +124,7 @@ export default function ClaimDriverDetails() {
 
       {isDriverSameAsInsured === false && (
         <div className="mt-2 p-4">
-          <h3 className="text-lg">Please State the Driver's</h3>
+          <p className="text-lg">Please State the Driver's</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
             <div className="relative w-full">
               <label className="absolute left-4 -top-2 text-black text-md bg-white px-1">First Name</label>

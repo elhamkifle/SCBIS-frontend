@@ -62,7 +62,7 @@ export default function WitnessInformation() {
 
       {/* Alone in Vehicle */}
       <div className="mt-4">
-        <h3 className="font-semibold">Were you alone in your vehicle during the accident</h3>
+        <p className="font-semibold">Were you alone in your vehicle during the accident</p>
         <div className="flex gap-4">
           {['Yes I was', 'No I wasn\'t alone'].map((option) => (
             <label key={option} className="flex items-center">
@@ -81,7 +81,7 @@ export default function WitnessInformation() {
 
         {aloneInVehicle === 'No I wasn\'t alone' && (
           <div className="mt-4">
-            <h4 className="font-semibold">Give name and addresses of persons in your vehicle</h4>
+            <p className="font-semibold">Give name and addresses of persons in your vehicle</p>
             {vehicleOccupants.map((occupant, index) => (
               <div key={index} className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_auto] gap-4 mt-2 items-end">
                 <div className="relative w-full">
@@ -132,7 +132,7 @@ export default function WitnessInformation() {
 
       {/* Independent Witnesses */}
       <div className="mt-6">
-        <h3 className="font-semibold">Were there any independent witnesses?</h3>
+        <p className="font-semibold">Were there any independent witnesses?</p>
         <div className="flex flex-wrap gap-4">
           {['Yes', 'Yes. I dont have their names', 'No, there were no witnesses'].map((option) => (
             <label key={option} className="flex items-center">
@@ -151,7 +151,7 @@ export default function WitnessInformation() {
 
         {independentWitnessPresent === 'Yes' && (
           <div className="mt-4">
-            <h4 className="font-semibold">Give name and addresses of witnesses.</h4>
+            <p className="font-semibold">Give name and addresses of witnesses.</p>
             {independentWitnesses.map((witness, index) => (
               <div key={index} className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_auto] gap-4 mt-2 items-end">
                 <div className="relative w-full">
@@ -201,7 +201,7 @@ export default function WitnessInformation() {
 
         {independentWitnessPresent === 'Yes. I dont have their names' && (
           <div className="mt-4">
-            <h4 className="font-semibold">If No, why?</h4>
+            <p className="font-semibold">If No, why?</p>
             <textarea
               placeholder="Reason"
               value={whyNoWitness}

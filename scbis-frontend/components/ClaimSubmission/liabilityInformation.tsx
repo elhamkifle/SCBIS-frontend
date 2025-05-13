@@ -65,7 +65,7 @@ export default function LiabilityInformation() {
 
       {/* Responsible Party */}
       <div className="mt-4">
-        <h3 className="font-semibold">Who in your opinion is responsible for the accident?</h3>
+        <p className="font-semibold">Who in your opinion is responsible for the accident?</p>
         <div className="flex flex-wrap lg:flex-nowrap gap-4">
           {['Myself', 'The other person'].map((option) => (
             <label key={option} className="flex items-center">
@@ -85,7 +85,7 @@ export default function LiabilityInformation() {
 
       {/* Other Vehicle Insured Status */}
       <div className="mt-4">
-        <h3 className="font-semibold">Is the other vehicle involved in this accident insured with another company?</h3>
+        <p className="font-semibold">Is the other vehicle involved in this accident insured with another company?</p>
         <div className="flex flex-wrap lg:flex-nowrap gap-4">
           {['I dont know', 'Yes , they are'].map((option) => (
             <label key={option} className="flex items-center">
@@ -103,7 +103,7 @@ export default function LiabilityInformation() {
         </div>
         {otherInsuredStatus === 'Yes , they are' && (
           <div>
-            <h4 className="font-semibold">If so please state</h4>
+            <p className="font-semibold">If so please state</p>
             <div className="relative w-full mt-4">
               <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Name of the Insurance Company</label>
               <input
@@ -119,7 +119,7 @@ export default function LiabilityInformation() {
 
       {/* Police Involvement */}
       <div className="mt-4">
-        <h3 className="font-semibold">Were particulars taken by police?</h3>
+        <p className="font-semibold">Were particulars taken by police?</p>
         <div className="flex flex-wrap lg:flex-nowrap gap-4">
           {['Yes', 'No'].map((option) => (
             <label key={option} className="flex items-center">
@@ -137,7 +137,7 @@ export default function LiabilityInformation() {
         </div>
         {policeInvolved === 'Yes' && (
           <div className="mt-2">
-            <h4 className="font-semibold">If so please state</h4>
+            <p className="font-semibold">If so please state</p>
             <div className="flex flex-col md:flex-row gap-4 mt-2">
               <div className="relative w-full md:w-1/2">
                 <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Police Officer's Name</label>

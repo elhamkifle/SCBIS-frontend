@@ -250,9 +250,9 @@ export default function AccidentDetails() {
         </div>
 
         </div> 
-        <h3> Address </h3>
+        <h3 className='mt-8'> Address </h3>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-2">
         {['city', 'subCity', 'kebele', 'sefer'].map((field) => (
           <div className="relative w-full" key={field}>
             <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1 capitalize">
@@ -273,7 +273,7 @@ export default function AccidentDetails() {
       
       {/* Position of Vehicle on Road */}
       <div className="mt-8">
-        <h3 className="font-semibold">Position of Vehicle on Road (Relative to Road Edge)</h3>
+        <p className="font-semibold">Position of Vehicle on Road (Relative to Road Edge)</p>
         <div className="flex flex-wrap lg:flex-nowrap gap-4">
           {['Left Side of Lane', 'Center of Lane', 'Right of Lane', 'Accident Was Not on a Road'].map((pos) => (
             <label key={pos} className="flex items-center">
@@ -293,7 +293,7 @@ export default function AccidentDetails() {
       
       {/* Other Vehicle Details */}
       <div className="mt-6">
-        <h3 className="text-lg font-semibold">Give names and addresses of Owner and Driver of other vehicle(s) involved</h3>
+        <p className="text-lg font-semibold">Give names and addresses of Owner and Driver of other vehicle(s) involved</p>
         {otherVehicles.map((vehicle, index) => (
           <div key={index} className="mt-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -357,12 +357,12 @@ export default function AccidentDetails() {
       
       {/* Description of the accident */}
       <div className="mt-6">
-        <h3 className="font-semibold text-blue-600">Description of the accident including conditions of road, and visibility</h3>
+        <p className="font-semibold text-blue-600">Description of the accident including conditions of road, and visibility</p>
       </div>
 
       {/* Type of road surface */}
       <div className="mt-4">
-        <h3 className="font-semibold">What type of road surface was it?</h3>
+        <p className="font-semibold">What type of road surface was it?</p>
         <div className="flex flex-wrap lg:flex-nowrap gap-4">
           {['Asphalt', 'Cobble Stone', 'Concrete', 'Other'].map((surface) => (
             <label key={surface} className="flex items-center">
@@ -382,7 +382,7 @@ export default function AccidentDetails() {
       
       {/* Traffic Condition */}
       <div className="mt-4">
-        <h3 className="font-semibold">Was the road crowded?</h3>
+        <p className="font-semibold">Was the road crowded?</p>
         <div className="flex flex-wrap lg:flex-nowrap gap-4">
           {['Not Crowded', 'Light Traffic', 'Moderate Traffic', 'Heavy Traffic'].map((traffic) => (
             <label key={traffic} className="flex items-center">
@@ -401,7 +401,7 @@ export default function AccidentDetails() {
       </div>
 
       <div className="mt-4">
-          <h3 className="font-semibold"> Were you in the vehicle?</h3>
+          <p className="font-semibold"> Were you in the vehicle?</p>
           <div className="flex flex-wrap lg:flex-nowrap gap-4">
             {['Yes', 'No'].map((option) => (
               <label key={option} className="flex items-center">
@@ -421,7 +421,7 @@ export default function AccidentDetails() {
 
       {/* Time of Day */}
       <div className="mt-4">
-        <h3 className="font-semibold">What was the time of day?</h3>
+        <p className="font-semibold">What was the time of day?</p>
         <div className="flex flex-wrap lg:flex-nowrap gap-4">
           {['Day Time', 'Night Time'].map((time) => (
             <label key={time} className="flex items-center">
@@ -442,7 +442,7 @@ export default function AccidentDetails() {
       {/* Headlights On - Conditional Display */}
       {timeOfDay === 'Night Time' && (
         <div className="mt-4">
-          <h3 className="font-semibold">If so, please state, Were your vehicle's headlights on?</h3>
+          <p className="font-semibold">If so, please state, Were your vehicle's headlights on?</p>
           <div className="flex flex-wrap lg:flex-nowrap gap-4">
             {['Yes', 'No'].map((option) => (
               <label key={option} className="flex items-center">
@@ -462,7 +462,7 @@ export default function AccidentDetails() {
       )}
 
     <div className="mt-4">
-          <h3 className="font-semibold">Was horn sounded?</h3>
+          <p className="font-semibold">Was horn sounded?</p>
           <div className="flex flex-wrap lg:flex-nowrap gap-4">
             {['Yes', 'No'].map((option) => (
               <label key={option} className="flex items-center">
@@ -482,7 +482,7 @@ export default function AccidentDetails() {
 
       {/* Visibility Obstructions */}
       <div className="mt-4">
-        <h3 className="font-semibold">Were there any obstructions to visibility?</h3>
+        <p className="font-semibold">Were there any obstructions to visibility?</p>
         <div className="flex flex-wrap lg:flex-nowrap gap-4">
           {['No', 'Light Rain', 'Heavy Rain', 'Fog'].map((obstruction) => (
             <label key={obstruction} className="flex items-center">
@@ -502,7 +502,7 @@ export default function AccidentDetails() {
 
       {/* Accident Location */}
       <div className="mt-4">
-        <h3 className="font-semibold">Did the accident occur at</h3>
+        <p className="font-semibold">Did the accident occur at</p>
         <div className="flex flex-wrap lg:flex-nowrap gap-4">
           {['Intersection', 'A Round About', 'Neither'].map((location) => (
             <label key={location} className="flex items-center">
@@ -522,7 +522,7 @@ export default function AccidentDetails() {
 
       {/* Description of the accident */}
       <div className="mt-6">
-        <h3 className="font-semibold">Please provide any additional detailed description of how the accident occurred</h3>
+        <p className="font-semibold">Please provide any additional detailed description of how the accident occurred</p>
         <textarea 
           value={additionalDescription} 
           onChange={(e) => setadditionalDescription(e.target.value)} 
@@ -533,7 +533,7 @@ export default function AccidentDetails() {
       </div>
 
       <div className='mt-6'> 
-        <h3 className="text-lg font-semibold mb-4">Upload the Sketch of accident (a photo or a simple sketch)</h3>  
+        <p className="text-lg font-semibold mb-4">Upload the Sketch of accident (a photo or a simple sketch)</p>  
 
         <div 
           className="md:w-1/2 flex flex-col items-center justify-center bg-blue-100 p-6 py-14 rounded-lg"
