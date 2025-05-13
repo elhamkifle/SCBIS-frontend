@@ -49,6 +49,22 @@ export default function SettingsPage() {
     setShowLogoutConfirm(false);
   };
 
+
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [confirmationInput, setConfirmationInput] = useState("");
+
+  const handleAccountDeletion = () => {
+    if (confirmationInput.trim().toUpperCase() === "DELETE") {
+      console.log("Account deleted");
+      // Add actual delete logic here
+      setShowDeleteConfirm(false);
+      setConfirmationInput("");
+    } else {
+      alert("Please type DELETE to confirm.");
+    }
+  };
+
+
   return (
     <div className="p-8 bg-gray-50 min-h-screen space-y-8">
       <h1 className="text-3xl font-bold text-gray-800">Settings</h1>
@@ -59,7 +75,42 @@ export default function SettingsPage() {
         imagePreview={imagePreview}
       />
       <SystemPreferences formData={formData} updateForm={updateForm} />
-      <AccountManagement />
+      <AccountManagement onDeleteClick={() => setShowDeleteConfirm(true)} />
+         {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center transition-opacity">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
+            <h3 className="text-xl font-semibold text-red-600">Confirm Account Deletion</h3>
+            <p className="text-gray-700">
+              This action is irreversible. Type <strong>DELETE</strong> below to confirm.
+            </p>
+            <input
+              type="text"
+              value={confirmationInput}
+              onChange={(e) => setConfirmationInput(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:border-blue-500"
+              placeholder="Type DELETE to confirm"
+            />
+            <div className="flex justify-end space-x-3 pt-4">
+              <button
+                className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 transition"
+                onClick={() => {
+                  setShowDeleteConfirm(false);
+                  setConfirmationInput("");
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white transition"
+                onClick={handleAccountDeletion}
+              >
+                Delete Account
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <SuccessPopup
         message="Your settings have been saved successfully."
         visible={showSuccess}
@@ -81,7 +132,7 @@ export default function SettingsPage() {
         </button>
       </div>
 
-      {showLogoutConfirm && (
+{showLogoutConfirm && (
   <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center transition-opacity">
     <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 animate-fade-in space-y-4">
       <h3 className="text-xl font-semibold text-gray-900">Confirm Logout</h3>
