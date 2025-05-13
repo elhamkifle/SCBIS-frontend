@@ -48,7 +48,7 @@ export default function AdminSidebar() {
 
       <nav className="flex-1 space-y-4 overflow-y-auto">
         <Link
-          href="/admin/dashboard"
+          href="/"
           className="flex items-center gap-3 text-sm font-medium text-gray-700 hover:bg-gradient-to-r from-gray-50 to-blue-50 px-3 py-2 rounded-lg transition-all group"
         >
           <LayoutDashboard size={18} className="text-blue-500 group-hover:text-blue-600 transition-colors" />

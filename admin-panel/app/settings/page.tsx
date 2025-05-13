@@ -1,17 +1,12 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Pencil } from "lucide-react";
-import { useRef, useState } from "react";
-import Image from "next/image";
-import SuccessPopup from "@/components/SuccessPopUp"; // adjust the path as needed
+import ProfileSettings from "@/components/settings/ProfileSettings";
+import SystemPreferences from "@/components/settings/SystemPreferences";
+import AccountManagement from "@/components/settings/AccountManagement";
+import SuccessPopup from "@/components/settings/SuccessPopup";
+import { useState } from "react";
 
 export default function SettingsPage() {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
@@ -26,6 +21,7 @@ export default function SettingsPage() {
 
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -35,140 +31,80 @@ export default function SettingsPage() {
     }
   };
 
+  const updateForm = (key: keyof typeof formData, value: string) => {
+    setFormData((prev) => ({ ...prev, [key]: value }));
+  };
+
   const handleSave = () => {
     setIsSaving(true);
-
     setTimeout(() => {
       setIsSaving(false);
       setShowSuccess(true);
     }, 1500);
   };
 
-  const updateForm = (key: keyof typeof formData, value: string) => {
-    setFormData((prev) => ({ ...prev, [key]: value }));
+  const handleLogout = () => {
+    console.log("User logged out");
+    // Add your logout logic here (e.g., clearing tokens, redirecting to login page)
+    setShowLogoutConfirm(false);
   };
 
   return (
     <div className="p-8 bg-gray-50 min-h-screen space-y-8">
       <h1 className="text-3xl font-bold text-gray-800">Settings</h1>
-
-      {/* Profile Settings */}
-      <Card>
-        <CardContent className="p-6 space-y-6">
-          <h2 className="text-xl font-semibold">Profile</h2>
-
-          {/* Profile Picture with Edit Button */}
-          <div className="flex items-center space-x-6">
-            <div className="relative h-24 w-24 rounded-full overflow-hidden border shadow group">
-              {imagePreview ? (
-                <Image src={imagePreview} alt="Profile" fill className="object-cover" />
-              ) : (
-                <div className="h-full w-full bg-gray-200 flex items-center justify-center text-gray-500">
-                  No Image
-                </div>
-              )}
-
-              <input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                ref={fileInputRef}
-                onChange={handleImageChange}
-              />
-
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="absolute bottom-1 right-1 p-1 bg-white rounded-full shadow hover:bg-gray-100 transition"
-                title="Edit profile picture"
-              >
-                <Pencil size={16} className="text-gray-600" />
-              </button>
-            </div>
-            <div>
-              <p className="text-gray-700">Click the pencil icon to change your photo</p>
-            </div>
-          </div>
-
-          {/* Profile Info */}
-          <div className="grid md:grid-cols-2 gap-4 mt-4">
-            <div>
-              <Label>Full Name</Label>
-              <Input
-                value={formData.fullName}
-                onChange={(e) => updateForm("fullName", e.target.value)}
-              />
-            </div>
-            <div>
-              <Label>Email</Label>
-              <Input
-                value={formData.email}
-                onChange={(e) => updateForm("email", e.target.value)}
-              />
-            </div>
-            <div>
-              <Label>Phone Number</Label>
-              <Input
-                value={formData.phone}
-                onChange={(e) => updateForm("phone", e.target.value)}
-              />
-            </div>
-            <div>
-              <Label>Password</Label>
-              <Input
-                type="password"
-                placeholder="********"
-                value={formData.password}
-                onChange={(e) => updateForm("password", e.target.value)}
-              />
-            </div>
-          </div>
-
-          <Button className="mt-6" onClick={handleSave} disabled={isSaving}>
-            {isSaving ? "Saving..." : "Save Changes"}
-          </Button>
-        </CardContent>
-      </Card>
-
-      {/* System Preferences */}
-      <Card>
-        <CardContent className="p-6 space-y-4">
-          <h2 className="text-xl font-semibold">System Preferences</h2>
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <Label>Language</Label>
-              <Input
-                value={formData.language}
-                onChange={(e) => updateForm("language", e.target.value)}
-              />
-            </div>
-            <div>
-              <Label>Time Zone</Label>
-              <Input
-                value={formData.timezone}
-                onChange={(e) => updateForm("timezone", e.target.value)}
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Account Settings */}
-      <Card>
-        <CardContent className="p-6 space-y-4">
-          <h2 className="text-xl font-semibold text-red-600">Account Management</h2>
-          <p className="text-gray-600">
-            Deleting your account is irreversible. All associated data will be permanently removed.
-          </p>
-          <Button variant="destructive">Delete My Account</Button>
-        </CardContent>
-      </Card>
-
-      {/* Success Popup */}
+      <ProfileSettings
+        formData={formData}
+        updateForm={updateForm}
+        handleImageChange={handleImageChange}
+        imagePreview={imagePreview}
+      />
+      <SystemPreferences formData={formData} updateForm={updateForm} />
+      <AccountManagement />
       <SuccessPopup
         message="Your settings have been saved successfully."
         visible={showSuccess}
         onClose={() => setShowSuccess(false)}
       />
+      <div className="flex justify-end space-x-4">
+        <button
+          className="mt-6 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          onClick={handleSave}
+          disabled={isSaving}
+        >
+          {isSaving ? "Saving..." : "Save Changes"}
+        </button>
+        <button
+          className="mt-6 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+          onClick={() => setShowLogoutConfirm(true)}
+        >
+          Log Out
+        </button>
+      </div>
+
+      {showLogoutConfirm && (
+  <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center transition-opacity">
+    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 animate-fade-in space-y-4">
+      <h3 className="text-xl font-semibold text-gray-900">Confirm Logout</h3>
+      <p className="text-gray-600">Are you sure you want to log out?</p>
+      <div className="flex justify-end space-x-3 pt-4">
+        <button
+          className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 transition"
+          onClick={() => setShowLogoutConfirm(false)}
+        >
+          Cancel
+        </button>
+        <button
+          className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white transition"
+          onClick={handleLogout}
+        >
+          Log Out
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
     </div>
   );
 }
