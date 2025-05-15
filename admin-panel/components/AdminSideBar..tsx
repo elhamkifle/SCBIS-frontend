@@ -73,7 +73,7 @@ export default function AdminSidebar() {
         <SidebarGroup
           title="Claims"
           links={[
-            { label: "Incoming Claims", href: "/admin/claims/incoming", icon: ShieldCheck },
+            { label: "Incoming Claims", href: "/claims/incomingClaims", icon: ShieldCheck },
             { label: "Pending (Police Report)", href: "/admin/claims/police-report", icon: FileText },
             { label: "Ongoing/Closed", href: "/admin/claims/ongoing", icon: FileSearch },
             { label: "Notify Performa", href: "/admin/claims/performa", icon: Mail },
