@@ -3,24 +3,64 @@
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import useLoginStore from "@/store/authStore/useLoginStore";
+import { AuthSchemaType,AuthSchema } from "@/schema/zodSchema";
+import { baseAPI } from "@/utils/axiosInstance";
+import { useUserStore } from "@/store/authStore/useUserStore";
+
 
 export default function Login() {
+    const setUser = useUserStore((state) => state.setUser);
     const { email, password, error, setEmail, setPassword, setError, resetLogin } = useLoginStore();
+    const [zodError, setZodError] = useState<AuthSchemaType>({
+        email: '',
+        password: ''
+    });
+
+    const [isLoading, setIsLoading] = useState(false);
+
     const router = useRouter();
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
+        setZodError({
+            email: '',
+            password: ''})
+            setIsLoading(true);
         setError(false);
 
-        if (!email || !password) {
-            setError(true);
+        const validation = AuthSchema.safeParse({ email, password });
+        if (!validation.success) {
+            const errors = validation.error.flatten();
+            setZodError({
+                email: errors.fieldErrors.email ? errors.fieldErrors.email[0] : '',
+                password: errors.fieldErrors.password ? errors.fieldErrors.password[0] : ''
+            });
+            
             return;
         }
 
-        // Reset login form after successful submission
-        resetLogin();
+        const serverResponse = await baseAPI.post('/auth/login', {
+            identifier: email,
+            password
+        })
+
+        if (serverResponse.status === 201) {
+            // Reset login form after successful submission
+            resetLogin();
+            console.log('Login successful:', serverResponse.data);
+            setUser({...serverResponse.data.user, accessToken: serverResponse.data.accessToken, refreshToken: serverResponse.data.refreshToken});
+            // Navigate to the next page after successful login
+            router.push('/policy-purchase/personal-information/personalDetails');
+            setIsLoading(false);
+            
+
+            
+        } else {
+            setError("Some error occurred. Please try again.");
+            setIsLoading(false);
+            
+        }
+
         
-        // Navigate to the next page after successful login
-        router.push('/policy-purchase/personal-information/personalDetails');
     };
 
     const signUp = () => {
@@ -52,6 +92,8 @@ export default function Login() {
                             id="email" 
                             name="email"
                         />
+
+                        {zodError.email && <p className="text-red-500 font-bold text-sm">{zodError.email}</p>}
                         
                         <label htmlFor="password" className="text-[#302F2F] text-xs font-medium font-inter">Password</label>
                         <input 
@@ -62,13 +104,15 @@ export default function Login() {
                             id="password" 
                             name="password"
                         />
+
+                        {zodError.password && <p className="text-red-500 font-bold text-sm">{zodError.password}</p>}
                     </div>
 
                     <button 
                         onClick={handleSubmit} 
                         className="bg-[#1F2168] font-bold font-inter text-lg text-white p-3 rounded"
                     >
-                        Login
+                        {isLoading ? <span className="loading loading-dots loading-lg"></span> : 'Login'}
                     </button>
                     
                     <p className="text-center text-sm text-slate-900 font-bold font-syne">
@@ -82,7 +126,7 @@ export default function Login() {
                         here
                     </p>
 
-                    {error && <p className="text-center font-bold text-base text-[red]">Please fill all the required fields.</p>}
+                    {error && <p className="text-center font-bold text-base text-[red]">{error}</p>}
                 </div>
             </div>
         </div>

@@ -82,7 +82,7 @@ export default function PrivateVehicleCategory() {
                 name='private-type' 
                 id='personal'
                 checked={usageType === 'personal'}
-                onChange={() => handleCheckboxChange('personal')}
+                onChange={() => handleCheckboxChange('Personal Use')}
             />
             <label htmlFor="personal" className='font-inter text-sm md:text-xs lg:text-xs'>
                 Private or Personal Use
@@ -94,7 +94,7 @@ export default function PrivateVehicleCategory() {
                 name='private-type' 
                 id='business'
                 checked={usageType === 'business'}
-                onChange={() => handleCheckboxChange('business')}
+                onChange={() => handleCheckboxChange('Business')}
             />
             <label htmlFor="business" className='font-inter text-sm md:text-xs lg:text-xs'>
                 Private Business Use

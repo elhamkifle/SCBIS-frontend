@@ -7,6 +7,9 @@ import { usePrivateVehicleCategoryStore } from '@/store/vehicleDetails/privateVe
 import { useGeneralVehicleStore } from '@/store/vehicleDetails/generalVehicle';
 import { useOwnershipUsageStore } from '@/store/vehicleDetails/ownershipAndUsage';
 import { useState } from 'react';
+import { useUserStore } from '@/store/authStore/useUserStore';
+import { baseAPI } from '@/utils/axiosInstance';
+import { set } from 'zod';
 
 type VehicleDetails = {
   make: string;
@@ -23,11 +26,13 @@ type OwnershipUsageData = {
 
 export default function PolicyPreview() {
   const router = useRouter();
-
+  const user = useUserStore((state) => state.user);
   const { selectedType, setSelectedType } = useVehiclePurposeStore();
   const { carType, usageType, setCarType, setUsageType } = usePrivateVehicleCategoryStore();
   const { formData: vehicleData, setFormData: setVehicleData } = useGeneralVehicleStore();
   const { formData: ownershipData, setFormData: setOwnershipData } = useOwnershipUsageStore();
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const [isEditing, setIsEditing] = useState({
     purpose: false,
@@ -40,23 +45,48 @@ export default function PolicyPreview() {
     setIsEditing(prev => ({ ...prev, [section]: !prev[section] }));
   };
 
-  const handleSubmit = () => {
-    console.log('Submitting policy with all data:', {
-      insuranceType: selectedType,
-      vehicleCategory: { carType, usageType },
-      vehicleDetails: vehicleData,
-      ownershipDetails: ownershipData
+  const handleSubmit = async () => {
+
+    setError('');
+    setIsLoading(true);
+
+    const vehicleName = selectedType === 'private' ? 'PrivateVehicle' : 'CommercialVehicle';
+
+    const serverResponse = await baseAPI.post('/policy/vehicle-details', {
+      VehicleType: selectedType==='private' ? "Private" : "Commercial",
+      [vehicleName]: { 
+        vehicleCategory:"Passanger Car", 
+        usageType:["Personal Use"], 
+        generalDetails: {...vehicleData,engineNumber:vehicleData.engineNo, plateNumber: vehicleData.plateNo},
+        ownershipUsage: {...ownershipData,dutyFree: ownershipData.dutyFree === "Yes" ? true : false}
+      },
+      
+    },{
+      headers: {
+        Authorization: `Bearer ${user?.accessToken}`
+      }
     });
+
+    if (serverResponse.status === 201) {
+      console.log('Policy submitted successfully:', serverResponse.data);
+      localStorage.removeItem('insurance-storage');
+      localStorage.removeItem('private-vehicle-storage');
+      localStorage.removeItem('general-vehicle-storage');
+      localStorage.removeItem('ownership-usage-storage');
+      router.push('/policy-purchase/purchase/policySelection');
+      alert('Policy submitted successfully!');
+
+    } else {
+      console.error('Error submitting policy:', serverResponse.data);
+      setError('❌ Some error occurred. Please try again.');
+    }
+
+    setIsLoading(false);
   
-    alert('Policy submitted successfully!');
+    
   
 
-    localStorage.removeItem('insurance-storage');
-    localStorage.removeItem('private-vehicle-storage');
-    localStorage.removeItem('general-vehicle-storage');
-    localStorage.removeItem('ownership-usage-storage');
-  
-    router.push('/policy-purchase/purchase/policySelection');
+
   };
 
   const handlePrevious = () => {
@@ -411,7 +441,7 @@ export default function PolicyPreview() {
             onClick={handleSubmit} 
             className="bg-green-500 text-white p-2 px-6 rounded"
           >
-            Submit Application
+            {isLoading ? <span className='loading loading-dots loading-lg'></span> :"Submit Application"}
           </button>
         </div>
       </div>

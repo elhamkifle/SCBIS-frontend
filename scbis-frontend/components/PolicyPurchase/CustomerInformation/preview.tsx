@@ -4,11 +4,20 @@ import { Edit, Check, Upload, FileText } from 'lucide-react';
 import { usePersonalDetailStore } from '@/store/customerInformationStore/personalDetails';
 import { useAddressStore } from '@/store/customerInformationStore/addressStore';
 import { useRouter } from 'next/navigation';
+import { useUserStore } from '@/store/authStore/useUserStore';
+import { baseAPI } from '@/utils/axiosInstance';
+import { set } from 'zod';
+import { span } from 'framer-motion/client';
 
 export default function Preview() {
+  const user = useUserStore((state) => state.user);
+  const setUser = useUserStore((state) => state.setUser);
+ 
   const router = useRouter();
   const { formData: personalData, resetForm } = usePersonalDetailStore(); // Changed resetFormData to resetForm
   const { address: addressData, resetAddress } = useAddressStore(); // Changed resetAddressData to resetAddress
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     // Personal Information
     title: '',
@@ -64,20 +73,31 @@ export default function Preview() {
   };
 
   // Handle form submission
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     console.log('Form Submitted:', formData);
+    setLoading(true);
 
-    // Clear personal details and address from localStorage
-    localStorage.removeItem('personal-details-storage');
-    localStorage.removeItem('address-details-storage');
+    const serverResponse = await baseAPI.patch(`/user/${user?._id}`, formData)
 
-    // Reset the Zustand stores
-    resetForm();  // Reset personal data store
-    resetAddress();  // Reset address data store
+    if (serverResponse.status === 200) {
+      console.log('Form submission successful:', serverResponse.data);
+      setUser({...user,...serverResponse.data})
+      alert('Application Submitted!');
+      router.push('/policy-purchase/vehicle-information/purpose');
+      
+      // Clear personal details and address from localStorage
+      localStorage.removeItem('personal-details-storage');
+      localStorage.removeItem('address-details-storage');
+      
+      // Reset the Zustand stores
+      resetForm();  // Reset personal data store
+      resetAddress();  // Reset address data store
+    } else {
+      setError('❌ Form submission failed. Please try again.');
+      console.error('Form submission failed:', serverResponse);
+    }
 
-    // Optionally, you can display a confirmation message or redirect the user
-    alert('Application Submitted!');
-    router.push('/policy-purchase/purchase/policySelection');
+    setLoading(false);
     
   };
 
@@ -339,9 +359,11 @@ export default function Preview() {
             onClick={handleSubmit}
             className="bg-green-500 text-white px-4 rounded-md py-2 text-lg font-semibold hover:bg-green-600"
           >
-            Submit Application
+            {loading ? <span className='loading loading-dots loading-lg'></span>  :"Submit Application"}
           </button>
         </div>
+
+        {error && <p className='text-sm text-red-400'>{error}</p>}
       </div>
     </div>
   );
