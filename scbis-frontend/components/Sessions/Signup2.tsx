@@ -3,10 +3,16 @@
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import useSignupStore from "@/store/authStore/useSignupStore"
+import { span } from "framer-motion/client"
+
 
 export default function SignupStep2() {
   const router = useRouter()
   const {
+    fName, 
+    lName, 
+    dob, 
+    pNo,
     email,
     password,
     setEmail,
@@ -15,9 +21,11 @@ export default function SignupStep2() {
 
   const [confirmPass, setConfirmPass] = useState('')
   const [error, setError] = useState('')
+  const [loading,setLoading] = useState(false)
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setError('')
+    setLoading(true)
 
     if (!email || !password || !confirmPass) {
       setError("Please fill all the required fields.")
@@ -29,7 +37,26 @@ export default function SignupStep2() {
       return
     }
 
-    router.push('/verification') // or wherever OTP page is
+    const serverResponse = await fetch('https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/auth/register',{
+      method:'POST',
+      body:JSON.stringify({fullname:fName + " " + lName,email,password,phoneNumber:pNo}),
+      headers:{
+        'Content-Type':'application/json'
+      }
+
+    })
+
+    const data = await serverResponse.json()
+
+    if (!serverResponse.ok && data.message==="Failed to send OTP. Please try again later."){
+      router.push('/verification') // or wherever OTP page is
+    }
+
+    setLoading(false)
+
+    // console.log(data)
+
+    
   }
 
   return (
@@ -62,10 +89,10 @@ export default function SignupStep2() {
 
           <div className="flex justify-end items-center gap-[110px] md:gap-[155px]">
             <div className="flex items-center gap-3">
-              <p className="w-[30px] py-1 cursor-pointer text-center font-bold bg-[#2752D0] w-1/6 font-inter text-sm text-white rounded">1</p>
-              <p className="w-[30px] py-1 cursor-pointer text-center font-bold bg-[#3E99E7] w-1/6 font-inter text-sm text-white rounded">2</p>
+              <p className="w-[30px] py-1 cursor-pointer text-center font-bold bg-[#2752D0] font-inter text-sm text-white rounded">1</p>
+              <p className="w-[30px] py-1 cursor-pointer text-center font-bold bg-[#3E99E7] font-inter text-sm text-white rounded">2</p>
             </div>
-            <button onClick={handleSubmit} className="bg-[#23C140] w-1/6 font-inter text-sm text-white p-1 rounded">Signup</button>
+            <button onClick={handleSubmit} className="bg-[#23C140] w-1/6 font-inter text-sm text-white p-1 rounded">{loading ? <span className="loading loading-dots loading-lg"></span>  :"Signup"}</button>
           </div>
           {error && <p className="text-center font-bold text-base text-[red]">{error}</p>}
         </div>
