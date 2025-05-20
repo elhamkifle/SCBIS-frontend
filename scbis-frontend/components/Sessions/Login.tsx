@@ -34,20 +34,28 @@ export default function Login() {
                 email: errors.fieldErrors.email ? errors.fieldErrors.email[0] : '',
                 password: errors.fieldErrors.password ? errors.fieldErrors.password[0] : ''
             });
+
+            setIsLoading(false)
             
             return;
         }
 
-        const serverResponse = await baseAPI.post('/auth/login', {
-            identifier: email,
-            password
+        const serverResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
+            method:"POST",
+            body: JSON.stringify({identifier: email,
+            password}),
+            headers:{
+                'Content-Type':'application/json'
+            }
         })
 
-        if (serverResponse.status === 201) {
+        const data = await serverResponse.json()
+
+        if (serverResponse.ok) {
             // Reset login form after successful submission
             resetLogin();
-            console.log('Login successful:', serverResponse.data);
-            setUser({...serverResponse.data.user, accessToken: serverResponse.data.accessToken, refreshToken: serverResponse.data.refreshToken});
+            console.log('Login successful:', data);
+            setUser({...data.user, accessToken: data.accessToken, refreshToken: data.refreshToken});
             // Navigate to the next page after successful login
             router.push('/policy-purchase/personal-information/personalDetails');
             setIsLoading(false);
