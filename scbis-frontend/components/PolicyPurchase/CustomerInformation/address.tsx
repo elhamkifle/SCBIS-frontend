@@ -1,48 +1,34 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useAddressStore } from '@/store/customerInformationStore/addressStore';
 
 export default function AddressForm() {
     const router = useRouter();
+    const { 
+        address, 
+        updateAddress, 
+    } = useAddressStore();
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log(formData);
-        handleNext(); // Move to the next step after submitting
+        router.push('/policy-purchase/personal-information/uploadID');
     };
 
-    // Navigate to the previous step
     const handlePrevious = () => {
         router.push('/policy-purchase/personal-information/personalDetails');
     };
 
-    // Navigate to the next step
-    const handleNext = () => {
-        router.push('/policy-purchase/personal-information/uploadID');
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        updateAddress({ [e.target.name]: e.target.value });
     };
 
-    const [formData, setFormData] = useState({
-        country: '',
-        state: '',
-        city: '',
-        subcity: '',
-        zone: '',
-        wereda: '',
-        kebele: '',
-        houseNo: '',
-    });
-
-    const countries = [
-        'Ethiopia'
-    ];
-
+    const countries = ['Ethiopia'];
     const ethiopianRegions = [
         'Addis Ababa', 'Afder', 'Afar', 'Amhara', 'Benishangul-Gumuz', 'Dire Dawa',
         'Gambela', 'Harari', 'Oromia', 'Sidama', 'Southern Nations, Nationalities, and Peoples\' Region (SNNPR)',
         'Somali', 'Tigray'
     ];
-
     const ethiopianCities = [
         'Addis Ababa', 'Adama', 'Hawassa', 'Mekelle', 'Dire Dawa', 'Jimma', 'Bahir Dar',
         'Gondar', 'Dessie', 'Jijiga', 'Nazret', 'Ambo', 'Awassa', 'Arba Minch', 'Asella',
@@ -50,10 +36,6 @@ export default function AddressForm() {
         'Harar', 'Assosa', 'Nejo', 'Bedele', 'Bahir Dar', 'Fiche', 'Buta Jirra', 'Finote Selam',
         'Bahir Dar', 'Kochere', 'Kebri Dehar', 'Dilla', 'Lalibela'
     ];
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
 
     return (
         <div className="flex flex-col items-center px-4">
@@ -88,7 +70,7 @@ export default function AddressForm() {
                         <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Country *</label>
                         <select
                             name="country"
-                            value={formData.country}
+                            value={address.country}
                             onChange={handleChange}
                             className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                             required
@@ -103,7 +85,7 @@ export default function AddressForm() {
                         <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Region *</label>
                         <select
                             name="state"
-                            value={formData.state}
+                            value={address.state}
                             onChange={handleChange}
                             className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                             required
@@ -118,7 +100,7 @@ export default function AddressForm() {
                         <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">City *</label>
                         <select
                             name="city"
-                            value={formData.city}
+                            value={address.city}
                             onChange={handleChange}
                             className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                             required
@@ -134,7 +116,7 @@ export default function AddressForm() {
                         <input
                             type="text"
                             name="subcity"
-                            value={formData.subcity}
+                            value={address.subcity}
                             onChange={handleChange}
                             className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                             required
@@ -145,7 +127,7 @@ export default function AddressForm() {
                         <input
                             type="text"
                             name="zone"
-                            value={formData.zone}
+                            value={address.zone}
                             onChange={handleChange}
                             className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                             required
@@ -156,7 +138,7 @@ export default function AddressForm() {
                         <input
                             type="text"
                             name="wereda"
-                            value={formData.wereda}
+                            value={address.wereda}
                             onChange={handleChange}
                             className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                             required
@@ -167,7 +149,7 @@ export default function AddressForm() {
                         <input
                             type="text"
                             name="kebele"
-                            value={formData.kebele}
+                            value={address.kebele}
                             onChange={handleChange}
                             className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                             required
@@ -178,7 +160,7 @@ export default function AddressForm() {
                         <input
                             type="text"
                             name="houseNo"
-                            value={formData.houseNo}
+                            value={address.houseNo}
                             onChange={handleChange}
                             className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                         />

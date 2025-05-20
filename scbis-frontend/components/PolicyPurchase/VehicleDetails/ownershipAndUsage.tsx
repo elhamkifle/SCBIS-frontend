@@ -1,37 +1,28 @@
 "use client";
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useOwnershipUsageStore } from '@/store/vehicleDetails/ownershipAndUsage';
 
 export default function OwnershipAndUsageForm() {
     const router = useRouter();
-
-    const [formData, setFormData] = useState({
-        ownerType: '',
-        driverType: '',
-        seatingCapacity: '',
-        purchasedValue: '',
-        dutyFree: '',
-    });
+    const { formData, setFormData, logFormData } = useOwnershipUsageStore();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        setFormData({ [e.target.name]: e.target.value });
     };
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log(formData);
+        logFormData();
         router.push('/policy-purchase/vehicle-information/uploadDocs');
     };
 
-    // Navigate to the previous step
     const handlePrevious = () => {
         router.push('/policy-purchase/vehicle-information/generalVehicleDetails');
     };
 
     return (
         <div className="flex flex-col items-center px-4">
-
             <div className="w-full max-w-5xl flex justify-between items-center mt-8">
                 <h2 className="md:text-xl sm:text-lg font-bold">Policy Purchase</h2>
                 <button className="bg-[#0F1D3F] sm:text-xs md:text-lg text-white px-4 py-2 rounded">Save as draft</button>
@@ -65,8 +56,6 @@ export default function OwnershipAndUsageForm() {
                 </div>
             </div>
 
-
-
             <div className="bg-white mb-10 p-8 rounded-xl w-full max-w-5xl"
                 style={{ boxShadow: '0px 10px 20px rgba(0, 123, 255, 0.4), 0px 4px 8px rgba(0, 0, 0, 0.1)' }}>
 
@@ -83,8 +72,8 @@ export default function OwnershipAndUsageForm() {
                         <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Driver Type *</label>
                         <select name="driverType" value={formData.driverType} onChange={handleChange} className="w-full p-2 border border-black rounded" required>
                             <option value="">Select</option>
-                            <option value="Private">Private</option>
-                            <option value="Commercial">Commercial</option>
+                            <option value="known">Known Driver</option>
+                            <option value="any">Any Driver</option>
                         </select>
                     </div>
                     <div className="relative w-full">

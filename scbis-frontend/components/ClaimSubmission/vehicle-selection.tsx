@@ -1,78 +1,80 @@
 'use client';
 
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
-import { Fragment } from 'react';
 import { useRouter } from 'next/navigation';
-
-const vehicles = [
-    {
-        title: 'Vehicle 1',
-        plateNo: '1122',
-        purpose: 'Private',
-        yearOfManufacture: '1999',
-    },
-    {
-        title: 'Vehicle 2',
-        plateNo: '3344',
-        purpose: 'Commercial',
-        yearOfManufacture: '2005',
-    },
-    {
-        title: 'Vehicle 3',
-        plateNo: '5566',
-        purpose: 'Private',
-        yearOfManufacture: '2010',
-    },
-];
+import { useVehicleSelectionStore } from '@/store/claimSubmission/vehicle-selection-store';
 
 export default function VehicleSelection() {
     const router = useRouter();
+    const {
+        vehicles,
+        selectedVehicle,
+        selectVehicle,
+    } = useVehicleSelectionStore();
+    
     const [open, setOpen] = useState(false);
-    const [selectedVehicle, setSelectedVehicle] = useState<{ title: string; plateNo: string; purpose: string; yearOfManufacture: string } | null>(null);
-    const [selectedPolicy, setSelectedPolicy] = useState('');
     const [error, setError] = useState('');
 
-    const handleSelect = (policy: string) => {
-        setSelectedPolicy(policy);
+    const handleSelect = (vehicleTitle: string) => {
+        selectVehicle(vehicleTitle);
         setError('');
     };
 
-
     const handleNext = () => {
-        if (!selectedPolicy) {
+        if (!selectedVehicle) {
             setError('Please select a vehicle.');
             return;
         }
-        console.log('Selected Vehicle:', selectedPolicy);
+        console.log('Selected Vehicle:', selectedVehicle);
         router.push('/claim-submission/claim-policy-selection'); 
     };
+
+
+    const selectedVehicleDetails = vehicles.find(v => v.title === selectedVehicle);
 
     return (
         <div className="flex flex-col items-center px-4 mb-10">
             <div className="w-full flex justify-between items-center mt-2 mb-10">
                 <h2 className="md:text-xl sm:text-lg font-bold">Claim Submission </h2>
-                <button className="bg-[#0F1D3F] sm:text-xs md:text-lg text-white px-4 py-2 rounded">Save as draft</button>
+                <div className="flex gap-2">
+                    <button className="bg-[#0F1D3F] sm:text-xs md:text-lg text-white px-4 py-2 rounded">
+                        Save as draft
+                    </button>
+                </div>
             </div>
             <div className="w-full flex-col justify-between items-center mt-2 md:ml-12 md:mb-12">
-                <p className='text-[#3AA4FF] font-bold text-start text-[22px] mb-2'>Which of your vehicles was involved in the incident? </p>
+                <p className='text-[#3AA4FF] font-bold text-start text-[22px] mb-2'>
+                    Which of your vehicles was involved in the incident? 
+                </p>
                 <p className='text-[18px]'> Please select the correct vehicle by clicking the card. </p>
-
-                </div>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {vehicles.map((vehicle, index) => (
                     <div
                         key={index}
-                        className={`bg-white px-16 py-8 rounded-2xl shadow-lg flex flex-col justify-around space-y-4 text-center md:mb-[20px] cursor-pointer ${selectedPolicy === vehicle.title ? 'border-2 border-green-500' : 'border border-gray-300'
-                            }`}
+                        className={`bg-white px-16 py-8 rounded-2xl shadow-lg flex flex-col justify-around space-y-4 text-center md:mb-[20px] cursor-pointer ${
+                            selectedVehicle === vehicle.title 
+                                ? 'border-2 border-green-500' 
+                                : 'border border-gray-300'
+                        }`}
                         style={{ boxShadow: '0px 10px 20px rgba(0, 123, 255, 0.4), 0px 4px 8px rgba(0, 0, 0, 0.1)' }}
                         onClick={() => handleSelect(vehicle.title)}
                     >
                         <h3 className="text-xl font-semibold">{vehicle.title}</h3>
-                        <p className="text-md"><span className='text-[#3AA4FF] font-bold'> Plate No.: </span> {vehicle.plateNo}</p>
-                        <p className="text-md"><span className='text-[#3AA4FF] font-bold'>  Purpose: </span> {vehicle.purpose}</p>
-                        <p className="text-md"> <span className='text-[#3AA4FF] font-bold'>  Year of Manufacture: </span> {vehicle.yearOfManufacture}</p>
+                        <p className="text-md">
+                            <span className='text-[#3AA4FF] font-bold'> Plate No.: </span> 
+                            {vehicle.plateNo}
+                        </p>
+                        <p className="text-md">
+                            <span className='text-[#3AA4FF] font-bold'> Purpose: </span> 
+                            {vehicle.purpose}
+                        </p>
+                        <p className="text-md">
+                            <span className='text-[#3AA4FF] font-bold'> Year of Manufacture: </span> 
+                            {vehicle.yearOfManufacture}
+                        </p>
                     </div>
                 ))}
             </div>
@@ -85,12 +87,12 @@ export default function VehicleSelection() {
                     <div className="fixed inset-0 flex items-center justify-center p-4">
                         <Dialog.Panel className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
                             <Dialog.Title className="text-lg font-bold mb-8">
-                                {selectedVehicle?.title}
+                                {selectedVehicleDetails?.title}
                             </Dialog.Title>
                             <div className="mt-4">
-                                <p>Plate No.: {selectedVehicle?.plateNo}</p>
-                                <p>Purpose: {selectedVehicle?.purpose}</p>
-                                <p>Year of Manufacture: {selectedVehicle?.yearOfManufacture}</p>
+                                <p>Plate No.: {selectedVehicleDetails?.plateNo}</p>
+                                <p>Purpose: {selectedVehicleDetails?.purpose}</p>
+                                <p>Year of Manufacture: {selectedVehicleDetails?.yearOfManufacture}</p>
                             </div>
                             <button
                                 onClick={() => setOpen(false)}

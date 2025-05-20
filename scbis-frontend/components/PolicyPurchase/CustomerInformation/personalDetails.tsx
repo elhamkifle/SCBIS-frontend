@@ -1,30 +1,19 @@
 "use client";
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { usePersonalDetailStore } from '@/store/customerInformationStore/personalDetails';
 
 export default function PersonalDetailForm() {
     const router = useRouter();
-
-    const [formData, setFormData] = useState({
-        title: '',
-        firstName: '',
-        lastName: '',
-        gender: '',
-        dateOfBirth: '',
-        nationality: '',
-        email: '',
-        phone: '',
-        tin: '',
-    });
+    const { formData, updateFormData, logFormData } = usePersonalDetailStore();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        updateFormData({ [e.target.name]: e.target.value });
     };
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log(formData);
+        logFormData(); // Log the current form data
         router.push('/policy-purchase/personal-information/address');
     };
 
@@ -74,6 +63,7 @@ export default function PersonalDetailForm() {
                         <input
                             type="text"
                             name="firstName"
+                            value={formData.firstName}
                             onChange={handleChange}
                             className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                             required
@@ -99,8 +89,11 @@ export default function PersonalDetailForm() {
                         <input type="date" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange} className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400" required />
                     </div>
                     <div className='relative w-full'>
-                        <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Nationality</label>
-                        <input type="text" name="nationality" value={formData.nationality} onChange={handleChange} className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                        <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Nationality *</label>
+                        <select name="nationality" value={formData.nationality} onChange={handleChange} className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+                            <option value="">Select</option>
+                            <option value="Ethiopian">Ethiopian</option>
+                        </select>
                     </div>
                     <div className='relative w-full'>
                         <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Email Address</label>

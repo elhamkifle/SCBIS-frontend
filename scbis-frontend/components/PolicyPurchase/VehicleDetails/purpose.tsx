@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useVehiclePurposeStore } from '@/store/vehicleDetails/purpose';
+import { useState } from 'react';
 
 export default function ChoosePurposeForm() {
     const router = useRouter();
-    const [selectedType, setSelectedType] = useState('');
+    const { selectedType, setSelectedType } = useVehiclePurposeStore();
     const [error, setError] = useState('');
 
     const handleSelect = (type: string) => {
@@ -23,8 +24,8 @@ export default function ChoosePurposeForm() {
             selectedType === "private"
               ? "/policy-purchase/vehicle-information/privateVehicleCategory"
               : "/policy-purchase/vehicle-information/commercialVehicleCategory"
-          );    };
-
+          );
+    };
 
     return (
         <div className="flex flex-col items-center px-4">
@@ -95,7 +96,5 @@ export default function ChoosePurposeForm() {
                 <button onClick={handleNext} className="bg-[#1A73E8] text-white px-6 py-2 rounded">Next</button>
             </div>
         </div>
-
-
     );
 }

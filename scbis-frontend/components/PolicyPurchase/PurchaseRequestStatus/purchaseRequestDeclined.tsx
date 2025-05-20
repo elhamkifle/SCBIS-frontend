@@ -74,14 +74,16 @@ export default function PurchaseRequestDeclined() {
       <h2 className="text-2xl lg:ml-28 mb-4 font-bold">Policy Purchase</h2>
 
     <div
-      className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg border mb-8 lg:mb-0"
+      className="max-w-5xl mx-auto p-6 bg-white shadow-lg rounded-lg border mb-8 lg:mb-0"
       style={{ boxShadow: '0px 10px 20px rgba(0, 123, 255, 0.4), 0px 4px 8px rgba(0, 0, 0, 0.1)' }}
     >
-      {/* Header Section */}
-      <div className="text-center mb-4">
-        <FileX className="text-red-500 mx-auto" size={40} />
-        <h2 className="text-xl font-bold text-red-600">Policy Purchase Request Not Approved - Action Required</h2>
-      </div>
+<div className="flex items-center justify-center gap-2 mb-8">
+  <FileX className="text-red-500" size={40} />
+  <div>
+    <h2 className="text-xl font-bold text-red-600">Policy Purchase Request Not Approved – Action Required </h2>
+  </div>
+</div>
+
 
       {/* Grid Layout for Reason and Upload Section */}
       <div className="flex flex-col lg:grid lg:grid-cols-2 gap-6">
@@ -137,7 +139,7 @@ export default function PurchaseRequestDeclined() {
       </div>
 
       {/* Notice */}
-      <p className="text-md mt-8">
+      <p className="lg:text-lg mt-8 font-syne">
         <span className="font-bold text-blue-700">N.B:</span> Your policy will become active on the day of payment after approval.
       </p>
     </div>
