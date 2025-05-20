@@ -1,5 +1,4 @@
 'use client'
-
 import { useRouter } from "next/navigation"
 import useSignupStore from "@/store/authStore/useSignupStore"
 import { useState } from "react"
@@ -60,8 +59,8 @@ export default function Signup() {
 
                     <div className="flex justify-end items-center gap-[110px] md:gap-[155px]">
                         <div className="flex items-center gap-3">
-                            <p className="w-[30px] py-1 cursor-pointer text-center font-bold bg-[#2752D0] w-1/6  font-inter text-sm text-white rounded">1</p>
-                            <p className="w-[30px] py-1 cursor-pointer text-center font-bold bg-[#3E99E7] w-1/6  font-inter text-sm text-white rounded">2</p>
+                            <p className="w-[30px] py-1 cursor-pointer text-center font-bold bg-[#2752D0]  font-inter text-sm text-white rounded">1</p>
+                            <p className="w-[30px] py-1 cursor-pointer text-center font-bold bg-[#3E99E7]  font-inter text-sm text-white rounded">2</p>
                         </div>
                         <button onClick={handleSubmit} className="bg-[#1F2168] w-1/6  font-inter text-sm text-white p-1 rounded">Next</button>
                     </div>
