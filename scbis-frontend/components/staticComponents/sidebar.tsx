@@ -2,9 +2,18 @@
 
 import { useState } from "react";
 import { User, LogOut, Settings, HelpCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useUserStore } from "@/store/authStore/useUserStore";
 
 export default function Sidebar() {
     const [isCollapsed, setIsCollapsed] = useState(false);
+
+    const router = useRouter();
+    const logout = useUserStore((state) => state.logout);
+    const handleLogout = () => {
+        router.push('/');
+        logout();
+      };
 
     return (
         <>
@@ -37,7 +46,13 @@ export default function Sidebar() {
                             <>
                                 <button className="p-2 bg-gray-700 rounded-full hover:bg-gray-600"><HelpCircle size={20} /></button>
                                 <button className="p-2 bg-gray-700 rounded-full hover:bg-gray-600"><Settings size={20} /></button>
-                                <button className="p-2 bg-gray-700 rounded-full hover:bg-red-500"><LogOut size={20} /></button>
+                                {/* <button className="p-2 bg-gray-700 rounded-full hover:bg-red-500"><LogOut size={20} /></button> */}
+                                <button 
+                                    className="p-2 bg-gray-700 rounded-full hover:bg-red-500"
+                                    onClick={handleLogout}
+                                >
+                                    <LogOut size={20} />
+                                </button>
                             </>
                         )
                     }

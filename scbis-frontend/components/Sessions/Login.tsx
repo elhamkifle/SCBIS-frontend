@@ -15,6 +15,9 @@ export default function Login() {
     });
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
+    
+    // Redirect already authenticated users away from login page
+    // useAuth(false);
 
     const handleSubmit = async () => {
         setZodError({
@@ -51,16 +54,23 @@ export default function Login() {
 
             if (serverResponse.ok) {
                 resetLogin();
+                
+                // Set authentication cookies
+                document.cookie = `auth_token=${data.accessToken}; path=/; max-age=3600; SameSite=Lax`;
+                document.cookie = `refresh_token=${data.refreshToken}; path=/; max-age=86400; SameSite=Lax`;
+                
                 setUser({
                     ...data.user,
                     accessToken: data.accessToken,
                     refreshToken: data.refreshToken
                 });
+                console.log(data.user)
                 router.push('/policy-purchase/personal-information/personalDetails');
             } else {
                 setError(data.message || "Login failed. Please check your credentials.");
             }
-        } catch (err) {
+        } catch (error) {
+            console.error("Login error:", error);
             setError("Network error. Please check your connection.");
         } finally {
             setIsLoading(false);
@@ -116,7 +126,7 @@ export default function Login() {
                     </button>
                     
                     <p className="text-center text-sm text-slate-900 font-bold font-syne">
-                        Don't have an account yet? 
+                        Don&apos;t have an account yet? 
                         <span 
                             onClick={signUp} 
                             className="text-orange-600 cursor-pointer hover:text-blue-800 underline"

@@ -2,14 +2,25 @@ import axios from "axios";
 import { useUserStore } from "@/store/authStore/useUserStore";
 
 export const baseAPI = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "https://scbis-git-dev-hailes-projects-a12464a1.vercel.app",
   headers: {
     "Content-Type": "application/json",
-    "Accept": "application/json",
-    "Access-Control-Allow-Origin": true,
+    "Accept": "application/json"
   },
   withCredentials: false,
 })
+
+// Add request interceptor to include auth token in requests
+baseAPI.interceptors.request.use(
+  (config) => {
+    const user = useUserStore.getState().user;
+    if (user?.accessToken) {
+      config.headers.Authorization = `Bearer ${user.accessToken}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 // Create a new service for auth operations
 export const refreshToken = async () => {
@@ -21,7 +32,7 @@ export const refreshToken = async () => {
   }
 
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/refresh-token`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://scbis-git-dev-hailes-projects-a12464a1.vercel.app"}/auth/refresh-token`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
