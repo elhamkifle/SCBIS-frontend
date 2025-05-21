@@ -1,12 +1,10 @@
 'use client'
 
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import useLoginStore from "@/store/authStore/useLoginStore";
-import { AuthSchemaType,AuthSchema } from "@/schema/zodSchema";
-import { baseAPI } from "@/utils/axiosInstance";
+import { AuthSchemaType, AuthSchema } from "@/schema/zodSchema";
 import { useUserStore } from "@/store/authStore/useUserStore";
-
 
 export default function Login() {
     const setUser = useUserStore((state) => state.setUser);
@@ -15,16 +13,15 @@ export default function Login() {
         email: '',
         password: ''
     });
-
     const [isLoading, setIsLoading] = useState(false);
-
     const router = useRouter();
 
     const handleSubmit = async () => {
         setZodError({
             email: '',
-            password: ''})
-            setIsLoading(true);
+            password: ''
+        });
+        setIsLoading(true);
         setError(false);
 
         const validation = AuthSchema.safeParse({ email, password });
@@ -34,50 +31,45 @@ export default function Login() {
                 email: errors.fieldErrors.email ? errors.fieldErrors.email[0] : '',
                 password: errors.fieldErrors.password ? errors.fieldErrors.password[0] : ''
             });
-
-            setIsLoading(false)
-            
+            setIsLoading(false);
             return;
         }
 
-        const serverResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
-            method:"POST",
-            body: JSON.stringify({identifier: email,
-            password}),
-            headers:{
-                'Content-Type':'application/json'
+        try {
+            const serverResponse = await fetch(`https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/auth/login`, {
+                method: "POST",
+                body: JSON.stringify({
+                    identifier: email,
+                    password
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const data = await serverResponse.json();
+
+            if (serverResponse.ok) {
+                resetLogin();
+                setUser({
+                    ...data.user,
+                    accessToken: data.accessToken,
+                    refreshToken: data.refreshToken
+                });
+                router.push('/policy-purchase/personal-information/personalDetails');
+            } else {
+                setError(data.message || "Login failed. Please check your credentials.");
             }
-        })
-
-        const data = await serverResponse.json()
-
-        if (serverResponse.ok) {
-            // Reset login form after successful submission
-            resetLogin();
-            console.log('Login successful:', data);
-            setUser({...data.user, accessToken: data.accessToken, refreshToken: data.refreshToken});
-            // Navigate to the next page after successful login
-            router.push('/policy-purchase/personal-information/personalDetails');
+        } catch (err) {
+            setError("Network error. Please check your connection.");
+        } finally {
             setIsLoading(false);
-            
-
-            
-        } else {
-            setError("Some error occurred. Please try again.");
-            setIsLoading(false);
-            
         }
-
-        
     };
 
     const signUp = () => {
         router.push('/signup');
     };
-
-    useEffect(() => {
-        console.log('Login State:', { email, password, error });
-    }, [email, password, error]);
 
     return (
         <div className="w-full h-full flex flex-col md:flex-row bg-gradient-to-r from-[#0F1D3F] to-[#3E99E7]">
@@ -91,12 +83,12 @@ export default function Login() {
                     <p className="text-center text-[#302F2F] text-2xl font-bold font-inter">Login</p>
                     
                     <div className="flex flex-col gap-3 md:gap-5">
-                        <label htmlFor="email" className="text-[#302F2F] text-xs font-medium font-inter">Email Address / Phone</label>
+                        <label htmlFor="email" className="text-[#302F2F] text-xs font-medium font-inter">Email Address / Phone Number</label>
                         <input 
                             value={email}
                             onChange={(e) => setEmail(e.target.value)} 
                             className="p-2 rounded" 
-                            type="email" 
+                            type="text" 
                             id="email" 
                             name="email"
                         />

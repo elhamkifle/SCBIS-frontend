@@ -2,28 +2,67 @@
 
 import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
-import useOtpStore from "@/store/authStore/useOtpStore";
+import useOtpStore from "@/store/authStore/useOtpStore"
+import useSignupStore from "@/store/authStore/useSignupStore"
+import { useUserStore } from "@/store/authStore/useUserStore"
 
-export default function Verification(){
-    const { otp, setOtpField, resetOtp } = useOtpStore();
-    const [error, setError] = useState(false);
-    const router = useRouter();
+export default function Verification() {
+    const { otp, setOtpField, resetOtp } = useOtpStore()
+    const { pNo, email, clearSignupData } = useSignupStore()
+    const [error, setError] = useState('')
+    const [loading, setLoading] = useState(false)
+    const router = useRouter()
+    const setUser = useUserStore((state) => state.setUser)
 
-    const handleSubmit = () => {
-        setError(false);
+    const handleSubmit = async () => {
+        setError('')
+        setLoading(true)
 
         // Check if all OTP fields are filled
         if (!otp.one || !otp.two || !otp.three || !otp.four || !otp.five || !otp.six) {
-            setError(true);
-            return;
+            setError('Please fill all OTP fields')
+            setLoading(false)
+            return
         }
 
-        // Reset OTP fields after successful submission
-        resetOtp();
-        
-        // Proceed to next page after verification
-        router.push('/policy-purchase/personal-information/personalDetails');
-    };
+        const otpValue = `${otp.one}${otp.two}${otp.three}${otp.four}${otp.five}${otp.six}`
+        console.log(otpValue, pNo, email)
+        try {
+            const response = await fetch(`https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/otp/verify`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    phoneNumber: pNo,
+                    otp: otpValue
+                })
+            })
+
+            const data = await response.json()
+
+            if (response.ok) {
+                // OTP verification successful, now login the user
+                try {
+                    //     // Clear signup and OTP stores
+                    resetOtp()
+                    clearSignupData()
+                    
+                // Redirect to dashboard
+                    router.push('/')
+
+                } catch (err) {
+                    setError('Error logging in after verification')
+                }
+            } else {
+                setError(data.message || 'OTP verification failed')
+            }
+        } catch (err) {
+            setError('Network error. Please check your connection.')
+        } finally {
+            setLoading(false)
+        }
+    }
 
     useEffect(() => {
         // Log OTP state on every render
@@ -48,6 +87,7 @@ export default function Verification(){
                             onChange={(e) => setOtpField('one', e.target.value)} 
                             className="w-[50px] text-center py-2 px-0 text-2xl rounded" 
                             type="text" 
+                            maxLength={1}
                         />
                         
                         <input 
@@ -55,6 +95,7 @@ export default function Verification(){
                             onChange={(e) => setOtpField('two', e.target.value)} 
                             className="w-[50px] text-center py-2 px-0 text-2xl  rounded"  
                             type="text"
+                            maxLength={1}
                         />
                         
                         <input 
@@ -62,6 +103,7 @@ export default function Verification(){
                             onChange={(e) => setOtpField('three', e.target.value)} 
                             className="w-[50px] text-center py-2 px-0 text-2xl  rounded" 
                             type="text" 
+                            maxLength={1}
                         />
                         
                         <input 
@@ -69,6 +111,7 @@ export default function Verification(){
                             onChange={(e) => setOtpField('four', e.target.value)} 
                             className="w-[50px] text-center py-2 px-0 text-2xl rounded"  
                             type="text" 
+                            maxLength={1}
                         />
                         
                         <input 
@@ -76,6 +119,7 @@ export default function Verification(){
                             onChange={(e) => setOtpField('five', e.target.value)} 
                             className="w-[50px] text-center py-2 px-0 text-2xl rounded" 
                             type="text" 
+                            maxLength={1}
                         />
                         
                         <input 
@@ -83,6 +127,7 @@ export default function Verification(){
                             onChange={(e) => setOtpField('six', e.target.value)} 
                             className="w-[50px] text-center py-2 px-0 text-2xl  rounded"  
                             type="text"
+                            maxLength={1}
                         />
                     </div>
 
@@ -90,10 +135,10 @@ export default function Verification(){
                         onClick={handleSubmit} 
                         className="bg-[#1F2168] mt-10 font-bold font-inter text-lg text-white p-3 rounded"
                     >
-                        Verify
+                        {loading ? <span className="loading loading-dots loading-lg"></span> : "Verify"}
                     </button>
         
-                    {error && <p className="text-center font-bold text-base text-[red]">Please fill all the required fields.</p>}
+                    {error && <p className="text-center font-bold text-base text-[red]">{error}</p>}
                 </div>
             </div>
         </div>
