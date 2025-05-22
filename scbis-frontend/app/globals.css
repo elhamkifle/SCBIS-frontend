@@ -4,22 +4,42 @@
 
 
 html, body, #root {
-    height: 100%;
     margin: 0;
+    background-color: white;
+}
+
+:root{
+    --background: white;
 }
 
 
 #root {
     display: flex;
     min-height: 100vh;
-    background: #302f2fa9;
+    background-color: white;
 }
+
+input, select, textarea {
+    background-color: white;
+    color:black;
+}
+
+input[type="radio"] {
+  accent-color: initial;
+}
+
 
 @layer base {
     h2 {
       @apply font-syne font-bold text-xl md:text-xl lg:text-xl;
+      color: black;
     }
     h3 {
         @apply font-syne font-bold text-xl md:text-xl lg:text-xl;
+        color: black;
+    }
+
+    p, strong, label {
+        color: black;
     }
   }
