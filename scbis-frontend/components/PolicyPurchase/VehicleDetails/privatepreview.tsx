@@ -50,18 +50,61 @@ export default function PolicyPreview() {
     setError('');
     setIsLoading(true);
 
-    const vehicleName = selectedType === 'private' ? 'PrivateVehicle' : 'CommercialVehicle';
+    const vehicleKey = selectedType === 'private' ? 'privateVehicle' : 'commercialVehicle';
 
-    const serverResponse = await baseAPI.post('/policy/vehicle-details', {
-      VehicleType: selectedType === 'private' ? "Private" : "Commercial",
-      [vehicleName]: {
-        vehicleCategory: "Passanger Car",
-        usageType: ["Personal Use"],
-        generalDetails: { ...vehicleData, engineNumber: vehicleData.engineNo, plateNumber: vehicleData.plateNo },
-        ownershipUsage: { ...ownershipData, dutyFree: ownershipData.dutyFree === "Yes" ? true : false }
+    let category: string;
+    let usage: string[];
+
+    if (selectedType === 'private') {
+      const mapCarTypeToBackendCategory = (privateCarType: string): string => {
+        switch (privateCarType) {
+          case 'passenger': return 'Passenger Car';
+          case 'suvs': return 'SUV'; 
+          case 'pickup': return 'Pickup Truck';
+          case 'minivan': return 'Van/Minibus';
+          default: return 'Passenger Car';
+        }
+      };
+      const mapPrivateUsageTypeToArray = (privateUsageType: string): string[] => {
+        if (privateUsageType === 'personal') return ['Personal Use'];
+        if (privateUsageType === 'business') return ['Private Business Use'];
+        return ['Personal Use'];
+      };
+      category = mapCarTypeToBackendCategory(carType);
+      usage = mapPrivateUsageTypeToArray(usageType);
+    } else { // Commercial
+      category = "Passenger Car"; 
+      usage = ["Personal Use"];  
+    }
+
+    const payload = {
+      vehicleType: selectedType === 'private' ? "Private" : "Commercial",
+      vehicleCategory: category,
+      usageType: usage,
+      generalDetails: {
+        make: vehicleData.make,
+        model: vehicleData.model,
+        engineCapacity: vehicleData.engineCapacity ? parseInt(vehicleData.engineCapacity, 10) : undefined,
+        plateNumber: vehicleData.plateNo,
+        bodyType: vehicleData.bodyType,
+        engineNumber: vehicleData.engineNo
       },
+      ownershipUsage: {
+        ownerType: ownershipData.ownerType,
+        purchasedValue: ownershipData.purchasedValue ? parseInt(ownershipData.purchasedValue, 10) : undefined,
+        dutyFree: ownershipData.dutyFree === "Yes" ? true : false,
+        driverType: ownershipData.driverType,
+        seatingCapacity: ownershipData.seatingCapacity ? parseInt(ownershipData.seatingCapacity, 10) : undefined
+      },
+      "policyType": "Comprehensive Cover",
+      "duration": 30,
+      "coverageArea": "Ethiopia Only",
+      "premium": 5000
+    };
 
-    }, {
+    console.log('Data being sent to backend:', payload);
+
+    const serverResponse = await baseAPI.post('/policy/vehicle-details', payload, {
       headers: {
         Authorization: `Bearer ${user?.accessToken}`
       }
