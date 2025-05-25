@@ -10,8 +10,8 @@ const ResetPassword = () => {
 
     const navigate = useRouter()
     const params = useSearchParams()
-    const email = params.get('email')
-    const otp = params.get('otp')
+    const email = params?.get('email')
+    const otp = params?.get('otp')
     const [isVisible,setIsVisible] = React.useState({
         password:false,
         confirmPassword:false
