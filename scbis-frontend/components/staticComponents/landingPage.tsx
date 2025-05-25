@@ -87,45 +87,45 @@ export default function Hero() {
                 </div>
             </section> */}
 
-             <section className="flex items-center justify-center bg-gradient-to-r from-[#e6edf2] to-[#1F4878] px-4">
-      <div className="max-w-7xl w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-        
-        {/* Left image section */}
-        <div className="relative w-full h-[20px] lg:h-[500px] md:h-[600px]">
-          <Image
-            src="/hand.svg"
-            alt="SCBIS logo"
-            layout="fill"
-            objectFit="contain"
-            className="hidden md:block"
-          />
-        </div>
+            <section className="flex items-center justify-center bg-gradient-to-r from-[#e6edf2] to-[#1F4878] px-4">
+                <div className="max-w-7xl w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
 
-        <div className="bg-white shadow-md rounded-lg p-8 max-w-lg mb-10 md:mb-0 mx-auto md:mx-0">
-          <p className="text-sm tracking-widest text-gray-500 uppercase mb-4">SCBIS </p>
-          <h1 className="text-2xl font-semibold text-gray-800 mb-4">
-            The smart vehicle insurance system for all your needs.
-          </h1>
-
-          <p className='mb-8'> Blockchain backed. Secure. Easy. </p>
-                    <div className="flex flex-col justify-start sm:flex-row gap-4 md:gap-8">
-                        <button
-                            onClick={handleStart}
-                            className="bg-[#7AC943] text-white font-semibold px-6 py-3 rounded-lg hover:bg-[#1F4878] transition"
-                        >
-                            Purchase a Policy
-                        </button>
-
-                        <button
-                            onClick={handleStart}
-                            className="bg-[#7AC943] text-white font-semibold px-6 py-3 rounded-lg hover:bg-[#1F4878] transition"
-                        >
-                            Start a New Claim
-                        </button>
+                    {/* Left image section */}
+                    <div className="relative w-full h-[20px] lg:h-[500px] md:h-[600px]">
+                        <Image
+                            src="/hand.svg"
+                            alt="SCBIS logo"
+                            layout="fill"
+                            objectFit="contain"
+                            className="hidden md:block"
+                        />
                     </div>
-        </div>
-      </div>
-    </section>
+
+                    <div className="bg-white shadow-md rounded-lg p-8 max-w-lg mb-10 md:mb-0 mx-auto md:mx-0">
+                        <p className="text-sm tracking-widest text-gray-500 uppercase mb-4">SCBIS </p>
+                        <h1 className="text-2xl font-semibold text-gray-800 mb-4">
+                            The smart vehicle insurance system for all your needs.
+                        </h1>
+
+                        <p className='mb-8'> Blockchain backed. Secure. Easy. </p>
+                        <div className="flex flex-col justify-start sm:flex-row gap-4 md:gap-8">
+                            <button
+                                onClick={ () => router.push("/policy-purchase/personal-information/personalDetails")}
+                                className="bg-[#7AC943] text-white font-semibold px-6 py-3 rounded-lg hover:bg-[#1F4878] transition"
+                            >
+                                Purchase a Policy
+                            </button>
+
+                            <button
+                                onClick={() => router.push("/claim-submission/vehicle-selection")}
+                                className="bg-[#7AC943] text-white font-semibold px-6 py-3 rounded-lg hover:bg-[#1F4878] transition"
+                            >
+                                Start a New Claim
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
             {/* OUR INSURANCE SERVICES */}
             <section className="w-full bg-white py-16 px-6">
@@ -186,7 +186,7 @@ export default function Hero() {
                         <div>
                             <p className="text-xl font-bold text-[#1F4878]">Made with Care</p>
                             <p className="text-gray-700 mt-2">
-                                Our system is designed to minimize headaches and unnecessary trips. Do almost everything right from your home. 
+                                Our system is designed to minimize headaches and unnecessary trips. Do almost everything right from your home.
                             </p>
                         </div>
                     </div>
@@ -197,7 +197,7 @@ export default function Hero() {
                         <div>
                             <p className="text-xl font-bold text-[#1F4878]">Easy and Secure </p>
                             <p className="text-gray-700 mt-2">
-                                We’ve built a secure and robust system that is easy to use by anyone. Everything is one click away.  
+                                We’ve built a secure and robust system that is easy to use by anyone. Everything is one click away.
                             </p>
                         </div>
                     </div>
