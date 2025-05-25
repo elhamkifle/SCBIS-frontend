@@ -39,7 +39,7 @@ input[type="radio"] {
         color: black;
     }
 
-    p, strong, label {
+    h4, h5, p, strong, label {
         color: black;
     }
   }
