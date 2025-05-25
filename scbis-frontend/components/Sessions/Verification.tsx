@@ -5,7 +5,7 @@ import verificationNumSchema from '@/schema/VerificationNum'
 import { VerificationNumSchemaType } from '@/schema/VerificationNum'
 import { useRouter, useSearchParams } from 'next/navigation'
 
-const Verification = () => {
+const VerificationComponent = () => {
 
     const naivgate = useRouter()
     const [iseResending,setIsResending] = useState<boolean>(false)
@@ -197,4 +197,8 @@ const Verification = () => {
     );
 }
 
-export default Verification
+export default function Verification(){
+    return(
+        <VerificationComponent />
+    )
+}
