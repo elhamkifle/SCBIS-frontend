@@ -1,12 +1,11 @@
 'use client'
 
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import useLoginStore from "@/store/authStore/useLoginStore";
 import { AuthSchemaType,AuthSchema } from "@/schema/zodSchema";
 import { useUserStore } from "@/store/authStore/useUserStore";
 import Link from "next/link";
-
 
 export default function Login() {
     const setUser = useUserStore((state) => state.setUser);
@@ -15,16 +14,18 @@ export default function Login() {
         email: '',
         password: ''
     });
-
     const [isLoading, setIsLoading] = useState(false);
-
     const router = useRouter();
+    
+    // Redirect already authenticated users away from login page
+    // useAuth(false);
 
     const handleSubmit = async () => {
         setZodError({
             email: '',
-            password: ''})
-            setIsLoading(true);
+            password: ''
+        });
+        setIsLoading(true);
         setError(false);
 
         const validation = AuthSchema.safeParse({ email, password });
@@ -34,49 +35,52 @@ export default function Login() {
                 email: errors.fieldErrors.email ? errors.fieldErrors.email[0] : '',
                 password: errors.fieldErrors.password ? errors.fieldErrors.password[0] : ''
             });
-
-            setIsLoading(false)
-            
+            setIsLoading(false);
             return;
         }
 
-        const serverResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
-            method:"POST",
-            body: JSON.stringify({identifier: email,password}),
-            headers:{
-                'Content-Type':'application/json'
+        try {
+            const serverResponse = await fetch(`https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/auth/login`, {
+                method: "POST",
+                body: JSON.stringify({
+                    identifier: email,
+                    password
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const data = await serverResponse.json();
+
+            if (serverResponse.ok) {
+                resetLogin();
+                
+                // Set authentication cookies
+                document.cookie = `auth_token=${data.accessToken}; path=/; max-age=3600; SameSite=Lax`;
+                document.cookie = `refresh_token=${data.refreshToken}; path=/; max-age=86400; SameSite=Lax`;
+                
+                setUser({
+                    ...data.user,
+                    accessToken: data.accessToken,
+                    refreshToken: data.refreshToken
+                });
+                console.log(data.user)
+                router.push('/policy-purchase/personal-information/personalDetails');
+            } else {
+                setError(data.message || "Login failed. Please check your credentials.");
             }
-        })
-
-        const data = await serverResponse.json()
-
-        if (serverResponse.ok) {
-            // Reset login form after successful submission
-            resetLogin();
-            console.log('Login successful:', data);
-            setUser({...data.user, accessToken: data.accessToken, refreshToken: data.refreshToken});
-            // Navigate to the next page after successful login
-            router.push('/policy-purchase/personal-information/personalDetails');
+        } catch (error) {
+            console.error("Login error:", error);
+            setError("Network error. Please check your connection.");
+        } finally {
             setIsLoading(false);
-            
-
-            
-        } else {
-            setError("Some error occurred. Please try again.");
-            setIsLoading(false);
-            
         }
-
-        
     };
 
     const signUp = () => {
         router.push('/signup');
     };
-
-    useEffect(() => {
-        console.log('Login State:', { email, password, error });
-    }, [email, password, error]);
 
     return (
         <div className="w-full h-full flex flex-col md:flex-row bg-gradient-to-r from-[#0F1D3F] to-[#3E99E7]">
@@ -129,7 +133,7 @@ export default function Login() {
                     </button>
                     
                     <p className="text-center text-sm text-slate-900 font-bold font-syne">
-                        Don't have an account yet? 
+                        Don&apos;t have an account yet? 
                         <span 
                             onClick={signUp} 
                             className="text-orange-600 cursor-pointer hover:text-orange-700 underline"

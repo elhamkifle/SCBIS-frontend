@@ -20,10 +20,11 @@ export type userType = {
     refreshToken: string,
 }
 
-export type userStoreType = {
+type userStoreType = {
     user: userType | null,
     setUser: (user: userType) => void,
     resetUser: () => void,
+    logout: () => void,
 }
 
 export const useUserStore = create<userStoreType>()(
@@ -32,6 +33,15 @@ export const useUserStore = create<userStoreType>()(
             user: null,
             setUser: (user) => set({user}),
             resetUser: () => set({user: null}),
+            logout: () => {
+                // Clear cookies
+                if (typeof document !== 'undefined') {
+                    document.cookie = 'auth_token=; path=/; max-age=0; SameSite=Lax';
+                    document.cookie = 'refresh_token=; path=/; max-age=0; SameSite=Lax';
+                }
+                // Reset user state
+                set({user: null});
+            }
         }),
         {
             name: "SCBIS-user-storage",

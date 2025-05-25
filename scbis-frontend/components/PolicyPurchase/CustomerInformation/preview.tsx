@@ -5,6 +5,7 @@ import { usePersonalDetailStore } from '@/store/customerInformationStore/persona
 import { useAddressStore } from '@/store/customerInformationStore/addressStore';
 import { useRouter } from 'next/navigation';
 import { useUserStore } from '@/store/authStore/useUserStore';
+import { fetchUserData, updateUserData } from '@/utils/userUtils';
 import { baseAPI } from '@/utils/axiosInstance';
 import { set } from 'zod';
 import { span } from 'framer-motion/client';
@@ -14,8 +15,8 @@ export default function Preview() {
   const setUser = useUserStore((state) => state.setUser);
  
   const router = useRouter();
-  const { formData: personalData, resetForm } = usePersonalDetailStore(); // Changed resetFormData to resetForm
-  const { address: addressData, resetAddress } = useAddressStore(); // Changed resetAddressData to resetAddress
+  const { formData: personalData, resetForm } = usePersonalDetailStore();
+  const { address: addressData, resetAddress } = useAddressStore();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -44,10 +45,48 @@ export default function Preview() {
     idFile: null as File | null,
   });
 
+  // Fetch latest user data on component mount
+  useEffect(() => {
+    const loadUserData = async () => {
+      try {
+        setLoading(true);
+        await fetchUserData();
+      } catch (err) {
+        console.error("Error fetching user data:", err);
+        setError("Failed to load the latest user data.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    if (user?._id) {
+      loadUserData();
+    }
+  }, []);
+
   // Merge personal data and address data into the state
   useEffect(() => {
-    setFormData((prev) => ({ ...prev, ...personalData, ...addressData }));
-  }, [personalData, addressData]);
+    // Get any existing user data we might want to include
+    const userData = user ? {
+      // Map user fields to form fields when form data is empty
+      email: personalData.email || user.email || '',
+      phone: personalData.phone || user.phoneNumber || '',
+      // Extract any additional fields
+      ...(user.city && { city: addressData.city || user.city || '' }),
+      ...(user.country && { country: addressData.country || user.country || '' }),
+      ...(user.subcity && { subcity: addressData.subcity || user.subcity || '' }),
+      ...(user.zone && { zone: addressData.zone || user.zone || '' }),
+      ...(user.kebele && { kebele: addressData.kebele || user.kebele || '' }),
+    } : {};
+
+    // Merge all data sources with priority: personalData/addressData > userData > current formData
+    setFormData((prev) => ({ 
+      ...prev, 
+      ...userData,
+      ...addressData, 
+      ...personalData 
+    }));
+  }, [personalData, addressData, user]);
 
   const [isEditing, setIsEditing] = useState({
     personalInfo: false,
@@ -76,12 +115,44 @@ export default function Preview() {
   const handleSubmit = async () => {
     console.log('Form Submitted:', formData);
     setLoading(true);
+    setError(null);
 
-    const serverResponse = await baseAPI.patch(`/user/${user?._id}`, formData)
+    try {
+      // Make sure user exists and has an ID
+      if (!user || !user._id) {
+        setError('❌ User information not available. Please login again.');
+        setLoading(false);
+        return;
+      }
 
-    if (serverResponse.status === 200) {
-      console.log('Form submission successful:', serverResponse.data);
-      setUser({...user,...serverResponse.data})
+      // Create form data object for submission
+      const submissionData = {
+        // Personal details
+        title: formData.title,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        fullname: `${formData.firstName} ${formData.lastName}`, // Make sure fullname is set correctly
+        gender: formData.gender,
+        dateOfBirth: formData.dateOfBirth,
+        nationality: formData.nationality,
+        email: formData.email || user.email, // Use existing email as fallback
+        phoneNumber: formData.phone || user.phoneNumber, // Use existing phone as fallback
+        tinNumber: formData.tin,
+        
+        // Address details
+        country: formData.country,
+        state: formData.state,
+        city: formData.city,
+        subcity: formData.subcity,
+        zone: formData.zone,
+        wereda: formData.wereda,
+        kebele: formData.kebele,
+        houseNo: formData.houseNo
+      };
+
+      // Use the updateUserData utility instead of direct API call
+      await updateUserData(submissionData);
+      
       alert('Application Submitted!');
       router.push('/policy-purchase/vehicle-information/purpose');
       
@@ -92,13 +163,25 @@ export default function Preview() {
       // Reset the Zustand stores
       resetForm();  // Reset personal data store
       resetAddress();  // Reset address data store
-    } else {
-      setError('❌ Form submission failed. Please try again.');
-      console.error('Form submission failed:', serverResponse);
+      
+    } catch (err) {
+      console.error('Form submission error:', err);
+      const error = err as { response?: any, request?: any, message?: string };
+      
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        setError(`❌ ${error.response.data?.message || `Error ${error.response.status}: ${error.response.statusText}`}`);
+      } else if (error.request) {
+        // The request was made but no response was received
+        setError('❌ Network error: No response from server. Please check your connection.');
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        setError(`❌ ${error.message || 'An unknown error occurred'}`);
+      }
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
-    
   };
 
 
@@ -359,7 +442,7 @@ export default function Preview() {
             onClick={handleSubmit}
             className="bg-green-500 text-white px-4 rounded-md py-2 text-lg font-semibold hover:bg-green-600"
           >
-            {loading ? <span className='loading loading-dots loading-lg'></span>  :"Submit Application"}
+            {loading ? <span className='loading loading-dots loading-lg'></span> : "Submit Application"}
           </button>
         </div>
 
