@@ -35,32 +35,32 @@ export default function Signup() {
 
                     <div className="flex flex-col md:flex-row gap-3 md:gap-10">
                         <div className="w-full md:w-1/2 flex flex-col gap-3 md:gap-5">
-                            <label htmlFor="fname" className="text-[302F2F] text-xs font-medium font-inter">First Name</label>
-                            <input value={fName} onChange={(e) => setFName(e.target.value)} className="p-2 rounded" type="text" id="fname" name="fname" />
+                            <label htmlFor="fname" className="text-[302F2F] text-sm font-bold font-inter">First Name</label>
+                            <input value={fName} onChange={(e) => setFName(e.target.value)} className="p-2 rounded placeholder:text-black placeholder:font-semibold placeholder:italic" type="text" id="fname" name="fname" />
                         </div>
 
                         <div className="w-full md:w-1/2 flex flex-col gap-3 md:gap-5">
-                            <label htmlFor="lname" className="text-[302F2F] text-xs font-medium font-inter">Last Name</label>
-                            <input value={lName} onChange={(e) => setLName(e.target.value)} className="p-2 rounded" type="text" id="lname" name="lname" />
+                            <label htmlFor="lname" className="text-[302F2F] text-sm font-bold font-inter">Last Name</label>
+                            <input value={lName} onChange={(e) => setLName(e.target.value)} className="p-2 rounded placeholder:text-black placeholder:font-semibold placeholder:italic" type="text" id="lname" name="lname" />
                         </div>
                     </div>
 
                     <div className="flex flex-col md:flex-row gap-3 md:gap-10">
                         <div className="w-full md:w-1/2 flex flex-col gap-3 md:gap-5">
-                            <label htmlFor="dob" className="text-[302F2F] text-xs font-medium font-inter">Date Of Birth</label>
-                            <input value={dob} onChange={(e) => setDob(e.target.value)} className="p-2 rounded" type="date" id="dob" name="dob" />
+                            <label htmlFor="dob" className="text-[302F2F] text-sm font-bold font-inter">Date Of Birth</label>
+                            <input value={dob} onChange={(e) => setDob(e.target.value)} className="p-2 rounded placeholder:text-black placeholder:font-semibold placeholder:italic" type="date" id="dob" name="dob" />
                         </div>
 
                         <div className="w-full md:w-1/2 flex flex-col gap-3 md:gap-5">
-                            <label htmlFor="phone" className="text-[302F2F] text-xs font-medium font-inter">Phone Number</label>
-                            <input value={pNo} onChange={(e) => setPNo(e.target.value)} className="p-2 rounded" type="tel" id="phone" name="phone" />
+                            <label htmlFor="phone" className="text-[302F2F] text-sm font-bold font-inter">Phone Number</label>
+                            <input value={pNo} onChange={(e) => setPNo(e.target.value)} className="p-2 rounded placeholder:text-black placeholder:font-semibold placeholder:italic" type="tel" id="phone" name="phone" />
                         </div>
                     </div>
 
                     <div className="flex justify-end items-center gap-[110px] md:gap-[155px]">
                         <div className="flex items-center gap-3">
-                            <p className="w-[30px] py-1 cursor-pointer text-center font-bold bg-[#2752D0]  font-inter text-sm text-white rounded">1</p>
-                            <p className="w-[30px] py-1 cursor-pointer text-center font-bold bg-[#3E99E7]  font-inter text-sm text-white rounded">2</p>
+                            <p onClick={()=>router.push('/signup')} className="w-[30px] py-1 cursor-pointer text-center font-bold bg-[#2752D0]  font-inter text-sm text-white rounded">1</p>
+                            <p onClick={handleSubmit} className="w-[30px] py-1 cursor-pointer text-center font-bold bg-[#3E99E7]  font-inter text-sm text-white rounded">2</p>
                         </div>
                         <button onClick={handleSubmit} className="bg-[#1F2168] w-1/6  font-inter text-sm text-white p-1 rounded">Next</button>
                     </div>
