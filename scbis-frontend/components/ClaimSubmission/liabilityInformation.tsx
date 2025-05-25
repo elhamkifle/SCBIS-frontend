@@ -18,7 +18,7 @@ export default function LiabilityInformation() {
     setPoliceInvolved,
     setpoliceOfficerName,
     setPoliceStation,
-    clearAllData
+    // clearAllData
   } = useLiabilityInformationStore();
 
   const handlePrevious = () => router.push('/claim-submission/accident-details');
@@ -42,7 +42,7 @@ export default function LiabilityInformation() {
       <div className="flex flex-wrap sm:justify-start md:justify-start items-center gap-4 mt-6 mb-4">
         <div className="flex items-center">
           <div className="w-7 h-7 flex items-center justify-center bg-green-500 text-white rounded-full">1</div>
-          <span className="ml-2 font-medium text-black text-xs sm:text-base">Driver's Details</span>
+          <span className="ml-2 font-medium text-black text-xs sm:text-base">Driver&rsquo;s Details</span>
         </div>
         <div className="w-7 sm:border-t-2 border-gray-400"></div>
         <div className="flex items-center">
@@ -140,7 +140,7 @@ export default function LiabilityInformation() {
             <p className="font-semibold">If so please state</p>
             <div className="flex flex-col md:flex-row gap-4 mt-2">
               <div className="relative w-full md:w-1/2">
-                <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Police Officer's Name</label>
+                <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Police Officer&rsquo;s Name</label>
                 <input
                   type="text"
                   value={policeOfficerName}

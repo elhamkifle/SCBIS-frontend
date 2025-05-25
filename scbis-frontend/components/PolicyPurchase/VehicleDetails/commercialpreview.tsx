@@ -57,7 +57,7 @@ export default function CommercialVehiclePreview() {
   // Helper function to get category names
   const getSelectedCategories = (categories: Record<string, boolean>) => {
     return Object.entries(categories)
-      .filter(([_, selected]) => selected)
+      .filter(([selected]) => selected)
       .map(([key]) => {
         // Map the keys to human-readable names
         const nameMap: Record<string, string> = {

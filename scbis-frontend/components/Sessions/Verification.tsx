@@ -117,7 +117,7 @@ const Verification = () => {
 
 
 
-        const data = await serverResponse.json()
+        // const data = await serverResponse.json()
 
         if (serverResponse.ok) {
             // setIsSuccess(true)

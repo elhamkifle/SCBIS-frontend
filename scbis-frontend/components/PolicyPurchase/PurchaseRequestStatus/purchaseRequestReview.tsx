@@ -1,6 +1,6 @@
 'use client';
 
-import { Car, Calculator } from 'lucide-react';
+import { Car  } from 'lucide-react';
 
 export default function PurchaseRequestReview() {
   return (

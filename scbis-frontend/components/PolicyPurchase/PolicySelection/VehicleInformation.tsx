@@ -4,31 +4,31 @@ import { useState, ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { useVehicleInfoStore } from '@/store/policyPurchase/vehicleDetails';
 
-interface FormData {
-  coverRequired: string;
-  make: string;
-  value: string;
-  vehicleInGoodRepair: string;
-  vehicleLeftOvernight: string;
-  soleProperty: string;
-  ownerName: string;
-  ownerAddress: string;
-  privateUse: string;
-  otherUses: string;
-  convicted: string;
-  convictionDetails: string;
-  insuredBefore: string;
-  insurerName: string;
-  companyHistory: string[];
-  hadAccidents: string;
-  accidentDetails: string;
-  claimsInjury: string;
-  claimsInjuryDetails: string;
-  claimsProperty: string;
-  claimsPropertyDetails: string;
-  personalAccident: string;
-  passengersInsured: string;
-}
+// interface FormData {
+//   coverRequired: string;
+//   make: string;
+//   value: string;
+//   vehicleInGoodRepair: string;
+//   vehicleLeftOvernight: string;
+//   soleProperty: string;
+//   ownerName: string;
+//   ownerAddress: string;
+//   privateUse: string;
+//   otherUses: string;
+//   convicted: string;
+//   convictionDetails: string;
+//   insuredBefore: string;
+//   insurerName: string;
+//   companyHistory: string[];
+//   hadAccidents: string;
+//   accidentDetails: string;
+//   claimsInjury: string;
+//   claimsInjuryDetails: string;
+//   claimsProperty: string;
+//   claimsPropertyDetails: string;
+//   personalAccident: string;
+//   passengersInsured: string;
+// }
 
 interface Errors {
   coverRequired?: string;
@@ -62,7 +62,7 @@ export default function VehicleInformation() {
     formData,
     updateFormData,
     updateCompanyHistory,
-    clearStorage
+    // clearStorage
   } = useVehicleInfoStore();
 
   const [errors, setErrors] = useState<Errors>({});
@@ -125,10 +125,9 @@ export default function VehicleInformation() {
     }
   };
 
-  const handleSubmitDraft = () => {
-    // Data is automatically saved to localStorage via Zustand
-    alert('Draft saved successfully!');
-  };
+  // const handleSubmitDraft = () => {
+  //   alert('Draft saved successfully!');
+  // };
 
 
   return (
@@ -328,7 +327,7 @@ export default function VehicleInformation() {
 
 <div className="mb-8">
   <label className="font-semibold">Will the vehicle(s) be used solely for private purposes as described below: If not, please state other uses.</label>
-  <p className="text-gray-600 mt-2">Private purpose: the term "private purposes" means social domestic, pleasure, Professional purposes or business calls of the insured.</p>
+  <p className="text-gray-600 mt-2">Private purpose: the term &apos;private purposes&apos; means social domestic, pleasure, Professional purposes or business calls of the insured.</p>
   <div className="flex gap-4 mt-4">
     <label>
       <input 

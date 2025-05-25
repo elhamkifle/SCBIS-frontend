@@ -11,8 +11,8 @@ export default function NotificationsPage() {
     markAllAsRead,
     deleteNotification,
     setFilter,
-    clearAllNotifications,
-    resetToDefault,
+    // clearAllNotifications,
+    // resetToDefault,
   } = useNotificationStore();
 
   const filteredNotifications =
