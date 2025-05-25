@@ -24,6 +24,7 @@ export default function AccidentDetails() {
     visibilityObstructions,
     intersectionType,
     // sketchFiles,
+    // sketchFiles,
     error,
     addVehicle,
     removeVehicle,
@@ -140,7 +141,7 @@ export default function AccidentDetails() {
       for (const file of files) {
         const formData = new FormData();
         formData.append('file', file);
-        formData.append('upload_preset', 'docuploads');
+        formData.append('upload_preset', 'docuploads'); // your Cloudinary preset
 
         const res = await axios.post(
           'https://api.cloudinary.com/v1_1/dmzvqehan/upload',

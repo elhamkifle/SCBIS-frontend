@@ -11,13 +11,15 @@ import { useVehicleSelectionStore } from '@/store/vehicleSelection/vehicleSelect
 import { vehiclePersistenceService } from '@/utils/vehicleApi';
 import { baseAPI } from '@/utils/axiosInstance';
 import { useUserStore } from '@/store/authStore/useUserStore';
+import { baseAPI } from '@/utils/axiosInstance';
+// import { set } from 'zod';
 
-type VehicleDetails = {
-  make: string;
-  model: string;
-  mfgYear: string;
-  [key: string]: any;
-};
+// type VehicleDetails = {
+//   make: string;
+//   model: string;
+//   mfgYear: string;
+//   [key: string]: any;
+// };
 
 // type OwnershipUsageData = {
 //   isOwned: boolean;

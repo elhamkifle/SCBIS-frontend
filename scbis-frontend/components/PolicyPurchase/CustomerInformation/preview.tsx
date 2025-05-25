@@ -6,7 +6,7 @@ import { useAddressStore } from '@/store/customerInformationStore/addressStore';
 import { useRouter } from 'next/navigation';
 import { useUserStore } from '@/store/authStore/useUserStore';
 import { fetchUserData, updateUserData } from '@/utils/userUtils';
-// import { baseAPI } from '@/utils/axiosInstance';
+import { baseAPI } from '@/utils/axiosInstance';
 // import { set } from 'zod';
 // import { span } from 'framer-motion/client';
 
