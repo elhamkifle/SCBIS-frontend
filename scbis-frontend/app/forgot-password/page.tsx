@@ -1,6 +1,8 @@
 import ForgotPassword from '@/components/Sessions/ForgotPassword'
 import React from 'react'
+import { Footer } from '@/components/staticComponents/footer'
 import Header from '@/components/staticComponents/header'
+import Sidebar from '@/components/staticComponents/sidebar'
 
 const page = () => {
   return (

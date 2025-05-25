@@ -3,9 +3,10 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import useLoginStore from "@/store/authStore/useLoginStore";
-import { AuthSchemaType } from "@/schema/zodSchema";
+import { AuthSchemaType,AuthSchema } from "@/schema/zodSchema";
 import { useUserStore } from "@/store/authStore/useUserStore";
 import Link from "next/link";
+
 
 export default function Login() {
     const setUser = useUserStore((state) => state.setUser);
@@ -102,7 +103,7 @@ export default function Login() {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)} 
                             className="p-2 rounded placeholder:text-black placeholder:font-semibold placeholder:italic placeholder:text-xs" 
-                            type="text" 
+                            type="email" 
                             id="email" 
                             name="email"
                             placeholder="Type email address"

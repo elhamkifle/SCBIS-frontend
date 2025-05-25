@@ -143,7 +143,7 @@ const ForgotPassword = () => {
 
                         <p className='flex mt-5'>
                             
-                            <Link href='/login' className='hover:bg-gray-300 w-auto rounded-md shadow-sm p-2 bg-gray-200 shadow-gray-600 flex justify-center items-center gap-1 text-black text-sm '>
+                            <Link href='/' className='hover:bg-gray-300 w-auto rounded-md shadow-sm p-2 bg-gray-200 shadow-gray-600 flex justify-center items-center gap-1 text-black text-sm '>
                                 <ArrowLeft size={16} className='text-gray-900'/>
                                 Back to login
                             </Link>

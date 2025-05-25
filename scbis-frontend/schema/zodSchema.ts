@@ -1,3 +1,4 @@
+import { Phone } from "lucide-react";
 import { z } from "zod";
 
 export const AuthSchema = z.object({

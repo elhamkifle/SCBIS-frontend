@@ -1,17 +1,17 @@
 'use client'
-import React, { Suspense } from 'react'
+import React from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Eye, EyeOffIcon } from 'lucide-react'
 import { ResetPasswordSchema, ResetPasswordSchemaType } from '@/schema/zodSchema'
 
 
-const ResetPasswordComponent = () => {
+const ResetPassword = () => {
 
     const navigate = useRouter()
     const params = useSearchParams()
-    const email = params?.get('email')
-    const otp = params?.get('otp')
+    const email = params.get('email')
+    const otp = params.get('otp')
     const [isVisible,setIsVisible] = React.useState({
         password:false,
         confirmPassword:false
@@ -87,7 +87,7 @@ const ResetPasswordComponent = () => {
                 confirmPassword:''
             })
             
-            navigate.push('/login')
+            navigate.push('/')
 
             
         } else {
@@ -163,7 +163,7 @@ const ResetPasswordComponent = () => {
 
                         <p className='flex mt-5'>
                             
-                            <Link href='/login' className='hover:bg-gray-300 w-auto rounded-md shadow-sm p-2 bg-gray-200 shadow-gray-600 flex justify-center items-center gap-1 text-black text-sm '>
+                            <Link href='/' className='hover:bg-gray-300 w-auto rounded-md shadow-sm p-2 bg-gray-200 shadow-gray-600 flex justify-center items-center gap-1 text-black text-sm '>
                                 <ArrowLeft size={16} className='text-gray-900'/>
                                 Back to login
                             </Link>
@@ -179,10 +179,4 @@ const ResetPasswordComponent = () => {
   )
 }
 
-export default function ResetPassword (){
-    return(
-        <Suspense>
-            <ResetPasswordComponent />
-        </Suspense>
-    )
-}
+export default ResetPassword
