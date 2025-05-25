@@ -48,13 +48,13 @@ export default function SignupStep2() {
 
     const data = await serverResponse.json()
 
-    if (!serverResponse.ok && data.message==="Failed to send OTP. Please try again later."){
-      router.push('/verification') // or wherever OTP page is
+    if (serverResponse.ok){
+      router.push(`/verification?page=page2&email=${email}&phone=${pNo}`) // or wherever OTP page is
     }
 
     setLoading(false)
 
-    // console.log(data)
+    console.log(data)
 
     
   }
@@ -71,26 +71,26 @@ export default function SignupStep2() {
           <p className="text-center text-[302F2F] text-2xl font-bold font-inter">Create Account</p>
 
           <div className="flex flex-col gap-3 md:gap-5">
-            <label htmlFor="email" className="text-[302F2F] text-xs font-medium font-inter">Email Address</label>
+            <label htmlFor="email" className="text-[302F2F] text-sm font-bold font-inter">Email Address</label>
             <input onChange={(e) => setEmail(e.target.value)} value={email} className="p-2 rounded" type="email" id="email" name="email" />
           </div>
 
           <div className="flex flex-col md:flex-row gap-3 md:gap-10">
             <div className="w-full md:w-1/2 flex flex-col gap-3 md:gap-5">
-              <label htmlFor="password" className="text-[302F2F] text-xs font-medium font-inter">Password</label>
+              <label htmlFor="password" className="text-[302F2F] text-sm font-bold font-inter">Password</label>
               <input onChange={(e) => setPassword(e.target.value)} value={password} className="p-2 rounded" type="password" id="password" name="password" />
             </div>
 
             <div className="w-full md:w-1/2 flex flex-col gap-3 md:gap-5">
-              <label htmlFor="confirmPass" className="text-[302F2F] text-xs font-medium font-inter">Confirm Password</label>
+              <label htmlFor="confirmPass" className="text-[302F2F] text-sm font-bold font-inter">Confirm Password</label>
               <input onChange={(e) => setConfirmPass(e.target.value)} value={confirmPass} className="p-2 rounded" type="password" id="confirmPass" name="confirmPass" />
             </div>
           </div>
 
           <div className="flex justify-end items-center gap-[110px] md:gap-[155px]">
             <div className="flex items-center gap-3">
-              <p className="w-[30px] py-1 cursor-pointer text-center font-bold bg-[#2752D0] font-inter text-sm text-white rounded">1</p>
-              <p className="w-[30px] py-1 cursor-pointer text-center font-bold bg-[#3E99E7] font-inter text-sm text-white rounded">2</p>
+                <p onClick={()=>router.push('/signup')} className="w-[30px] py-1 cursor-pointer text-center font-bold bg-[#2752D0]  font-inter text-sm text-white rounded">1</p>
+                <p onClick={()=>router.push('/signup/page2')} className="w-[30px] py-1 cursor-pointer text-center font-bold bg-[#3E99E7]  font-inter text-sm text-white rounded">2</p>
             </div>
             <button onClick={handleSubmit} className="bg-[#23C140] w-1/6 font-inter text-sm text-white p-1 rounded">{loading ? <span className="loading loading-dots loading-lg"></span>  :"Signup"}</button>
           </div>
