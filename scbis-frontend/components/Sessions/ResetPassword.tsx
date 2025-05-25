@@ -1,12 +1,12 @@
 'use client'
-import React from 'react'
+import React, { Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Eye, EyeOffIcon } from 'lucide-react'
 import { ResetPasswordSchema, ResetPasswordSchemaType } from '@/schema/zodSchema'
 
 
-const ResetPassword = () => {
+const ResetPasswordComponent = () => {
 
     const navigate = useRouter()
     const params = useSearchParams()
@@ -179,4 +179,10 @@ const ResetPassword = () => {
   )
 }
 
-export default ResetPassword
+export default function ResetPassword (){
+    return(
+        <Suspense>
+            <ResetPasswordComponent />
+        </Suspense>
+    )
+}
