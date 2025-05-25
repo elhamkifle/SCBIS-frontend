@@ -20,7 +20,7 @@ export default function DamageDetails() {
     addVehicleDamageFile,
     addThirdPartyDamageFile,
     setError,
-    clearAllData
+    // clearAllData
   } = useDamageDetailsStore();
 
   const [vehicleFiles, setVehicleFiles] = useState<File[]>([]);
@@ -153,11 +153,11 @@ export default function DamageDetails() {
       </div>
 
       <div>
-        <label className="font-semibold block mb-2">Details of damage to Third Party's property & Vehicle(s)</label>
+        <label className="font-semibold block mb-2">Details of damage to Third Party&rsquo;s property & Vehicle(s)</label>
         <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 items-start">
           {renderDropArea(thirdPartyFiles, setThirdPartyFiles, 'thirdPartyUpload')}
           <div className="w-full lg:w-1/2">
-            <label className="font-semibold block mb-2">Details of damage to Third Party's property & Vehicle</label>
+            <label className="font-semibold block mb-2">Details of damage to Third Party&rsquo;s property & Vehicle</label>
             <textarea
               className="w-full border border-gray-300 rounded-md p-2"
               value={thirdPartyDamageDesc}
@@ -221,6 +221,7 @@ export default function DamageDetails() {
       <div className="w-full max-w-5xl flex justify-between items-center mt-8">
         <button
           type="button"
+          disabled={loading}
           className="bg-[#3AA4FF] text-white p-7 py-2 rounded"
           onClick={handlePrevious}
         >

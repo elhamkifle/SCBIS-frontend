@@ -99,7 +99,7 @@ export default function UploadIDForm() {
                     style={{ boxShadow: '0px 10px 20px rgba(0, 123, 255, 0.4), 0px 4px 8px rgba(0, 0, 0, 0.1)' }} >
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div className="text-black">
-                            <p className="text-xl font-bold mb-4">Rule for Uploading Driver's License and Libre</p>
+                            <p className="text-xl font-bold mb-4">Rule for Uploading Driver&apos;s License and Libre</p>
                             {[
                                 '✅ Allowed Document Types: Only Kebele ID, National ID or Passport are accepted.',
                                 '✅ File Format: Only PDF, JPG, PNG files are allowed.',

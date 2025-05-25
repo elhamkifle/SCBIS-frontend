@@ -20,7 +20,7 @@ export default function WitnessInformation() {
     updateIndependentWitness,
     removeIndependentWitness,
     setwhyNoWitness,
-    clearAllData
+    // clearAllData
   } = useWitnessInformationStore();
 
   const handlePrevious = () => router.push('/claim-submission/liability-information');
@@ -41,7 +41,7 @@ export default function WitnessInformation() {
       <div className="flex flex-wrap sm:justify-start md:justify-start items-center gap-4 mt-6 mb-4">
         <div className="flex items-center">
           <div className="w-7 h-7 flex items-center justify-center bg-green-500 text-white rounded-full">1</div>
-          <span className="ml-2 font-medium text-black text-xs sm:text-base">Driver's Details</span>
+          <span className="ml-2 font-medium text-black text-xs sm:text-base">Driver&rsquo;s Details</span>
         </div>
         <div className="w-7 sm:border-t-2 border-gray-400"></div>
         <div className="flex items-center">

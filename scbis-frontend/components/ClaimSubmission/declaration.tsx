@@ -15,7 +15,7 @@ export default function Declaration() {
     setinsuredFullName,
     setsignatureDate,
     setagreedToDeclaration,
-    clearAllData
+    // clearAllData
   } = useDeclarationStore();
 
   const [error, setError] = useState('');
@@ -66,7 +66,7 @@ export default function Declaration() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="relative">
-              <label className="block text-sm font-medium  mb-1">Driver's Full Name</label>
+              <label className="block text-sm font-medium  mb-1">Driver&rsquo;s Full Name</label>
               <input
                 type="text"
                 value={driverFullName}
@@ -79,7 +79,7 @@ export default function Declaration() {
             </div>
 
             <div className="relative">
-              <label className="block text-sm font-medium mb-1">Insured's Full Name</label>
+              <label className="block text-sm font-medium mb-1">Insured&rsquo;s Full Name</label>
               <input
                 type="text"
                 value={insuredFullName}

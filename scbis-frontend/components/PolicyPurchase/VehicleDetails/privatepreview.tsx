@@ -9,20 +9,20 @@ import { useOwnershipUsageStore } from '@/store/vehicleDetails/ownershipAndUsage
 import { useState } from 'react';
 import { useUserStore } from '@/store/authStore/useUserStore';
 import { baseAPI } from '@/utils/axiosInstance';
-import { set } from 'zod';
+// import { set } from 'zod';
 
-type VehicleDetails = {
-  make: string;
-  model: string;
-  mfgYear: string;
-  [key: string]: any;
-};
+// type VehicleDetails = {
+//   make: string;
+//   model: string;
+//   mfgYear: string;
+//   [key: string]: any;
+// };
 
-type OwnershipUsageData = {
-  isOwned: boolean;
-  isUsedForWork: boolean;
-  [key: string]: any;
-};
+// type OwnershipUsageData = {
+//   isOwned: boolean;
+//   isUsedForWork: boolean;
+//   [key: string]: any;
+// };
 
 export default function PolicyPreview() {
   const router = useRouter();
@@ -89,20 +89,20 @@ export default function PolicyPreview() {
 
   };
 
-  const handlePrevious = () => {
-    router.push('/policy-purchase/vehicle-information/ownershipAndUsage');
-  };
+  // const handlePrevious = () => {
+  //   router.push('/policy-purchase/vehicle-information/ownershipAndUsage');
+  // };
 
-  const YesNoDisplay = ({ value }: { value: string | boolean }) => {
-    const displayValue = typeof value === 'boolean' ? (value ? 'yes' : 'no') : value;
-    return (
-      <span className={`px-2 py-1 rounded-full text-sm font-medium ${
-        displayValue === 'yes' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-      }`}>
-        {displayValue === 'yes' ? 'Yes' : 'No'}
-      </span>
-    );
-  };
+  // const YesNoDisplay = ({ value }: { value: string | boolean }) => {
+  //   const displayValue = typeof value === 'boolean' ? (value ? 'yes' : 'no') : value;
+  //   return (
+  //     <span className={`px-2 py-1 rounded-full text-sm font-medium ${
+  //       displayValue === 'yes' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+  //     }`}>
+  //       {displayValue === 'yes' ? 'Yes' : 'No'}
+  //     </span>
+  //   );
+  // };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -434,6 +434,8 @@ export default function PolicyPreview() {
             </div>
           )}
         </div>
+
+        {error && <p className="text-red-500 mt-4 text-center">{error}</p>}
 
         {/* Navigation Buttons */}
         <div className="w-full max-w-5xl flex justify-end my-6 pr-4">

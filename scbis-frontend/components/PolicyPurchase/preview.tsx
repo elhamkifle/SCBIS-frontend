@@ -180,9 +180,9 @@ export default function PolicyPreview() {
     router.push('/claim-submission/accident-details');
   };
 
-  const handlePrevious = () => {
-    router.push('/policy-purchase/purchase/driverInformation');
-  };
+  // const handlePrevious = () => {
+  //   router.push('/policy-purchase/purchase/driverInformation');
+  // };
 
   return (
     <div className="px-4">

@@ -2,15 +2,9 @@
 
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import Link from 'next/link';
 
 export default function Hero() {
     const router = useRouter();
-
-    const handleStart = () => {
-        router.push('/claim-submission/policy-selection');
-    };
-
     const handleNext = () => {
         router.push('/');
     }
@@ -197,7 +191,7 @@ export default function Hero() {
                         <div>
                             <p className="text-xl font-bold text-[#1F4878]">Easy and Secure </p>
                             <p className="text-gray-700 mt-2">
-                                We’ve built a secure and robust system that is easy to use by anyone. Everything is one click away.
+                                We&apos;ve built a secure and robust system that is easy to use by anyone. Everything is one click away.
                             </p>
                         </div>
                     </div>
@@ -208,7 +202,7 @@ export default function Hero() {
                         <div>
                             <p className="text-xl font-bold text-[#1F4878]">Diverse Motor Insurance Products</p>
                             <p className="text-gray-700 mt-2">
-                                We provide a wide portfolio of coverage types tailored to our clients' motor insurance needs.
+                                We provide a wide portfolio of coverage types tailored to our clients&apos; motor insurance needs.
                             </p>
                         </div>
                     </div>

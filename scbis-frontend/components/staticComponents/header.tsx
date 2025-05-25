@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Menu, X, Bell, HelpCircle, Settings, LogOut, User, Expand, Trash2, CheckCheck } from "lucide-react";
+import { Menu, X, Bell, HelpCircle, Settings, LogOut, User, Expand, CheckCheck } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useNotificationStore, type NotificationType } from "@/store/notificationStore/notifications";;
+import { useNotificationStore } from "@/store/notificationStore/notifications";;
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);

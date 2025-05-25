@@ -1,13 +1,13 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Edit, Check, Upload, FileText } from 'lucide-react';
+import { Edit, Check } from 'lucide-react';
 import { usePersonalDetailStore } from '@/store/customerInformationStore/personalDetails';
 import { useAddressStore } from '@/store/customerInformationStore/addressStore';
 import { useRouter } from 'next/navigation';
 import { useUserStore } from '@/store/authStore/useUserStore';
 import { baseAPI } from '@/utils/axiosInstance';
-import { set } from 'zod';
-import { span } from 'framer-motion/client';
+// import { set } from 'zod';
+// import { span } from 'framer-motion/client';
 
 export default function Preview() {
   const user = useUserStore((state) => state.user);
@@ -61,11 +61,11 @@ export default function Preview() {
   };
 
   // Handle file change
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFormData((prev) => ({ ...prev, idFile: e.target.files![0] }));
-    }
-  };
+  // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   if (e.target.files && e.target.files[0]) {
+  //     setFormData((prev) => ({ ...prev, idFile: e.target.files![0] }));
+  //   }
+  // };
 
   // Toggle edit state for personal or address info
   const toggleEdit = (section: 'personalInfo' | 'address') => {
