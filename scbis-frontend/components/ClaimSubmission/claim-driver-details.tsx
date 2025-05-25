@@ -1,82 +1,90 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useDriverDetailsStore } from '@/store/claimSubmission/driver-details';
 import { useState } from 'react';
 
+const ethiopianCities = [
+  'Addis Ababa', 'Adama', 'Hawassa', 'Mekelle', 'Dire Dawa', 'Jimma', 'Bahir Dar',
+  'Gondar', 'Dessie', 'Jijiga', 'Nazret', 'Ambo', 'Awassa', 'Arba Minch', 'Asella',
+  'Debre Birhan', 'Kombolcha', 'Woldiya', 'Shashemene', 'Goba', 'Debre Markos', 'Mizan Teferi',
+  'Harar', 'Assosa', 'Nejo', 'Bedele', 'Bahir Dar', 'Fiche', 'Buta Jirra', 'Finote Selam',
+  'Bahir Dar', 'Kochere', 'Kebri Dehar', 'Dilla', 'Lalibela'
+];
+
 export default function ClaimDriverDetails() {
-  const [agreed, setAgreed] = useState(false);
-  const [isDriverSame, setIsDriverSame] = useState<boolean | null>(null);
+  const router = useRouter();
+  const {
+    isDriverSameAsInsured,
+    agreed,
+    formData,
+    setDriverSame,
+    updateFormData,
+    clearAllData
+  } = useDriverDetailsStore();
+
   const [error, setError] = useState('');
 
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    age: '',
-    city: '',
-    subCity: '',
-    kebele: '',
-    phoneNumber: '',
-    licenseNo: '',
-    grade: '',
-    expirationDate: '',
-  });
-
-  const ethiopianCities = [
-    'Addis Ababa', 'Adama', 'Hawassa', 'Mekelle', 'Dire Dawa', 'Jimma', 'Bahir Dar',
-    'Gondar', 'Dessie', 'Jijiga', 'Nazret', 'Ambo', 'Awassa', 'Arba Minch', 'Asella',
-    'Debre Birhan', 'Kombolcha', 'Woldiya', 'Shashemene', 'Goba', 'Debre Markos', 'Mizan Teferi',
-    'Harar', 'Assosa', 'Nejo', 'Bedele', 'Bahir Dar', 'Fiche', 'Buta Jirra', 'Finote Selam',
-    'Bahir Dar', 'Kochere', 'Kebri Dehar', 'Dilla', 'Lalibela'
-  ];
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    updateFormData({ [e.target.name]: e.target.value });
   };
-
-  const router = useRouter();
 
   const handlePrevious = () => router.push('/claim-submission/claim-disclaimer');
 
-
   const handleNext = () => {
-    if (!agreed) {
-      setError('You must agree to the disclaimer to proceed.');
-      router.push('/claim-submission/accident-details');
+
+    // Only validate form if driver is not the same
+    if (isDriverSameAsInsured === false) {
+      const requiredFields = [
+        'firstName',
+        'lastName',
+        'age',
+        'city',
+        'subCity',
+        'kebele',
+        'phoneNumber',
+        'licenseNo',
+        'grade',
+        'expirationDate'
+      ];
+    
+      const isFormValid = requiredFields.every(field => {
+        const value = formData[field as keyof typeof formData];
+        return String(value).trim() !== '';
+      });
+    
+      if (!isFormValid) {
+        setError('All fields are required when driver is not the insured customer.');
+        return;
+      }
     }
+    
 
-    // Check if all required fields are filled
-    const requiredFields = Object.keys(formData);
-    const isFormValid = requiredFields.every((field) => formData[field as keyof typeof formData].trim() !== '');
-
-    if (!isFormValid) {
-      setError('All fields are required.');
-      return;
-    }
-
-    // Log form data to console
     console.log('Form Data:', formData);
-
-    // Proceed to the next step
-    console.log('User agreed, proceeding...');
+    router.push('/claim-submission/accident-details');
   };
 
   return (
     <div className="max-w-5xl mx-auto p-6 bg-white">
       <div className="w-full flex justify-between items-center mt-2 mb-10">
-        <h2 className="md:text-xl sm:text-lg font-bold">Claim Submission </h2>
-        <button className="bg-[#0F1D3F] sm:text-xs md:text-lg text-white px-4 py-2 rounded">Save as draft</button>
+        <h2 className="md:text-xl sm:text-lg font-bold">Claim Submission</h2>
+        <div className="flex gap-2">
+          <button className="bg-[#0F1D3F] sm:text-xs md:text-lg text-white px-4 py-2 rounded">
+            Save as draft
+          </button>
+        </div>
       </div>
 
       {/* Progress Bar */}
       <div className="flex flex-wrap sm:justify-start md:justify-start items-center gap-4 mt-6 mb-4">
         <div className="flex items-center">
           <div className="w-7 h-7 flex items-center justify-center bg-[#1F4878] text-white rounded-full">1</div>
-          <span className="ml-2 font-medium text-black text-xs sm:text-base">Driver's Details </span>
+          <span className="ml-2 font-medium text-black text-xs sm:text-base">Driver's Details</span>
         </div>
         <div className="w-7 sm:border-t-2 border-gray-400"></div>
         <div className="flex items-center">
           <div className="w-7 h-7 flex items-center justify-center text-white bg-gray-300 rounded-full">2</div>
-          <span className="ml-2 text-black text-xs sm:text-base">Accident Details </span>
+          <span className="ml-2 text-black text-xs sm:text-base">Accident Details</span>
         </div>
         <div className="w-7 sm:border-t-2 border-gray-400"></div>
         <div className="flex items-center">
@@ -91,22 +99,32 @@ export default function ClaimDriverDetails() {
       </div>
 
       <div className="mt-6 p-4">
-        <h3 className="text-lg">1. Was the driver at the moment of accident the same as the insured customer?</h3>
+        <p className="text-lg">1. Was the driver at the moment of accident the same as the insured customer?</p>
         <div className="mt-2 flex space-x-6">
           <label className="flex items-center space-x-2">
-            <input type="radio" name="driver" value="yes" onChange={() => setIsDriverSame(true)} />
+            <input 
+              type="radio" 
+              name="driver" 
+              checked={isDriverSameAsInsured === true}
+              onChange={() => setDriverSame(true)} 
+            />
             <p>Yes</p>
           </label>
           <label className="flex items-center space-x-2">
-            <input type="radio" name="driver" value="no" onChange={() => setIsDriverSame(false)} />
+            <input 
+              type="radio" 
+              name="driver" 
+              checked={isDriverSameAsInsured === false}
+              onChange={() => setDriverSame(false)} 
+            />
             <p>No</p>
           </label>
         </div>
       </div>
 
-      {!isDriverSame && isDriverSame !== null && (
+      {isDriverSameAsInsured === false && (
         <div className="mt-2 p-4">
-          <h3 className="text-lg">Please State the Driver’s</h3>
+          <p className="text-lg">Please State the Driver's</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
             <div className="relative w-full">
               <label className="absolute left-4 -top-2 text-black text-md bg-white px-1">First Name</label>
@@ -196,7 +214,7 @@ export default function ClaimDriverDetails() {
             />
           </div>
 
-          <h3 className="mt-6 text-blue-600 font-semibold">Driver’s License</h3>
+          <h3 className="mt-6 text-blue-600 font-semibold">Driver's License</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
             <div className="relative w-full">
               <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">License No.</label>

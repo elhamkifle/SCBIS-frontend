@@ -1,24 +1,8 @@
 'use client';
 
-import { useState, ChangeEvent } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-
-interface DriverInfo {
-  driverLicenseGrade: string;
-  driverName: string;
-  drivingExperience: string;
-}
-
-interface FormData {
-  employDriver: string;
-  drivers: DriverInfo[];
-  employDriverUnder21: string;
-  physicalInfirmity: string;
-  lessThanSixMonthsExperience: string;
-  fullName: string;
-  signatureDate: string;
-  acceptTerms: boolean;
-}
+import { useDriverInformationStore } from '@/store/policyPurchase/driverInformation'; 
 
 interface Errors {
   employDriver?: string;
@@ -32,52 +16,35 @@ interface Errors {
 }
 
 export default function DriverInformation() {
-  const [formData, setFormData] = useState<FormData>({
-    employDriver: '',
-    drivers: [{ driverLicenseGrade: '', driverName: '', drivingExperience: '' }],
-    employDriverUnder21: '',
-    physicalInfirmity: '',
-    lessThanSixMonthsExperience: '',
-    fullName: '',
-    signatureDate: '',
-    acceptTerms: false,
-  });
-
+  const router = useRouter();
   const [errors, setErrors] = useState<Errors>({});
+  
+  // Get state and actions from Zustand store
+  const {
+    formData,
+    updateFormData,
+    updateDriver,
+    addDriver,
+    removeDriver
+  } = useDriverInformationStore();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     if (type === 'checkbox') {
-      setFormData({ ...formData, [name]: (e.target as HTMLInputElement).checked });
+      updateFormData({ [name]: (e.target as HTMLInputElement).checked });
     } else {
-      setFormData({ ...formData, [name]: value });
+      updateFormData({ [name]: value });
     }
     // Clear errors when the user starts typing
     setErrors({ ...errors, [name]: '' });
   };
 
-  const handleDriverChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDriverChange = (index: number, e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    const updatedDrivers = [...formData.drivers];
-    updatedDrivers[index] = { ...updatedDrivers[index], [name]: value };
-    setFormData({ ...formData, drivers: updatedDrivers });
+    updateDriver(index, { [name]: value });
     // Clear errors for the specific driver field
     setErrors({ ...errors, drivers: undefined });
   };
-
-  const addDriver = () => {
-    setFormData({
-      ...formData,
-      drivers: [...formData.drivers, { driverLicenseGrade: '', driverName: '', drivingExperience: '' }],
-    });
-  };
-
-  const removeDriver = (index: number) => {
-    const updatedDrivers = formData.drivers.filter((_, i) => i !== index);
-    setFormData({ ...formData, drivers: updatedDrivers });
-  };
-
-  const router = useRouter();
 
   const handlePrevious = () => {
     router.push('/policy-purchase/purchase/vehicleInformation');
@@ -115,7 +82,7 @@ export default function DriverInformation() {
 
     // If there are no errors, proceed to the next page
     if (Object.keys(newErrors).length === 0) {
-      router.push('/preview'); // Replace with the actual next page route
+      router.push('/policy-purchase/purchase/preview'); // Replace with the actual next page route
     }
   };
 
@@ -158,21 +125,26 @@ export default function DriverInformation() {
         </label>
         <div className="flex gap-4 mt-4">
           <label>
-            <input type="radio" name="employDriver" value="yes" onChange={handleChange} /> Yes
+            <input type="radio" name="employDriver" value="yes" onChange={handleChange} checked={formData.employDriver === 'yes'} /> Yes
           </label>
           <label>
-            <input type="radio" name="employDriver" value="no" onChange={handleChange} /> No
+            <input type="radio" name="employDriver" value="no" onChange={handleChange} checked={formData.employDriver === 'no'} /> No
           </label>
         </div>
         {errors.employDriver && <p className="text-red-500">{errors.employDriver}</p>}
         {formData.employDriver === 'yes' && (
           <div className="mt-4">
-            <p>Please State the driver’s information</p>
+            <p>Please State the driver's information</p>
             {formData.drivers.map((driver, index) => (
               <div key={index} className="flex flex-col lg:flex-row gap-4 mt-4">
                 <div className="flex-1">
-                <label className="block text-md font-medium text-black mb-2">Driver’s License Grade/Level</label>
-                  <select name="make" className="border p-2 w-full" onChange={handleChange}>
+                <label className="block text-md font-medium text-black mb-2">Driver's License Grade/Level</label>
+                  <select 
+                    name="driverLicenseGrade" 
+                    className="border p-2 w-full" 
+                    value={driver.driverLicenseGrade}
+                    onChange={(e) => handleDriverChange(index, e)}
+                  >
                     <option value=""></option>
                     <option value="1">1</option>
                     <option value="2">2</option>
@@ -183,7 +155,7 @@ export default function DriverInformation() {
                   )}
                 </div>
                 <div className="flex-1">
-                  <label className="block text-md font-medium text-black mb-2">Driver’s Name</label>
+                  <label className="block text-md font-medium text-black mb-2">Driver's Name</label>
                   <input
                     type="text"
                     name="driverName"
@@ -239,10 +211,10 @@ export default function DriverInformation() {
         <label className="font-semibold">2. Do you or will you employ any driver under the age of 21?</label>
         <div className="flex gap-4 mt-4">
           <label>
-            <input type="radio" name="employDriverUnder21" value="yes" onChange={handleChange} /> Yes
+            <input type="radio" name="employDriverUnder21" value="yes" onChange={handleChange} checked={formData.employDriverUnder21 === 'yes'} /> Yes
           </label>
           <label>
-            <input type="radio" name="employDriverUnder21" value="no" onChange={handleChange} /> No
+            <input type="radio" name="employDriverUnder21" value="no" onChange={handleChange} checked={formData.employDriverUnder21 === 'no'} /> No
           </label>
         </div>
         {errors.employDriverUnder21 && <p className="text-red-500">{errors.employDriverUnder21}</p>}
@@ -253,10 +225,10 @@ export default function DriverInformation() {
         <label className="font-semibold">3. Do you or any other person, who to your knowledge will drive, suffer from any physical infirmity or from defective vision or hearing?</label>
         <div className="flex gap-4 mt-4">
           <label>
-            <input type="radio" name="physicalInfirmity" value="yes" onChange={handleChange} /> Yes
+            <input type="radio" name="physicalInfirmity" value="yes" onChange={handleChange} checked={formData.physicalInfirmity === 'yes'} /> Yes
           </label>
           <label>
-            <input type="radio" name="physicalInfirmity" value="no" onChange={handleChange} /> No
+            <input type="radio" name="physicalInfirmity" value="no" onChange={handleChange} checked={formData.physicalInfirmity === 'no'} /> No
           </label>
         </div>
         {errors.physicalInfirmity && <p className="text-red-500">{errors.physicalInfirmity}</p>}
@@ -264,13 +236,13 @@ export default function DriverInformation() {
 
       {/* Question 4 */}
       <div className="mb-8">
-        <label className="font-semibold">4. Do you or any driver of the vehicle(s) have had less than six months’ experience?</label>
+        <label className="font-semibold">4. Do you or any driver of the vehicle(s) have had less than six months' experience?</label>
         <div className="flex gap-4 mt-4">
           <label>
-            <input type="radio" name="lessThanSixMonthsExperience" value="yes" onChange={handleChange} /> Yes
+            <input type="radio" name="lessThanSixMonthsExperience" value="yes" onChange={handleChange} checked={formData.lessThanSixMonthsExperience === 'yes'} /> Yes
           </label>
           <label>
-            <input type="radio" name="lessThanSixMonthsExperience" value="no" onChange={handleChange} /> No
+            <input type="radio" name="lessThanSixMonthsExperience" value="no" onChange={handleChange} checked={formData.lessThanSixMonthsExperience === 'no'} /> No
           </label>
         </div>
         {errors.lessThanSixMonthsExperience && <p className="text-red-500">{errors.lessThanSixMonthsExperience}</p>}
@@ -293,6 +265,7 @@ export default function DriverInformation() {
             <input
               type="text"
               name="fullName"
+              value={formData.fullName}
               className="w-full border py-2 border-white border-b-black"
               onChange={handleChange}
             />
@@ -303,6 +276,7 @@ export default function DriverInformation() {
             <input
               type="date"
               name="signatureDate"
+              value={formData.signatureDate}
               className="w-full border py-2 border-white border-b-black"
               onChange={handleChange}
             />

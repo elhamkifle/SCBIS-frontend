@@ -1,21 +1,25 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useRouter } from 'next/navigation';
+import { useUploadIDStore } from '@/store/customerInformationStore/uploadID';
+import { usePersonalDetailStore } from '@/store/customerInformationStore/personalDetails';
+import { useAddressStore } from '@/store/customerInformationStore/addressStore'; 
 
 export default function UploadIDForm() {
     const router = useRouter();
-    const [files, setFiles] = useState<File[]>([]);
-    const [error, setError] = useState<string>('');
-
-    const handlePrevious = () => router.push('policy-purchase/vehicle-information/ownershipAndUsage');
+    const { files, error, setFiles, setError } = useUploadIDStore();
+    const { formData: personalData } = usePersonalDetailStore();
+    const { address } = useAddressStore();
+    const handlePrevious = () => router.push('/policy-purchase/personal-information/address');
     
     const handleNext = () => {
         if (files.length < 1) {
             setError('❌ Please upload an ID before proceeding.');
         } else {
             setError('');
-            router.push('/policy-purchase/vehicle-information/purpose');
+            logAllFormData();
+            router.push('/preview');
         }
     };
 
@@ -39,7 +43,7 @@ export default function UploadIDForm() {
                 setError(validationError);
             } else {
                 setError('');
-                setFiles((prev) => [...prev, selectedFile].slice(0, 1)); // Allow only one file
+                setFiles([...files, selectedFile].slice(0, 1)); // Allow only one file
             }
         }
     };
@@ -53,17 +57,28 @@ export default function UploadIDForm() {
                 setError(validationError);
             } else {
                 setError('');
-                setFiles((prev) => [...prev, droppedFile].slice(0, 1)); // Allow only one file
+                setFiles([...files, droppedFile].slice(0, 1));
             }
         }
     };
 
     const handleDeleteFile = (index: number) => {
-        setFiles((prev) => prev.filter((_, i) => i !== index));
+        setFiles(files.filter((_, i) => i !== index));
         setError('');
     };
 
-    return (
+    const logAllFormData = () => {
+        console.log('=== COMPLETE FORM SUBMISSION DATA ===');
+        console.log('Personal Details:', personalData);
+        console.log('Uploaded Files:', files.map(f => ({
+            name: f.name,
+            type: f.type,
+            size: `${(f.size / 1024 / 1024).toFixed(2)} MB`
+        })));
+        console.log('====================================');
+    };
+
+   return (
         <div className="flex items-start justify-center h-full px-4">
             <div className="w-full max-w-5xl">
                 <div className="flex justify-between items-center">

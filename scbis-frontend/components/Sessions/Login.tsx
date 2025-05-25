@@ -1,35 +1,84 @@
 'use client'
 
+import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import useLoginStore from "@/store/authStore/useLoginStore";
+import { AuthSchemaType,AuthSchema } from "@/schema/zodSchema";
+import { useUserStore } from "@/store/authStore/useUserStore";
+import Link from "next/link";
 
-import { useRouter } from "next/navigation"
-import { useState } from "react"
 
-export default function Login(){
+export default function Login() {
+    const setUser = useUserStore((state) => state.setUser);
+    const { email, password, error, setEmail, setPassword, setError, resetLogin } = useLoginStore();
+    const [zodError, setZodError] = useState<AuthSchemaType>({
+        email: '',
+        password: ''
+    });
 
-    const [email,setEmail] = useState('')
-    const [password,setPassword] = useState('')
-    const [error,setError] = useState(false)
-    const router = useRouter()
+    const [isLoading, setIsLoading] = useState(false);
 
-    const handleSubmit = ()=>{
-        
-        setError(false)
+    const router = useRouter();
 
-        if(!email && !password){
-            setError(true)
-            return
+    const handleSubmit = async () => {
+        setZodError({
+            email: '',
+            password: ''})
+            setIsLoading(true);
+        setError(false);
+
+        const validation = AuthSchema.safeParse({ email, password });
+        if (!validation.success) {
+            const errors = validation.error.flatten();
+            setZodError({
+                email: errors.fieldErrors.email ? errors.fieldErrors.email[0] : '',
+                password: errors.fieldErrors.password ? errors.fieldErrors.password[0] : ''
+            });
+
+            setIsLoading(false)
+            
+            return;
         }
 
-        setEmail('')
-        setPassword('')
-        router.push('/policy-purchase/personal-information/personalDetails');
-    }
+        const serverResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
+            method:"POST",
+            body: JSON.stringify({identifier: email,password}),
+            headers:{
+                'Content-Type':'application/json'
+            }
+        })
 
-    const signUp = ()=>{
-        router.push('/signup')
-    }
+        const data = await serverResponse.json()
 
-    return(
+        if (serverResponse.ok) {
+            // Reset login form after successful submission
+            resetLogin();
+            console.log('Login successful:', data);
+            setUser({...data.user, accessToken: data.accessToken, refreshToken: data.refreshToken});
+            // Navigate to the next page after successful login
+            router.push('/policy-purchase/personal-information/personalDetails');
+            setIsLoading(false);
+            
+
+            
+        } else {
+            setError("Some error occurred. Please try again.");
+            setIsLoading(false);
+            
+        }
+
+        
+    };
+
+    const signUp = () => {
+        router.push('/signup');
+    };
+
+    useEffect(() => {
+        console.log('Login State:', { email, password, error });
+    }, [email, password, error]);
+
+    return (
         <div className="w-full h-full flex flex-col md:flex-row bg-gradient-to-r from-[#0F1D3F] to-[#3E99E7]">
             <div className="w-full md:w-1/3">
                 <p className="text-white text-xl font-syne p-5 md:text-3xl md:p-10 text-center">SCBIS The Future of Insurance</p>
@@ -38,21 +87,61 @@ export default function Login(){
 
             <div className="w-full border-none md:rounded-tl-[35px] md:rounded-bl-[35px] md:w-2/3 h-full flex justify-center items-center bg-gradient-to-b from-[#9ECCF3] to-[#3E99E7]">
                 <div className="w-full md:w-3/5 flex flex-col gap-8 p-3 md:p-8 " style={{background:'linear-gradient(to top,rgba(197, 191, 191, 0.65), rgba(215, 209, 209, 0.3))'}}>
-                    <p className="text-center text-[302F2F] text-2xl font-bold font-inter">Login</p>
+                    <p className="text-center text-black  text-2xl font-bold ">Login</p>
                     
                     <div className="flex flex-col gap-3 md:gap-5">
-                        <label htmlFor="email" className="text-[302F2F] text-xs font-medium font-inter">Email Address / Phone</label>
-                        <input onChange={(e)=>setEmail(e.target.value)} className="p-2 rounded" type="email" id="email" name="email"/>
+                        <label htmlFor="email" className="text-black text-sm  italic font-bold font-inter">Email Address / Phone</label>
+                        <input 
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)} 
+                            className="p-2 rounded placeholder:text-black placeholder:font-semibold placeholder:italic placeholder:text-xs" 
+                            type="email" 
+                            id="email" 
+                            name="email"
+                            placeholder="Type email address"
+                        />
+
+                        {zodError.email && <p className="text-red-500 font-bold text-sm">{zodError.email}</p>}
                         
-                        <label htmlFor="password" className="text-[302F2F] text-xs font-medium font-inter">Password</label>
-                        <input onChange={(e)=>setPassword(e.target.value)} className="p-2 rounded"  type="password" id="password" name="password"/>
+                        <label htmlFor="password" className="text-black text-sm  italic  font-bold font-inter">Password</label>
+                        <input 
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)} 
+                            className="p-2 rounded placeholder:text-black placeholder:font-semibold placeholder:italic placeholder:text-xs"  
+                            type="password" 
+                            id="password" 
+                            name="password"
+                            placeholder="Type password"
+                        />
+
+                        {zodError.password && <p className="text-red-500 font-bold text-sm">{zodError.password}</p>}
                     </div>
 
-                    <button onClick={handleSubmit} className="bg-[#1F2168] font-bold font-inter text-lg text-white p-3 rounded">Login</button>
-                    <p className="text-center text-sm text-slate-900 font-bold font-syne">Don't have an account yet? <span onClick={signUp} className="text-orange-600 cursor-pointer hover:text-blue-800 underline">Signup</span> here</p>
-                    {error && <p className="text-center f0nt-bold text-base text-[red]">Please fill all the required fields.</p>}
+                    <p className="text-xs md:text-sm  font-semibold text-end">
+                        <Link className="underline text-orange-600 hover:text-orange-700" href="/forgot-password">Forgot password?</Link>
+                    </p>
+
+                    <button 
+                        onClick={handleSubmit} 
+                        className="bg-[#1F2168] hover:bg-[#1e2d66] font-bold font-inter text-lg text-white p-3 rounded"
+                    >
+                        {isLoading ? <span className="loading loading-dots loading-lg"></span> : 'Login'}
+                    </button>
+                    
+                    <p className="text-center text-sm text-slate-900 font-bold font-syne">
+                        Don't have an account yet? 
+                        <span 
+                            onClick={signUp} 
+                            className="text-orange-600 cursor-pointer hover:text-orange-700 underline"
+                        >
+                            Signup
+                        </span> 
+                        here
+                    </p>
+
+                    {error && <p className="text-center font-bold text-base text-[red]">{error}</p>}
                 </div>
             </div>
         </div>
-    )
+    );
 }
