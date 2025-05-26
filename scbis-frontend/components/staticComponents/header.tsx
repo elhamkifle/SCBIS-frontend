@@ -13,7 +13,7 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [filter, setFilter] = useState<"All" | "Unread">("All");
-  
+
   // Use the Zustand store
   const {
     notifications,
@@ -24,8 +24,8 @@ export default function Header() {
   const router = useRouter();
   const logout = useUserStore((state) => state.logout);
 
-  const filteredNotifications = filter === "Unread" 
-    ? notifications.filter(n => n.unread) 
+  const filteredNotifications = filter === "Unread"
+    ? notifications.filter(n => n.unread)
     : notifications;
 
   const handleNotificationClick = (notificationId: number) => {
@@ -38,9 +38,13 @@ export default function Header() {
   };
 
   const handleLogout = () => {
-    logout();
-    router.push('/');
+    const confirmLogout = window.confirm("Are you sure you want to log out?");
+    if (confirmLogout) {
+      logout();
+      router.push('/');
+    }
   };
+
 
   return (
     <header className="bg-[#1F4878] font-semibold text-white p-8 flex justify-between items-center relative">
@@ -66,10 +70,10 @@ export default function Header() {
       {/* Bell Icon (Right side on large screens) */}
       <div className="hidden lg:block absolute right-4">
         <div className="relative">
-          <Bell 
-            size={24} 
-            className="cursor-pointer" 
-            onClick={() => setNotificationsOpen(!notificationsOpen)} 
+          <Bell
+            size={24}
+            className="cursor-pointer"
+            onClick={() => setNotificationsOpen(!notificationsOpen)}
           />
           {notifications.some(n => n.unread) && (
             <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
@@ -88,10 +92,10 @@ export default function Header() {
       {/* User and Bell icons (Mobile) */}
       <div className="lg:hidden absolute top-4 right-16">
         <div className="relative">
-          <Bell 
-            size={24} 
-            className="cursor-pointer" 
-            onClick={() => setNotificationsOpen(!notificationsOpen)} 
+          <Bell
+            size={24}
+            className="cursor-pointer"
+            onClick={() => setNotificationsOpen(!notificationsOpen)}
           />
           {notifications.some(n => n.unread) && (
             <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
@@ -136,7 +140,7 @@ export default function Header() {
               <button className="p-2 bg-gray-700 rounded-full hover:bg-gray-600">
                 <Settings size={24} />
               </button>
-              <button 
+              <button
                 className="p-2 bg-gray-700 rounded-full hover:bg-red-500"
                 onClick={handleLogout}
               >
@@ -191,8 +195,8 @@ export default function Header() {
             </div>
             <div className="space-y-2 lg:space-y-6">
               {filteredNotifications.map((notification) => (
-                <div 
-                  key={notification.id} 
+                <div
+                  key={notification.id}
                   className="px-4 py-2 rounded flex justify-between items-start hover:bg-gray-100 cursor-pointer"
                   onClick={() => handleNotificationClick(notification.id)}
                 >

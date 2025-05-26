@@ -320,15 +320,15 @@ export default function Preview() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 px-4">
-              <div><strong>Title:</strong> {formData.title}</div>
-              <div><strong>First Name:</strong> {formData.firstName}</div>
-              <div><strong>Last Name:</strong> {formData.lastName}</div>
-              <div><strong>Gender:</strong> {formData.gender}</div>
-              <div><strong>Date of Birth:</strong> {formData.dateOfBirth}</div>
-              <div><strong>Nationality:</strong> {formData.nationality}</div>
-              <div><strong>Email:</strong> {formData.email || 'Not provided'}</div>
-              <div><strong>Phone:</strong> {formData.phone || 'Not provided'}</div>
-              <div><strong>TIN No.:</strong> {formData.tin || 'Not provided'}</div>
+              <div><strong>Title:</strong> <p> {formData.title} </p> </div>
+              <div><strong>First Name:</strong> <p> {formData.firstName} </p></div>
+              <div><strong>Last Name:</strong> <p>{formData.lastName} </p></div>
+              <div><strong>Gender:</strong> <p>{formData.gender} </p> </div>
+              <div><strong>Date of Birth:</strong> <p> {formData.dateOfBirth} </p></div>
+              <div><strong>Nationality:</strong> <p> {formData.nationality} </p></div>
+              <div><strong>Email:</strong> <p>{formData.email || 'Not provided'} </p> </div>
+              <div><strong>Phone:</strong> <p> {formData.phone || 'Not provided'} </p> </div>
+              <div><strong>TIN No.:</strong> <p> {formData.tin || 'Not provided'} </p></div>
             </div>
           )}
         </div>
@@ -435,15 +435,32 @@ export default function Preview() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 px-4">
-              <div><strong>Country:</strong> {formData.country}</div>
-              <div><strong>State:</strong> {formData.state || 'Not provided'}</div>
-              <div><strong>City:</strong> {formData.city || 'Not provided'}</div>
-              <div><strong>Subcity:</strong> {formData.subcity || 'Not provided'}</div>
-              <div><strong>Zone:</strong> {formData.zone || 'Not provided'}</div>
-              <div><strong>Wereda:</strong> {formData.wereda || 'Not provided'}</div>
-              <div><strong>Kebele:</strong> {formData.kebele || 'Not provided'}</div>
-              <div><strong>House No.:</strong> {formData.houseNo || 'Not provided'}</div>
+              <div>
+                <strong>Country:</strong> <p>{formData.country}</p>
+              </div>
+              <div>
+                <strong>State:</strong> <p>{formData.state || 'Not provided'}</p>
+              </div>
+              <div>
+                <strong>City:</strong> <p>{formData.city || 'Not provided'}</p>
+              </div>
+              <div>
+                <strong>Subcity:</strong> <p>{formData.subcity || 'Not provided'}</p>
+              </div>
+              <div>
+                <strong>Zone:</strong> <p>{formData.zone || 'Not provided'}</p>
+              </div>
+              <div>
+                <strong>Wereda:</strong> <p>{formData.wereda || 'Not provided'}</p>
+              </div>
+              <div>
+                <strong>Kebele:</strong> <p>{formData.kebele || 'Not provided'}</p>
+              </div>
+              <div>
+                <strong>House No.:</strong> <p>{formData.houseNo || 'Not provided'}</p>
+              </div>
             </div>
+
           )}
         </div>
 
