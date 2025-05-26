@@ -4,11 +4,49 @@ import { Mail, Lock } from "lucide-react";
 
 export default function AdminLogin() {
   const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
-    console.log("Logging in with:", email, password);
-    // Handle authentication logic here
+  console.log(phoneNumber, password);
+  const handleLogin = async () => {
+    try {
+      const API_BASE_URL = "http://localhost:3001";
+
+      const response = await fetch(`${API_BASE_URL}/admin/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ identifier: phoneNumber, password }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+
+        if (typeof window !== "undefined") {
+          localStorage.setItem("accessToken", data.accessToken);
+          localStorage.setItem("refreshToken", data.refreshToken);
+          localStorage.setItem("user", JSON.stringify(data.user));
+
+          window.location.href = '/'; 
+        }
+
+        console.log("Login successful:", data);
+        // Redirect to the admin panel or settings page
+        // For example: window.location.href = '/admin/settings'; 
+        return { success: true, user: data.user };
+
+      } else {
+        const errorData = await response.json().catch(() => ({ message: "Login failed. Please check your credentials." }));
+        console.error("Login failed:", errorData);
+        alert(`Login failed: ${errorData.message || response.statusText}`);
+        return { success: false, error: errorData.message || response.statusText };
+      }
+    } catch (error) {
+      console.error("An error occurred during login:", error);
+      alert("An unexpected error occurred during login. Please try again.");
+      return { success: false, error: "An unexpected error occurred." };
+    }
   };
 
   return (
@@ -27,11 +65,11 @@ export default function AdminLogin() {
             <div className="flex items-center bg-gray-800 border border-cyan-500 rounded-md px-3 py-2 focus-within:ring-2 focus-within:ring-cyan-400">
               <Mail className="text-cyan-300 mr-2 w-5 h-5" />
               <input
-                type="email"
+                type="text"
                 className="bg-transparent w-full focus:outline-none text-sm placeholder-gray-500"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@example.com"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                placeholder="email/phone number"
               />
             </div>
           </div>

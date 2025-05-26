@@ -8,6 +8,7 @@ import { useRef, useState } from "react";
 export default function ProfileSettings({ formData, updateForm, handleImageChange, imagePreview }: any) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  console.log('chekckd \n', formData);
   return (
     <Card>
       <CardContent className="p-6 space-y-6">
@@ -41,8 +42,8 @@ export default function ProfileSettings({ formData, updateForm, handleImageChang
           <div>
             <Label>Full Name</Label>
             <Input
-              value={formData.fullName}
-              onChange={(e) => updateForm("fullName", e.target.value)}
+              value={formData.fullname}
+              onChange={(e) => updateForm("fullname", e.target.value)}
             />
           </div>
           <div>
@@ -55,8 +56,8 @@ export default function ProfileSettings({ formData, updateForm, handleImageChang
           <div>
             <Label>Phone Number</Label>
             <Input
-              value={formData.phone}
-              onChange={(e) => updateForm("phone", e.target.value)}
+              value={formData.phoneNumber}
+              onChange={(e) => updateForm("phoneNumber", e.target.value)}
             />
           </div>
           <div>

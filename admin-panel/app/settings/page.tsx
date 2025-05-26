@@ -4,16 +4,31 @@ import ProfileSettings from "@/components/settings/ProfileSettings";
 import SystemPreferences from "@/components/settings/SystemPreferences";
 import AccountManagement from "@/components/settings/AccountManagement";
 import SuccessPopup from "@/components/settings/SuccessPopup";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import withAuth from '../utils/withAuth'; // Adjust path as needed
 
-export default function SettingsPage() {
+// Placeholder for your actual auth data retrieval
+// Replace this with your actual implementation (e.g., from context, localStorage)
+const getAuthCredentials = () => {
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem('accessToken');
+    const userData = JSON.parse(localStorage.getItem('user') || '{}');
+    return { accessToken: token, user: userData };
+  }
+  return { accessToken: null, user: { id: '', fullname: "John Doe", email: "john@example.com", phone: "+251912345678", language: "English", timezone: "GMT+3 (EAT)" } };
+};
+
+// const API_BASE_URL = "https://scbis-git-dev-hailes-projects-a12464a1.vercel.app";
+const API_BASE_URL = "http://localhost:3001";
+
+function SettingsPage() {
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
-    fullName: "John Doe",
-    email: "john@example.com",
-    phone: "+251912345678",
+    fullname: "",
+    email: "",
+    phoneNumber: "",
     password: "",
     language: "English",
     timezone: "GMT+3 (EAT)",
@@ -22,6 +37,29 @@ export default function SettingsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
+  useEffect(() => {
+    const { user, accessToken } = getAuthCredentials(); // Ensure token is still fetched if page needs it
+    // The HOC handles redirection, but the page might still need user data if it's already past the HOC check
+    console.log(user, accessToken);
+    if (accessToken && user && user._id) { 
+      console.log('\nuser\n', user);
+
+      setFormData({
+        fullname: user.fullname || "Default Full Name",
+        email: user.email || "default@example.com",
+        phoneNumber: user.phoneNumber || user.phone || "",
+        password: "", 
+        language: user.language || "English", 
+        timezone: user.timezone || "GMT+3 (EAT)",
+      });
+    } else if (!accessToken) {
+      console.log('\naccessToken\n', accessToken);
+        // This case should ideally be caught by withAuth HOC and redirected.
+        // If it reaches here, it might mean the user was initially authenticated then token removed.
+        console.warn("User data or token not found for settings page. Check HOC.");
+    }
+  }, []);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -35,36 +73,129 @@ export default function SettingsPage() {
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setIsSaving(true);
-    setTimeout(() => {
+    const { accessToken } = getAuthCredentials();
+
+    if (!accessToken) {
+      // This check is somewhat redundant if withAuth works correctly, but good for safety
+      alert("Authentication token not found. Please log in again.");
       setIsSaving(false);
-      setShowSuccess(true);
-    }, 1500);
+      return;
+    }
+    const payload: any = {
+      fullname: formData.fullname,
+      email: formData.email,
+      phoneNumber: formData.phoneNumber,
+      language: formData.language,
+      timezone: formData.timezone,
+    };
+    if (formData.password) {
+      payload.password = formData.password;
+    }
+    console.log('\npayload\n', payload);
+    try {
+      const response = await fetch(`${API_BASE_URL}/admin/users/profile`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(payload),
+      });
+      if (response.ok) {
+        const updatedUser = await response.json(); // Get the updated user data from response
+
+        // --- Update localStorage with the new user data ---
+        if (typeof window !== "undefined" && updatedUser) {
+          localStorage.setItem("user", JSON.stringify(updatedUser));
+          console.log("User data in localStorage updated:", updatedUser);
+
+          // Optionally, re-populate formData from the updatedUser to ensure UI consistency
+          // This is useful if the backend modifies/formats data (e.g., phone number)
+          // or if there are fields in updatedUser not directly in formData but should be reflected.
+          setFormData({
+            fullname: updatedUser.fullname || "",
+            email: updatedUser.email || "",
+            phoneNumber: updatedUser.phoneNumber || "",
+            password: "", // Clear password field after successful save
+            language: updatedUser.language || "English",
+            timezone: updatedUser.timezone || "GMT+3 (EAT)",
+          });
+        }
+        // --- End of localStorage update ---
+
+        setShowSuccess(true);
+      } else {
+        const errorData = await response.json().catch(() => ({ message: "Failed to save settings." }));
+        console.error("Save failed:", errorData);
+        alert(`Error saving settings: ${errorData.message || response.statusText}`);
+      }
+    } catch (error) {
+      console.error("An error occurred during save:", error);
+      alert("An unexpected error occurred. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleLogout = () => {
     console.log("User logged out");
-    // Add your logout logic here (e.g., clearing tokens, redirecting to login page)
+    if (typeof window !== "undefined") {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user');
+        window.location.href = '/login'; // Redirect to login after logout
+    }
     setShowLogoutConfirm(false);
   };
-
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [confirmationInput, setConfirmationInput] = useState("");
 
-  const handleAccountDeletion = () => {
+  const handleAccountDeletion = async () => {
     if (confirmationInput.trim().toUpperCase() === "DELETE") {
-      console.log("Account deleted");
-      // Add actual delete logic here
-      setShowDeleteConfirm(false);
-      setConfirmationInput("");
+      const { accessToken } = getAuthCredentials();
+      if (!accessToken) {
+        alert("Authentication token not found. Please log in again.");
+        return;
+      }
+      setIsSaving(true); 
+      try {
+        const response = await fetch(`${API_BASE_URL}/admin/users/profile`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        if (response.ok) {
+          alert("Account deleted successfully.");
+          // Log out user after deletion
+            if (typeof window !== "undefined") {
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('refreshToken');
+                localStorage.removeItem('user');
+                window.location.href = '/login'; // Redirect to login
+            }
+        } else {
+          const errorData = await response.json().catch(() => ({ message: "Failed to delete account." }));
+          console.error("Deletion failed:", errorData);
+          alert(`Error deleting account: ${errorData.message || response.statusText}`);
+        }
+      } catch (error) {
+        console.error("An error occurred during account deletion:", error);
+        alert("An unexpected error occurred while deleting the account.");
+      } finally {
+        setIsSaving(false); 
+        setShowDeleteConfirm(false);
+        setConfirmationInput("");
+      }
     } else {
       alert("Please type DELETE to confirm.");
     }
   };
 
-
+  console.log('formData\n', formData);
   return (
     <div className="p-8 bg-gray-50 min-h-screen space-y-8">
       <h1 className="text-3xl font-bold text-gray-800">Settings</h1>
@@ -132,30 +263,30 @@ export default function SettingsPage() {
         </button>
       </div>
 
-{showLogoutConfirm && (
-  <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center transition-opacity">
-    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 animate-fade-in space-y-4">
-      <h3 className="text-xl font-semibold text-gray-900">Confirm Logout</h3>
-      <p className="text-gray-600">Are you sure you want to log out?</p>
-      <div className="flex justify-end space-x-3 pt-4">
-        <button
-          className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 transition"
-          onClick={() => setShowLogoutConfirm(false)}
-        >
-          Cancel
-        </button>
-        <button
-          className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white transition"
-          onClick={handleLogout}
-        >
-          Log Out
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
-
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center transition-opacity">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 animate-fade-in space-y-4">
+            <h3 className="text-xl font-semibold text-gray-900">Confirm Logout</h3>
+            <p className="text-gray-600">Are you sure you want to log out?</p>
+            <div className="flex justify-end space-x-3 pt-4">
+              <button
+                className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 transition"
+                onClick={() => setShowLogoutConfirm(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white transition"
+                onClick={handleLogout}
+              >
+                Log Out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
+export default withAuth(SettingsPage); // Wrap SettingsPage with withAuth
