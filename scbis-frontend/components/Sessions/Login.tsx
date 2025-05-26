@@ -27,18 +27,18 @@ export default function Login() {
             setIsLoading(true);
         setError(false);
 
-        const validation = AuthSchema.safeParse({ email, password });
-        if (!validation.success) {
-            const errors = validation.error.flatten();
-            setZodError({
-                email: errors.fieldErrors.email ? errors.fieldErrors.email[0] : '',
-                password: errors.fieldErrors.password ? errors.fieldErrors.password[0] : ''
-            });
+        // const validation = AuthSchema.safeParse({ email, password });
+        // if (!validation.success) {
+        //     const errors = validation.error.flatten();
+        //     setZodError({
+        //         email: errors.fieldErrors.email ? errors.fieldErrors.email[0] : '',
+        //         password: errors.fieldErrors.password ? errors.fieldErrors.password[0] : ''
+        //     });
 
-            setIsLoading(false)
+        //     setIsLoading(false)
             
-            return;
-        }
+        //     return;
+        // }
 
         const serverResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
             method:"POST",
@@ -95,7 +95,7 @@ export default function Login() {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)} 
                             className="p-2 rounded placeholder:text-black placeholder:font-semibold placeholder:italic placeholder:text-xs" 
-                            type="email" 
+                            type="text" 
                             id="email" 
                             name="email"
                             placeholder="Type email address"
