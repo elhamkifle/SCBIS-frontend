@@ -5,7 +5,9 @@ import { Menu, X, Bell, HelpCircle, Settings, LogOut, User, Expand, CheckCheck }
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useNotificationStore } from "@/store/notificationStore/notifications";;
+import { useNotificationStore, type NotificationType } from "@/store/notificationStore/notifications";;
+import { useUserStore } from "@/store/authStore/useUserStore";
+
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -20,6 +22,7 @@ export default function Header() {
   } = useNotificationStore();
 
   const router = useRouter();
+  const logout = useUserStore((state) => state.logout);
 
   const filteredNotifications = filter === "Unread" 
     ? notifications.filter(n => n.unread) 
@@ -32,6 +35,11 @@ export default function Header() {
 
   const handleExpandClick = () => {
     router.push("/notifications");
+  };
+
+  const handleLogout = () => {
+    logout();
+    router.push('/');
   };
 
   return (
@@ -128,7 +136,10 @@ export default function Header() {
               <button className="p-2 bg-gray-700 rounded-full hover:bg-gray-600">
                 <Settings size={24} />
               </button>
-              <button className="p-2 bg-gray-700 rounded-full hover:bg-red-500">
+              <button 
+                className="p-2 bg-gray-700 rounded-full hover:bg-red-500"
+                onClick={handleLogout}
+              >
                 <LogOut size={24} />
               </button>
             </div>
