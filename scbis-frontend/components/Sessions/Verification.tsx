@@ -9,7 +9,7 @@ const VerificationComponent = () => {
 
     const naivgate = useRouter()
     const [iseResending, setIsResending] = useState<boolean>(false)
-    const [timeLeft, setTimeLeft] = React.useState<number>(60 * 10)
+    const [timeLeft, setTimeLeft] = React.useState<number>(60 * 1)
     const searchParams = useSearchParams()
     const page = searchParams.get('page')
     const email = searchParams.get('email') || 'asfawfanual2003@gmail.com'
@@ -70,9 +70,9 @@ const VerificationComponent = () => {
 
     const ResendCode = async () => {
         setIsResending(true)
-        const serverResponse = await fetch('https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/auth/request-password-reset', {
+        const serverResponse = await fetch('https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/otp/send', {
             method: 'POST',
-            body: JSON.stringify({ email, phoneNumber: phone }),
+            body: JSON.stringify({ phoneNumber: phone }),
             headers: {
                 'Content-Type': 'application/json'
             }
@@ -109,7 +109,7 @@ const VerificationComponent = () => {
 
         const serverResponse = await fetch('https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/otp/verify', {
             method: 'POST',
-            body: JSON.stringify({ otp: verificationNum, email, phoneNumber: phone }),
+            body: JSON.stringify({ otp: verificationNum, phoneNumber: phone }),
             headers: {
                 'Content-Type': 'application/json'
             }
