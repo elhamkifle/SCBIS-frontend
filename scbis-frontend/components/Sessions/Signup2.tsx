@@ -56,6 +56,7 @@ export default function SignupStep2() {
 
 
     if (serverResponse.ok){
+      clearSignupData()
       router.push(`/verification?page=page2&email=${email}&phone=${pNo}`) // or wherever OTP page is
     }
 
