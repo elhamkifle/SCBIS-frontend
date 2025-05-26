@@ -6,7 +6,7 @@ import { useAddressStore } from '@/store/customerInformationStore/addressStore';
 import { useRouter } from 'next/navigation';
 import { useUserStore } from '@/store/authStore/useUserStore';
 import { fetchUserData, updateUserData } from '@/utils/userUtils';
-import { baseAPI } from '@/utils/axiosInstance';
+// import { baseAPI } from '@/utils/axiosInstance';
 // import { set } from 'zod';
 // import { span } from 'framer-motion/client';
 
@@ -152,9 +152,7 @@ export default function Preview() {
 
       // Use the updateUserData utility instead of direct API call
       await updateUserData(submissionData);
-      
-      console.log('✅ Personal information submitted successfully!');
-      console.log('➡️ Navigating to vehicle list page...');
+
       alert('Application Submitted!');
       router.push('/policy-purchase/vehicle-information/vehicle-list');
       
