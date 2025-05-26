@@ -103,7 +103,7 @@ export default function Login() {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)} 
                             className="p-2 rounded placeholder:text-black placeholder:font-semibold placeholder:italic placeholder:text-xs" 
-                            type="email" 
+                            type="text" 
                             id="email" 
                             name="email"
                             placeholder="Type email address"
