@@ -68,7 +68,7 @@ export default function SignupStep2() {
 
     }
 
-    catch (error) {
+    catch {
       setError("Network error. Please check your connection and try again.")
     } finally {
       setLoading(false)
