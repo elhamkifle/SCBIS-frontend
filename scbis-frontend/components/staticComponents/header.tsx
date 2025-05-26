@@ -5,7 +5,7 @@ import { Menu, X, Bell, HelpCircle, Settings, LogOut, User, Expand, CheckCheck }
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useNotificationStore, type NotificationType } from "@/store/notificationStore/notifications";;
+import { useNotificationStore } from "@/store/notificationStore/notifications";;
 import { useUserStore } from "@/store/authStore/useUserStore";
 
 

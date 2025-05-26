@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import useLoginStore from "@/store/authStore/useLoginStore";
-import { AuthSchemaType,AuthSchema } from "@/schema/zodSchema";
+import { AuthSchemaType } from "@/schema/zodSchema";
 import { useUserStore } from "@/store/authStore/useUserStore";
 import Link from "next/link";
 
