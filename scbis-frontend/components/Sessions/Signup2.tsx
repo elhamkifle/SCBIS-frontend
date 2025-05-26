@@ -3,13 +3,12 @@
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import useSignupStore from "@/store/authStore/useSignupStore"
-
 export default function SignupStep2() {
   const router = useRouter()
   const {
     fName, 
     lName, 
-    dob, 
+    // dob, 
     pNo,
     email,
     password,

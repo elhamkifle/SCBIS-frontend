@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Menu, X, Bell, HelpCircle, Settings, LogOut, User, Expand, Trash2, CheckCheck } from "lucide-react";
+import { Menu, X, Bell, HelpCircle, Settings, LogOut, User, Expand, CheckCheck } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useNotificationStore, type NotificationType } from "@/store/notificationStore/notifications";;
 import { useUserStore } from "@/store/authStore/useUserStore";
+
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -45,7 +46,7 @@ export default function Header() {
     <header className="bg-[#1F4878] font-semibold text-white p-8 flex justify-between items-center relative">
       {/* Navigation Links (Desktop) */}
       <nav className="hidden lg:flex lg:space-x-8 lg:items-center w-full justify-center">
-        <Link href="#" className="text-white hover:text-green-400 font-syne">
+        <Link href="/landing-page" className="text-white hover:text-green-400 font-syne">
           Home
         </Link>
         <Link href="/policy-purchase/personal-information/personalDetails" className="text-white hover:text-green-400 font-syne">
@@ -111,7 +112,7 @@ export default function Header() {
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className="w-full bg-[#1F4878] font-semibold flex flex-col items-center space-y-4 p-8 lg:hidden absolute top-16 left-0 right-0 shadow-md"
           >
-            <Link href="#" className="text-white hover:text-green-400">
+            <Link href="landing-page" className="text-white hover:text-green-400">
               Home
             </Link>
             <Link href="/policy-purchase/personal-information/personalDetails" className="text-white hover:text-green-400">
