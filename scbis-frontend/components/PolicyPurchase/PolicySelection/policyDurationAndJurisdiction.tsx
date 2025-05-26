@@ -1,7 +1,8 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from 'next/navigation';
+import { usePolicyDurationStore } from "@/store/policyPurchase/policyDurationAndJurisdiction";
 
 const policyDurations = [
   "3 Days",
@@ -16,7 +17,7 @@ const policyDurations = [
 const coverageAreas = [
   {
     category: "Domestic Coverage",
-    options: ["Ethiopia Only (Valid within Ethiopia’s borders.)"],
+    options: ["Ethiopia Only (Valid within Ethiopia's borders.)"],
   },
   {
     category: "Border Crossing",
@@ -30,16 +31,33 @@ const coverageAreas = [
 ];
 
 export default function PolicyDuration() {
-  const [selectedDuration, setSelectedDuration] = useState<string | null>(null); // Allow string or null
-  const [selectedCoverage, setSelectedCoverage] = useState<string | null>(null); // Allow string or null
+  const { 
+    policyDuration, 
+    jurisdiction,
+    updateFormData 
+  } = usePolicyDurationStore();
+  
   const router = useRouter();
+
+  // No need for manual localStorage handling - Zustand persist middleware handles it
+  useEffect(() => {
+    // You can add any initialization logic here if needed
+  }, []);
+
+  const handleSelectDuration = (duration: string) => {
+    updateFormData({ policyDuration: duration });
+  };
+
+  const handleSelectCoverage = (coverage: string) => {
+    updateFormData({ jurisdiction: coverage });
+  };
 
   const handlePrevious = () => {
     router.push('/policy-purchase/purchase/policySelection');
   };
 
   const handleNext = () => {
-    if (!selectedDuration || !selectedCoverage) {
+    if (!policyDuration || !jurisdiction) {
       alert("Please select a policy duration and coverage area.");
       return;
     }
@@ -55,7 +73,7 @@ export default function PolicyDuration() {
         </button>
       </div>
 
-      {/* Progress Bar */}
+      {/* Progress Bar - unchanged */}
       <div className="flex flex-wrap sm:justify-start md:justify-start items-center gap-4 mt-6 mb-4">
         <div className="flex items-center">
           <div className="w-7 h-7 flex items-center justify-center bg-green-500 text-white rounded-full">1</div>
@@ -106,8 +124,8 @@ export default function PolicyDuration() {
                   type="radio"
                   name="policyDuration"
                   value={duration}
-                  checked={selectedDuration === duration}
-                  onChange={() => setSelectedDuration(duration)}
+                  checked={policyDuration === duration}
+                  onChange={() => handleSelectDuration(duration)}
                   className="form-radio text-blue-600"
                 />
                 <span>{duration}</span>
@@ -138,8 +156,8 @@ export default function PolicyDuration() {
                       type="radio"
                       name="coverageArea"
                       value={option}
-                      checked={selectedCoverage === option}
-                      onChange={() => setSelectedCoverage(option)}
+                      checked={jurisdiction === option}
+                      onChange={() => handleSelectCoverage(option)}
                       className="form-radio text-blue-600"
                     />
                     <span>{option}</span>

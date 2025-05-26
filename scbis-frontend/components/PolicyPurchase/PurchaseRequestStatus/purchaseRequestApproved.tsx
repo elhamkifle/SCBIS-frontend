@@ -10,17 +10,22 @@ export default function PurchaseRequestApproved() {
 
     <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg border mb-8" style={{ boxShadow: '0px 10px 20px rgba(0, 123, 255, 0.4), 0px 4px 8px rgba(0, 0, 0, 0.1)' }}>
       {/* Header Section */}
-      <div className="text-center mb-8">
-        <CheckCircle className="text-green-500 mx-auto" size={40} />
-        <h2 className="text-xl font-bold text-green-600 mb-4">Policy Purchase Request is Approved</h2>
-        <p className="text-blue-600 font-semibold">
-          Status: <span className="text-green-500">Approved - Pending Payment</span>
-        </p>
-      </div>
+      <div className="flex items-center justify-center gap-2 mb-2">
+        <CheckCircle className="text-green-500" size={40} />
+          <div>
+            <h2 className="text-xl font-bold text-green-600">Policy Purchase Request is Approved</h2>
+          </div>          
+    </div>
+
+    <div className="flex items-center justify-center gap-2 mb-8"> 
+    <p className="text-blue-600 font-semibold font-syne">
+      Status: <span className="text-green-500">Approved - Pending Payment</span>
+    </p>
+    </div>
 
       {/* Vehicle & Policy Details */}
       <div className="pb-4 mb-4 px-16">
-        <div className="flex items-center gap-2 mb-4 text-blue-700 font-bold">
+        <div className="flex items-center gap-2 mb-4 text-blue-700 font-bold font-syne">
           <Car size={20} />
           <h3 className='text-lg'>Vehicle & Policy Details:</h3>
         </div>
@@ -34,7 +39,7 @@ export default function PurchaseRequestApproved() {
 
       {/* Premium Calculation */}
       <div className="pb-4 mb-4 px-16">
-        <div className="flex items-center gap-2 mb-4 text-blue-700 font-bold">
+        <div className="flex items-center gap-2 mb-4 text-blue-700 font-bold font-syne">
           <Calculator size={20} />
           <h3 className='text-lg'>Premium Calculation:</h3>
         </div>
