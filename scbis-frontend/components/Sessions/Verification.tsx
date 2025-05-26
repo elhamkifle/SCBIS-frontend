@@ -126,7 +126,7 @@ const Verification = () => {
             //     setIsSuccess(false)
             // }, 3000)
 
-            if (page && page==="page2"){naivgate.push('/policy-purchase/personal-information/personalDetails')}
+            if (page && page==="page2"){naivgate.push('/')}
             else if (page && page==="forgot-password") {naivgate.push(`/reset-password?otp=${verificationNum}&email=${email}`)}
 
         
@@ -152,13 +152,13 @@ const Verification = () => {
                 <img className="hidden lg:block" src="/hand.svg" alt="Hand Image" />
             </div>
 
-            <div className="w-full border-none md:rounded-tl-[35px] md:rounded-bl-[35px] md:w-2/3 h-full flex justify-center items-center bg-gradient-to-b from-[#9ECCF3] to-[#3E99E7]">
-                <div className="w-full md:w-3/5 flex flex-col gap-8 p-3 md:p-8 " style={{background:'linear-gradient(to top,rgba(197, 191, 191, 0.65), rgba(215, 209, 209, 0.3))'}}>
+            <div className="w-full border-none md:rounded-tl-[35px] md:rounded-bl-[35px] sm:w-3/4 lg:2/3 h-full flex justify-center items-center bg-gradient-to-b from-[#9ECCF3] to-[#3E99E7]">
+                <div className="w-full md:w-5/6 xl:w-3/5 flex flex-col gap-8 p-3 xl:p-8 " style={{background:'linear-gradient(to top,rgba(197, 191, 191, 0.65), rgba(215, 209, 209, 0.3))'}}>
                     <div className='flex justify-center py-5'>
                         <form action="" className='flex flex-col gap-5 items-center justify-center w-full  p-5'>
                             <h1 className='text-black text-3xl font-bold'>Verification</h1>
                             <p className='text-black text-sm font-semibold'>Please enter the verification code sent to your email.</p>
-                            <div className='grid grid-cols-6 gap-3 md:gap-10   justify-center  w-full p-5'>
+                            <div className='grid grid-cols-6 gap-3 md:gap-10   justify-center  w-full md: lg:p-5'>
 
                                 {numArray.map((item,index) => (
                                     
@@ -171,7 +171,7 @@ const Verification = () => {
                                         value={verifcationNumbers[item]}
                                         onChange={HandleChange} 
                                         maxLength={1} 
-                                        className='bg-gray-200 sm:w-15 sm:h-12  border-none rounded-md text-black text-center sm:text-2xl font-semibold p-2  sm:px-2 sm:py-3'
+                                        className='bg-gray-200 sm:w-12 sm:h-12  border-none rounded-md text-black text-center sm:text-2xl font-semibold p-2  sm:px-2 sm:py-3'
                                     />
                                 ))}          
                             
