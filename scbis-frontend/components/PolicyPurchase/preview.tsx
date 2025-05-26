@@ -173,66 +173,47 @@ export default function PolicyPreview() {
         vehicleId,
         selectedPolicy,
         policyDuration: formData.policyDuration,
-        jurisdiction: formData.jurisdiction,
-        vehicleData: selectedVehicleData,
-        driverData: {
-          employDriver: formData.employDriver,
-          drivers: formData.drivers,
-          employDriverUnder21: formData.employDriverUnder21,
-          physicalInfirmity: formData.physicalInfirmity,
-          lessThanSixMonthsExperience: formData.lessThanSixMonthsExperience,
-          fullName: formData.fullName,
-          signatureDate: formData.signatureDate,
-          acceptTerms: formData.acceptTerms
-        }
-      });
+        jurisdiction: formData.jurisdiction
+      },
+      vehicleData: {
+        coverRequired: formData.coverRequired,
+        make: formData.make,
+        value: formData.value,
+        vehicleInGoodRepair: formData.vehicleInGoodRepair,
+        vehicleLeftOvernight: formData.vehicleLeftOvernight,
+        soleProperty: formData.soleProperty,
+        ownerName: formData.ownerName,
+        ownerAddress: formData.ownerAddress,
+        privateUse: formData.privateUse,
+        otherUses: formData.otherUses,
+        convicted: formData.convicted,
+        convictionDetails: formData.convictionDetails,
+        insuredBefore: formData.insuredBefore,
+        insurerName: formData.insurerName,
+        companyHistory: formData.companyHistory,
+        hadAccidents: formData.hadAccidents,
+        accidentDetails: formData.accidentDetails,
+        claimsInjury: formData.claimsInjury,
+        claimsInjuryDetails: formData.claimsInjuryDetails,
+        claimsProperty: formData.claimsProperty,
+        claimsPropertyDetails: formData.claimsPropertyDetails,
+        personalAccident: formData.personalAccident,
+        passengersInsured: formData.passengersInsured
+      },
+      driverData: {
+        employDriver: formData.employDriver,
+        drivers: formData.drivers,
+        employDriverUnder21: formData.employDriverUnder21,
+        physicalInfirmity: formData.physicalInfirmity,
+        lessThanSixMonthsExperience: formData.lessThanSixMonthsExperience,
+        fullName: formData.fullName,
+        signatureDate: formData.signatureDate,
+        acceptTerms: formData.acceptTerms
+      }
+    });
 
-      // Build policy selection payload
-      const policySelectionPayload = {
-        vehicleId,
-        selectedPolicy,
-        policyDuration: formData.policyDuration,
-        jurisdiction: formData.jurisdiction,
-        vehicleData: selectedVehicleData || undefined,
-        driverData: {
-          employDriver: formData.employDriver,
-          drivers: formData.drivers,
-          employDriverUnder21: formData.employDriverUnder21,
-          physicalInfirmity: formData.physicalInfirmity,
-          lessThanSixMonthsExperience: formData.lessThanSixMonthsExperience,
-          fullName: formData.fullName,
-          signatureDate: formData.signatureDate,
-          acceptTerms: formData.acceptTerms
-        }
-      };
-      console.log('🔄 Policy selection payload:', policySelectionPayload);
-      // Save policy selection
-      const policyResponse = await policySelectionService.savePolicySelection(policySelectionPayload as any);
-      
-      console.log('✅ Policy created successfully:', policyResponse);
-      
-      // Show success message with policy details
-      alert(`Policy application submitted successfully! 
-      
-Policy ID: ${policyResponse._id}
-Policy Type: ${policyResponse.policyType}
-Duration: ${policyResponse.duration}
-Coverage Area: ${policyResponse.coverageArea}
-Premium: $${policyResponse.premium}
-
-You will be redirected to the next step.`);
-
-      // Navigate to next step (you can change this route as needed)
-      router.push('/claim-submission/vehicle-selection');
-      
-    } catch (error) {
-      console.error('❌ Error submitting policy application:', error);
-      
-      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
-      alert(`Failed to submit policy application: ${errorMessage}`);
-    } finally {
-      setIsSubmitting(false);
-    }
+    alert('Policy submitted successfully!');
+    router.push('/claim-submission/accident-details');
   };
 
   // const handlePrevious = () => {
