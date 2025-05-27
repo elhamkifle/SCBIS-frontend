@@ -6,6 +6,8 @@ import AccountManagement from "@/components/settings/AccountManagement";
 import SuccessPopup from "@/components/settings/SuccessPopup";
 import { useState, useEffect } from "react";
 import withAuth from '../utils/withAuth'; // Adjust path as needed
+import { adminApi } from "../services/api";
+import { useAuth } from "../contexts/AuthContext";
 
 // Placeholder for your actual auth data retrieval
 // Replace this with your actual implementation (e.g., from context, localStorage)
@@ -18,11 +20,8 @@ const getAuthCredentials = () => {
   return { accessToken: null, user: { id: '', fullname: "John Doe", email: "john@example.com", phone: "+251912345678", language: "English", timezone: "GMT+3 (EAT)" } };
 };
 
-// const API_BASE_URL = "https://scbis-git-dev-hailes-projects-a12464a1.vercel.app";
-const API_BASE_URL = "http://localhost:3001";
-
 function SettingsPage() {
-  const [profileImage, setProfileImage] = useState<File | null>(null);
+  const { logout } = useAuth();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
@@ -64,7 +63,6 @@ function SettingsPage() {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setProfileImage(file);
       setImagePreview(URL.createObjectURL(file));
     }
   };
@@ -83,57 +81,41 @@ function SettingsPage() {
       setIsSaving(false);
       return;
     }
-    const payload: any = {
+    const payload = {
       fullname: formData.fullname,
       email: formData.email,
       phoneNumber: formData.phoneNumber,
+      password: formData.password || undefined,
       language: formData.language,
       timezone: formData.timezone,
     };
-    if (formData.password) {
-      payload.password = formData.password;
-    }
     console.log('\npayload\n', payload);
     try {
-      const response = await fetch(`${API_BASE_URL}/admin/users/profile`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(payload),
-      });
-      if (response.ok) {
-        const updatedUser = await response.json(); // Get the updated user data from response
+      const updatedUser = await adminApi.updateProfile(payload);
 
-        // --- Update localStorage with the new user data ---
-        if (typeof window !== "undefined" && updatedUser) {
-          localStorage.setItem("user", JSON.stringify(updatedUser));
-          console.log("User data in localStorage updated:", updatedUser);
+      // --- Update localStorage with the new user data ---
+      if (typeof window !== "undefined" && updatedUser) {
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+        console.log("User data in localStorage updated:", updatedUser);
 
-          // Optionally, re-populate formData from the updatedUser to ensure UI consistency
-          // This is useful if the backend modifies/formats data (e.g., phone number)
-          // or if there are fields in updatedUser not directly in formData but should be reflected.
-          setFormData({
-            fullname: updatedUser.fullname || "",
-            email: updatedUser.email || "",
-            phoneNumber: updatedUser.phoneNumber || "",
-            password: "", // Clear password field after successful save
-            language: updatedUser.language || "English",
-            timezone: updatedUser.timezone || "GMT+3 (EAT)",
-          });
-        }
-        // --- End of localStorage update ---
-
-        setShowSuccess(true);
-      } else {
-        const errorData = await response.json().catch(() => ({ message: "Failed to save settings." }));
-        console.error("Save failed:", errorData);
-        alert(`Error saving settings: ${errorData.message || response.statusText}`);
+        // Optionally, re-populate formData from the updatedUser to ensure UI consistency
+        // This is useful if the backend modifies/formats data (e.g., phone number)
+        // or if there are fields in updatedUser not directly in formData but should be reflected.
+        setFormData({
+          fullname: updatedUser.fullname || "",
+          email: updatedUser.email || "",
+          phoneNumber: updatedUser.phoneNumber || "",
+          password: "", // Clear password field after successful save
+          language: updatedUser.language || "English",
+          timezone: updatedUser.timezone || "GMT+3 (EAT)",
+        });
       }
+      // --- End of localStorage update ---
+
+      setShowSuccess(true);
     } catch (error) {
-      console.error("An error occurred during save:", error);
-      alert("An unexpected error occurred. Please try again.");
+      console.error("Save failed:", error);
+      alert(`Error saving settings: ${error instanceof Error ? error.message : "Unknown error"}`);
     } finally {
       setIsSaving(false);
     }
@@ -141,12 +123,7 @@ function SettingsPage() {
 
   const handleLogout = () => {
     console.log("User logged out");
-    if (typeof window !== "undefined") {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('user');
-        window.location.href = '/login'; // Redirect to login after logout
-    }
+    logout(); // Use AuthContext logout which handles redirect
     setShowLogoutConfirm(false);
   };
 
@@ -162,29 +139,13 @@ function SettingsPage() {
       }
       setIsSaving(true); 
       try {
-        const response = await fetch(`${API_BASE_URL}/admin/users/profile`, {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-        if (response.ok) {
-          alert("Account deleted successfully.");
-          // Log out user after deletion
-            if (typeof window !== "undefined") {
-                localStorage.removeItem('accessToken');
-                localStorage.removeItem('refreshToken');
-                localStorage.removeItem('user');
-                window.location.href = '/login'; // Redirect to login
-            }
-        } else {
-          const errorData = await response.json().catch(() => ({ message: "Failed to delete account." }));
-          console.error("Deletion failed:", errorData);
-          alert(`Error deleting account: ${errorData.message || response.statusText}`);
-        }
+        await adminApi.deleteProfile();
+        alert("Account deleted successfully.");
+        // Use AuthContext logout which handles redirect and cleanup
+        logout();
       } catch (error) {
-        console.error("An error occurred during account deletion:", error);
-        alert("An unexpected error occurred while deleting the account.");
+        console.error("Deletion failed:", error);
+        alert(`Error deleting account: ${error instanceof Error ? error.message : "Unknown error"}`);
       } finally {
         setIsSaving(false); 
         setShowDeleteConfirm(false);

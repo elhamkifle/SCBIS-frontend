@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Eye } from "lucide-react";
 import Image from "next/image";
+import withAuth from "../../utils/withAuth";
 
 interface Claim {
   id: string;
@@ -21,7 +22,7 @@ interface Claim {
   declaration: boolean;
 }
 
-export default function IncomingClaimsPage() {
+function IncomingClaimsPage() {
   const [claims, setClaims] = useState<Claim[]>([]);
   const [search, setSearch] = useState("");
 
@@ -158,3 +159,5 @@ export default function IncomingClaimsPage() {
     </div>
   );
 }
+
+export default withAuth(IncomingClaimsPage);
