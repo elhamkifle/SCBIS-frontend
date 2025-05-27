@@ -126,7 +126,7 @@ const VerificationComponent = () => {
             //     setIsSuccess(false)
             // }, 3000
           
-            if (page && page==="page2"){naivgate.push('/')}
+            if (page && page==="page2"){naivgate.push('/login')}
             else if (page && page==="forgot-password") {naivgate.push(`/reset-password?otp=${verificationNum}&email=${email}`)}
 
 

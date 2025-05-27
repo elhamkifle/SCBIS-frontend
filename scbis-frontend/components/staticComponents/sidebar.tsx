@@ -14,7 +14,7 @@ export default function Sidebar() {
         const confirmLogout = window.confirm("Are you sure you want to log out?");
         if (confirmLogout) {
             logout();
-            router.push('/');
+            router.push('/login');
         }
     };
 

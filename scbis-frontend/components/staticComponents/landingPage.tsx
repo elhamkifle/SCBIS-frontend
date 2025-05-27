@@ -6,7 +6,7 @@ import Image from 'next/image';
 export default function Hero() {
     const router = useRouter();
     const handleNext = () => {
-        router.push('/');
+        router.push('/login');
     }
 
     const covers = [
@@ -229,7 +229,7 @@ export default function Hero() {
                         Sign up or log in to select and purchase your policies today.
                     </p>
 
-                    <button type="submit" onClick={handleNext} className="bg-green-500 text-white p-10 py-2 rounded font-semibold hover:bg-green-400">Sign Up </button>
+                    <button type="submit" onClick={handleNext} className="bg-green-500 text-white p-10 py-2 rounded font-semibold hover:bg-green-400">Log in </button>
 
                 </div>
             </section>
