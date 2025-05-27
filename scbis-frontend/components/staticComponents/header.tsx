@@ -26,8 +26,8 @@ export default function Header() {
   } = useNotificationStore();
 
   const { user } = useUserStore();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [, setLoading] = useState(true);
+  const [, setError] = useState("");
 
   const filteredNotifications =
     filter === "All" ? notifications : notifications.filter((n) => n.category === filter);
@@ -102,6 +102,21 @@ export default function Header() {
     if (confirmLogout) {
       logout();
       router.push('/login');
+    }
+  };
+
+   const handleMarkAllAsRead = async () => {
+    if (!user?.accessToken) return;
+    try {
+      await fetch(`${API_BASE_URL}/notifications/read-all/${user._id}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${user.accessToken}`,
+        },
+      });
+      markAllAsRead();
+    } catch (err) {
+      console.error("Failed to mark all notifications as read", err);
     }
   };
 
@@ -257,11 +272,11 @@ export default function Header() {
                 <CheckCheck
                   size={20}
                   className="text-blue-500 cursor-pointer"
-                  onClick={markAllAsRead}
+                  onClick={handleMarkAllAsRead}
                 />
                 <span
                   className="text-black cursor-pointer hover:underline"
-                  onClick={markAllAsRead}
+                  onClick={handleMarkAllAsRead}
                 >
                   Mark All as Read
                 </span>

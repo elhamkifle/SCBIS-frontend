@@ -77,7 +77,7 @@ export default function NotificationsPage() {
   const handleMarkAllAsRead = async () => {
     if (!user?.accessToken) return;
     try {
-      await fetch(`${API_BASE_URL}/notifications/user/${user._id}/readAll`, {
+      await fetch(`${API_BASE_URL}/notifications/read-all/${user._id}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${user.accessToken}`,
