@@ -281,22 +281,18 @@ export default function Header() {
                     <div className={`${!notification.isRead ? "font-bold" : ""} text-black mb-2`}>
                       {/* {notification.title} */}
                     </div>
+
+                     <div className="flex flex-col gap-4">
+                  {notification.message && (
+                    <div className="text-sm text-gray-600">
+                      {notification.message}
+                    </div>
+                  )}
+                </div>
                     <div className="text-xs text-gray-400">
                       {new Date(notification.createdAt).toLocaleDateString()} |{" "}
                       {new Date(notification.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {!notification.isRead && (
-                      <CheckCheck
-                        size={20}
-                        className="cursor-pointer text-green-500 hover:text-green-700"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          markAsRead(notification._id);
-                        }}
-                      />
-                    )}
                   </div>
                 </div>
               ))}
