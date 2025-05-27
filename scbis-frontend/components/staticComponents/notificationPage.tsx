@@ -117,9 +117,7 @@ export default function NotificationsPage() {
           <button
             key={tab}
             className={`px-4 py-2 w-full text-center border font-medium rounded-md ${
-              filter === tab
-                ? "text-blue-500"
-                : "text-gray-500 hover:text-blue-500"
+              filter === tab ? "text-blue-500" : "text-gray-500 hover:text-blue-500"
             }`}
             onClick={() => setFilter(tab)}
           >
@@ -168,3 +166,4 @@ export default function NotificationsPage() {
     </div>
   );
 }
+
