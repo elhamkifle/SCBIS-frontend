@@ -125,7 +125,7 @@ export default function Header() {
     <header className="bg-[#1F4878] font-semibold text-white p-8 flex justify-between items-center relative">
       {/* Navigation Links (Desktop) */}
       <nav className="hidden lg:flex lg:space-x-8 lg:items-center w-full justify-center">
-        <Link href="/" className="text-white hover:text-green-400 font-syne">
+        <Link href="/dashboard" className="text-white hover:text-green-400">
           Home
         </Link>
         <Link href="/policy-purchase/personal-information/personalDetails" className="text-white hover:text-green-400 font-syne">
