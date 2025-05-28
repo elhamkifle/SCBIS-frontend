@@ -1,15 +1,17 @@
 "use client";
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { usePersonalDetailStore } from '@/store/customerInformationStore/personalDetails';
 import { useUserStore } from '@/store/authStore/useUserStore';
 
 export default function PersonalDetailForm() {
     const router = useRouter();
-    const { formData, updateFormData, logFormData } = usePersonalDetailStore();
+    const { formData, updateFormData, logFormData, setOriginalData, isDataModified } = usePersonalDetailStore();
     const user = useUserStore(state => state.user);
+    const setUser = useUserStore(state => state.setUser);
     const dataLoadedRef = useRef(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Load user data when the component mounts, but only once
     useEffect(() => {
@@ -31,31 +33,73 @@ export default function PersonalDetailForm() {
             }
         }
 
-        // Merge user data with form data, prioritizing any existing form data
-        // This prevents overwriting user-entered form data with profile data
+        // Create user data object from backend response
         const userData = {
-            firstName: formData.firstName || firstName,
-            lastName: formData.lastName || lastName,
-            email: formData.email || user.email,
-            phone: formData.phone || user.phoneNumber,
-            // Add other fields as needed
+            title: user.title || '',
+            firstName: firstName,
+            lastName: lastName,
+            gender: user.gender || '',
+            dateOfBirth: user.dateOfBirth || '',
+            nationality: user.nationality || '',
+            email: user.email || '',
+            phone: user.phoneNumber || '',
+            tin: user.tinNumber || '',
         };
         
-        // Only update if we have data to update
-        if (Object.values(userData).some(val => val)) {
-            updateFormData(userData);
-            // Mark as loaded so we don't try again
-            dataLoadedRef.current = true;
-        }
-    }, [user, updateFormData]); // Removed formData from dependencies
+        // Set this as the original data and current form data
+        setOriginalData(userData);
+        // Mark as loaded so we don't try again
+        dataLoadedRef.current = true;
+    }, [user, setOriginalData]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         updateFormData({ [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        logFormData(); // Log the current form data
+        
+        if (isDataModified) {
+            // If data is modified, submit to backend
+            setIsSubmitting(true);
+            try {
+                // Update user data in backend
+                const updateData = {
+                    title: formData.title,
+                    fullname: `${formData.firstName} ${formData.lastName}`,
+                    gender: formData.gender,
+                    dateOfBirth: formData.dateOfBirth,
+                    nationality: formData.nationality,
+                    email: formData.email,
+                    phoneNumber: formData.phone,
+                    tinNumber: formData.tin,
+                };
+
+                // Here you would call your API to update user data
+                // For now, I'll update the local user store
+                if (user) {
+                    const updatedUser = {
+                        ...user,
+                        ...updateData,
+                        fullname: updateData.fullname,
+                    };
+                    setUser(updatedUser);
+                }
+
+                console.log('Personal details updated:', updateData);
+                
+                // Update the original data to reflect the new saved state
+                setOriginalData(formData);
+                
+            } catch (error) {
+                console.error('Error updating personal details:', error);
+                // Handle error appropriately
+            } finally {
+                setIsSubmitting(false);
+            }
+        }
+        
+        logFormData();
         router.push('/policy-purchase/personal-information/address');
     };
 
@@ -102,14 +146,13 @@ export default function PersonalDetailForm() {
 
                 <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-16 xl:gap-20">
                     <div className='relative w-full'>
-                        <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1" htmlFor="title">Title *</label>
+                        <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1" htmlFor="title">Title</label>
                         <select 
                             id="title"
                             name="title" 
                             value={formData.title} 
                             onChange={handleChange} 
                             className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400" 
-                            required
                             aria-label="Title"
                         >
                             <option value="">Select</option>
@@ -134,8 +177,6 @@ export default function PersonalDetailForm() {
                             placeholder="Enter first name"
                         />
                     </div>
-
-
 
                     <div className='relative w-full'>
                         <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1" htmlFor="lastName">Last Name *</label>
@@ -168,7 +209,7 @@ export default function PersonalDetailForm() {
                         </select>
                     </div>
                     <div className='relative w-full'>
-                        <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1" htmlFor="dateOfBirth">Date Of Birth *</label>
+                        <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1" htmlFor="dateOfBirth">Date Of Birth *</label>
                         <input 
                             id="dateOfBirth"
                             type="date" 
@@ -196,7 +237,7 @@ export default function PersonalDetailForm() {
                         </select>
                     </div>
                     <div className='relative w-full'>
-                        <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1" htmlFor="email">Email Address</label>
+                        <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1" htmlFor="email">Email Address</label>
                         <input 
                             id="email"
                             type="email" 
@@ -209,7 +250,7 @@ export default function PersonalDetailForm() {
                         />
                     </div>
                     <div className='relative w-full'>
-                        <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1" htmlFor="phone">Additional Phone No.</label>
+                        <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1" htmlFor="phone">Additional Phone No.</label>
                         <input 
                             id="phone"
                             type="text" 
@@ -222,7 +263,7 @@ export default function PersonalDetailForm() {
                         />
                     </div>
                     <div className='relative w-full'>
-                        <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1" htmlFor="tin">TIN No.</label>
+                        <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1" htmlFor="tin">TIN No.</label>
                         <input 
                             id="tin"
                             type="text" 
@@ -237,10 +278,17 @@ export default function PersonalDetailForm() {
                     <div className="col-span-1 md:col-span-3 flex justify-end">
                         <button
                             type="submit"
-                            className="bg-[#1A73E8] text-white p-7 py-2 rounded"
-                            aria-label="Next"
+                            disabled={isSubmitting}
+                            className={`${
+                                isDataModified 
+                                    ? 'bg-green-600 hover:bg-green-700' 
+                                    : 'bg-[#1A73E8] hover:bg-blue-700'
+                            } text-white p-7 py-2 rounded transition-colors ${
+                                isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
+                            }`}
+                            aria-label={isDataModified ? "Submit" : "Next"}
                         >
-                            Next
+                            {isSubmitting ? 'Submitting...' : (isDataModified ? 'Submit' : 'Next')}
                         </button>
                     </div>
                 </form>
