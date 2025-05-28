@@ -3,9 +3,17 @@ import { useState } from "react";
 import Sidebar from "../../components/staticComponents/sidebar";
 import Header from "../../components/staticComponents/header";
 import { Footer } from "../../components/staticComponents/footer";
-import { Car } from "lucide-react";
+import { useClaimDetailsStore } from "@/store/claimSubmission/claim-details";
+import { useDriverDetailsStore } from "@/store/claimSubmission/driver-details";
+import { useAccidentDetailsStore } from "@/store/claimSubmission/accident-details";
+import { useLiabilityInformationStore } from "@/store/claimSubmission/liability-information";
+import { useWitnessInformationStore } from "@/store/claimSubmission/witness-information";
+import { useDamageDetailsStore } from "@/store/claimSubmission/damage-details";
+import { StageCard } from "@/components/ClaimDetails/StageCard";
+import { UnderReviewCard } from "@/components/ClaimDetails/UnderReviewCard";
+import { StageSelector } from "@/components/ClaimDetails/StageSelector";
 
-// Claim interface
+
 interface Claim {
     id: string;
     stage:
@@ -19,44 +27,27 @@ interface Claim {
     policeReportUrl?: string;
     proformaUrls?: string[];
     winnerProformaUrl?: string;
-    // ...other claim fields
 }
 
-// Mock claim data
-const mockClaim: Claim = {
-    id: "1",
-    stage: "review",
-    adminImageUrl: "/admin-image.png",
-    winnerProformaUrl: "/winning-proforma.pdf",
-};
-
 export default function ClaimDetailsPage() {
-    const [claim, setClaim] = useState<Claim>(mockClaim);
+    const claim = useClaimDetailsStore();
+    const { formData: driver } = useDriverDetailsStore();
+    const accidentDetails = useAccidentDetailsStore();
+    const liability = useLiabilityInformationStore();
+    const witness = useWitnessInformationStore();
+    const damage = useDamageDetailsStore();
     const [policeReport, setPoliceReport] = useState<File | null>(null);
 
-    // For demo: function to move to next stage
-    const nextStage = () => {
-        const order: Claim["stage"][] = [
-            "review",
-            "admin-approved",
-            "waiting-approval",
-            "in-person",
-            "under-review",
-            "winner-announced",
-        ];
-        const idx = order.indexOf(claim.stage);
-        if (idx < order.length - 1) {
-            setClaim({ ...claim, stage: order[idx + 1] });
-        }
-    };
-
-    // For demo: handle police report upload
+    
     const handlePoliceReportUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             setPoliceReport(e.target.files[0]);
-            // In real app, upload to server and update claim
-            nextStage();
+            claim.nextStage();
         }
+    };
+
+    const handleStageChange = (newStage: Claim["stage"]) => {
+        claim.setClaim({ stage: newStage });
     };
 
     return (
@@ -88,21 +79,91 @@ export default function ClaimDetailsPage() {
                                             statusColor="#DBBF1F"
                                             description="Claim is under review by admin."
                                             note="Your claim will be processed as soon as possible."
-                                            onNext={nextStage}
+                                            onNext={claim.nextStage}
                                             buttonLabel="Approve Claim (Demo)"
+                                            claimData={{
+                                                driver,
+                                                accidentDetails,
+                                                liability,
+                                                witness,
+                                                damage
+                                            }}
                                         />
                                     );
                                 case "admin-approved":
                                     return (
-                                        <StageCard title="Admin Approval">
-                                            <p className="mb-4">Your claim has been approved. Please download the image and upload your police report.</p>
-                                            <a href={claim.adminImageUrl} download className="block my-4">
-                                                <img src={claim.adminImageUrl} alt="Admin Provided" className="w-64 h-64 object-contain border rounded mx-auto" />
-                                                <button className="mt-2 px-4 py-2 bg-blue-500 text-white rounded w-full">Download Image</button>
-                                            </a>
-                                            <div className="my-4">
-                                                <label className="block mb-2 font-semibold">Upload Police Report:</label>
-                                                <input type="file" onChange={handlePoliceReportUpload} className="w-full" />
+                                        <StageCard title="Request and Submit Police Report">
+                                            <div className="space-y-6">
+                                                <div className="bg-blue-50 p-4 rounded-lg">
+                                                    <h3 className="text-lg font-semibold text-blue-800 mb-2">Instructions:</h3>
+                                                    <ol className="list-decimal list-inside space-y-2 text-blue-700">
+                                                        <li>Download the request letter below</li>
+                                                        <li>Take this letter to your local police station</li>
+                                                        <li>Request an official police report for your accident</li>
+                                                        <li>Once you receive the police report, upload it here</li>
+                                                    </ol>
+                                                </div>
+
+                                                <div className="border rounded-lg p-4">
+                                                    <h3 className="text-lg font-semibold mb-3">Download Request Letter</h3>
+                                                    <div className="flex items-center justify-center bg-gray-50 p-4 rounded-lg mb-4">
+                                                        <a href="/placeholder-police-request.png" download className="block">
+                                                            <img
+                                                                src="/placeholder-police-request.png"
+                                                                alt="Police Report Request Letter"
+                                                                className="w-64 h-64 object-contain"
+                                                                onError={(e) => {
+                                                                    const target = e.target as HTMLImageElement;
+                                                                    target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Crect width='200' height='200' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='14' fill='%236b7280'%3ERequest Letter%3C/text%3E%3C/svg%3E";
+                                                                }}
+                                                            />
+                                                        </a>
+                                                    </div>
+                                                    <a
+                                                        href="/placeholder-police-request.png"
+                                                        download
+                                                        className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors inline-block text-center"
+                                                    >
+                                                        Download Request Letter
+                                                    </a>
+                                                </div>
+
+                                                <div className="border rounded-lg p-4">
+                                                    <h3 className="text-lg font-semibold mb-3">Upload Police Report</h3>
+                                                    <div className="space-y-4">
+                                                        <p className="text-gray-600 text-sm">Please upload the official police report you received from the police station.</p>
+                                                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                                                            <input
+                                                                type="file"
+                                                                onChange={handlePoliceReportUpload}
+                                                                className="hidden"
+                                                                id="police-report-upload"
+                                                                accept=".pdf,.jpg,.jpeg,.png"
+                                                            />
+                                                            <label
+                                                                htmlFor="police-report-upload"
+                                                                className="cursor-pointer inline-flex items-center justify-center px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                                            >
+                                                                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                                                                </svg>
+                                                                Choose File
+                                                            </label>
+                                                            <p className="mt-2 text-xs text-gray-500">PDF, JPG, or PNG up to 10MB</p>
+                                                        </div>
+                                                        {policeReport && (
+                                                            <div className="mt-4">
+                                                                <p className="text-sm text-gray-600 mb-2">Selected file: {policeReport.name}</p>
+                                                                <button
+                                                                    onClick={() => claim.nextStage()}
+                                                                    className="w-full px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                                                                >
+                                                                    Submit Police Report
+                                                                </button>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
                                             </div>
                                         </StageCard>
                                     );
@@ -114,7 +175,7 @@ export default function ClaimDetailsPage() {
                                             statusColor="#DBBF1F"
                                             description="Your police report is under review. Please wait for further instructions."
                                             note="You will be notified once your report is approved."
-                                            onNext={nextStage}
+                                            onNext={claim.nextStage}
                                             buttonLabel="Simulate Approval (Demo)"
                                         />
                                     );
@@ -124,7 +185,7 @@ export default function ClaimDetailsPage() {
                                             <p className="mb-4">
                                                 Please come to the office and submit a proforma from your preferred garage and/or spare parts company.
                                             </p>
-                                            <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded w-full" onClick={nextStage}>
+                                            <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded w-full" onClick={claim.nextStage}>
                                                 I have submitted (Demo)
                                             </button>
                                         </StageCard>
@@ -137,7 +198,7 @@ export default function ClaimDetailsPage() {
                                             statusColor="#DBBF1F"
                                             description="Your proforma is being reviewed. Please wait for the results."
                                             note="You will be notified once a decision is made."
-                                            onNext={nextStage}
+                                            onNext={claim.nextStage}
                                             buttonLabel="Announce Winner (Demo)"
                                         />
                                     );
@@ -159,66 +220,8 @@ export default function ClaimDetailsPage() {
                 {/* Footer */}
                 <Footer />
             </div>
-        </div>
-    );
-}
-
-function StageCard({ title, children }: { title: string; children: React.ReactNode }) {
-    return (
-        <div className="bg-white rounded-2xl shadow-xl p-8 border border-blue-100 w-full">
-            <h1 className="text-2xl font-bold text-blue-900 mb-6">{title}</h1>
-            {children}
-        </div>
-    );
-}
-
-function UnderReviewCard({
-    title,
-    status,
-    statusColor,
-    description,
-    note,
-    onNext,
-    buttonLabel,
-}: {
-    title: string;
-    status: string;
-    statusColor: string;
-    description: string;
-    note: string;
-    onNext: () => void;
-    buttonLabel: string;
-}) {
-    return (
-        <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg border mb-8" style={{ boxShadow: '0px 10px 20px rgba(0, 123, 255, 0.12), 0px 4px 8px rgba(0, 0, 0, 0.06)' }}>
-            <div className="text-center mb-8">
-                <h2 className="text-xl font-bold mb-4" style={{ color: statusColor }}>{title}</h2>
-                <p className="text-blue-600 font-semibold mb-4">
-                    Status: <span style={{ color: statusColor }}>{status}</span>
-                </p>
-                <p className="text-blue-600">{description}</p>
-            </div>
-            <div className="pb-4 mb:8 md:mb-24 px-2 md:px-16">
-                <div className="flex items-center gap-2 mb-4 text-blue-700 font-bold">
-                    <Car size={20} />
-                    <h3 className="text-lg">Claim & Policy Details:</h3>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-md">
-                    <p><strong>Claim ID:</strong> 1</p>
-                    <p><strong>Vehicle Type:</strong> Toyota Corolla 2021</p>
-                    <p><strong>Plate Number:</strong> Code 2 - A12345</p>
-                    <p><strong>Insurance Type:</strong> Comprehensive Cover</p>
-                    <p><strong>Policy Duration:</strong> 1 Year</p>
-                </div>
-            </div>
-            <p className="text-md mt-8">
-                <span className="font-bold text-blue-700">N.B:</span> {note}
-            </p>
-            {onNext && (
-                <button className="mt-8 px-4 py-2 bg-blue-600 text-white rounded w-full" onClick={onNext}>
-                    {buttonLabel}
-                </button>
-            )}
+            {/* Stage Selector for Testing */}
+            <StageSelector currentStage={claim.stage} onStageChange={handleStageChange} />
         </div>
     );
 } 
