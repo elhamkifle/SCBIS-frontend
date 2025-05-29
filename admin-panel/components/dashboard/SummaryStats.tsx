@@ -13,7 +13,7 @@ export default function SummaryStats({
   onCardClick,
 }: SummaryStatsProps) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 ">
       <Card
         onClick={() => onCardClick("policies")}
         className="cursor-pointer p-4 shadow-md hover:shadow-lg transition"
