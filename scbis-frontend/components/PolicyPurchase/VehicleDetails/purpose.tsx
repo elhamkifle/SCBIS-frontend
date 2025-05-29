@@ -69,7 +69,7 @@ export default function ChoosePurposeForm() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:px-12 mt-3">
                 <div className={`px-12 py-8 border rounded-xl cursor-pointer shadow-lg ${selectedType === 'private' ? 'border-green-500' : 'border-gray-300'}`} onClick={() => handleSelect('private')} style={{ boxShadow: '0px 10px 20px rgba(0, 123, 255, 0.4), 0px 4px 8px rgba(0, 0, 0, 0.1)' }} >
                     <h3 className="text-xl text-center font-bold text-blue-600 mb-6">Private </h3>
-                    <h4 className='font-bold'> What's Included</h4>
+                    <h4 className='font-bold'> What&apos;s Included</h4>
                     <p className="mt-2">✅ Vehicles registered for private individuals.</p>
                     <p className="mt-1">✅ Non-commercial travel.</p> <br />
 
@@ -80,7 +80,7 @@ export default function ChoosePurposeForm() {
                 </div>
                 <div className={`px-12 py-8 border rounded-xl cursor-pointer shadow-lg ${selectedType === 'commercial' ? 'border-green-500' : 'border-gray-300'}`} onClick={() => handleSelect('commercial')} style={{ boxShadow: '0px 10px 20px rgba(0, 123, 255, 0.4), 0px 4px 8px rgba(0, 0, 0, 0.1)' }} >
                     <h3 className="text-xl text-center font-bold text-blue-600 mb-6">Commercial</h3>
-                    <h4 className='font-bold'> What's Included</h4> 
+                    <h4 className='font-bold'> What&apos;s Included</h4> 
                     <p className="mt-2">✅ Vehicles registered for business transport.</p>
                     <p className="mt-1">✅ Includes taxis, buses, and cargo trucks.</p> <br />
 
