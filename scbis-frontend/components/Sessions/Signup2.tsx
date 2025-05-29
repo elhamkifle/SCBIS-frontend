@@ -3,9 +3,6 @@
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import useSignupStore from "@/store/authStore/useSignupStore"
-// import { span } from "framer-motion/client"
-
-
 export default function SignupStep2() {
   const router = useRouter()
   const {
@@ -17,11 +14,12 @@ export default function SignupStep2() {
     password,
     setEmail,
     setPassword,
+    clearSignupData,
   } = useSignupStore()
 
   const [confirmPass, setConfirmPass] = useState('')
   const [error, setError] = useState('')
-  const [loading,setLoading] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const handleSubmit = async () => {
     setError('')
@@ -29,34 +27,52 @@ export default function SignupStep2() {
 
     if (!email || !password || !confirmPass) {
       setError("Please fill all the required fields.")
+      setLoading(false)
       return
     }
 
     if (password !== confirmPass) {
       setError("Passwords do not match.")
+      setLoading(false)
       return
     }
 
-    const serverResponse = await fetch('https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/auth/register',{
-      method:'POST',
-      body:JSON.stringify({fullname:fName + " " + lName,email,password,phoneNumber:pNo}),
-      headers:{
-        'Content-Type':'application/json'
-      }
+    try {
+      const serverResponse = await fetch(`https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/auth/register`, {
+        method: 'POST',
+        body: JSON.stringify({
+          fullname: `${fName} ${lName}`,
+          email,
+          password,
+          phoneNumber: pNo
+        }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
 
-    })
+      const data = await serverResponse.json()
 
-    const data = await serverResponse.json()
 
     if (serverResponse.ok){
+      clearSignupData()
       router.push(`/verification?page=page2&email=${email}&phone=${pNo}`) // or wherever OTP page is
     }
 
-    setLoading(false)
+    else {
+        // Handle specific error messages from backend
+        setError(data.message || "Registration failed. Please try again.")
+      }
 
-    console.log(data)
+      console.log(data) 
 
-    
+    }
+
+    catch {
+      setError("Network error. Please check your connection and try again.")
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -92,7 +108,7 @@ export default function SignupStep2() {
                 <p onClick={()=>router.push('/signup')} className="w-[30px] py-1 cursor-pointer text-center font-bold bg-[#2752D0]  font-inter text-sm text-white rounded">1</p>
                 <p onClick={()=>router.push('/signup/page2')} className="w-[30px] py-1 cursor-pointer text-center font-bold bg-[#3E99E7]  font-inter text-sm text-white rounded">2</p>
             </div>
-            <button onClick={handleSubmit} className="bg-[#23C140] w-1/6 font-inter text-sm text-white p-1 rounded">{loading ? <span className="loading loading-dots loading-lg"></span>  :"Signup"}</button>
+            <button onClick={handleSubmit} className="bg-[#23C140] w-1/6 font-inter text-sm text-white p-1 rounded">{loading ? <span className="loading loading-dots loading-lg"></span> : "Signup"}</button>
           </div>
           {error && <p className="text-center font-bold text-base text-[red]">{error}</p>}
         </div>

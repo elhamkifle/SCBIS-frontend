@@ -39,7 +39,7 @@ const useSignupStore = create(
     }),
     {
       name: 'signup-storage',
-      getStorage: () => localStorage,
+      getStorage: () => (typeof window !== 'undefined' ? localStorage : null),
     }
   )
 );
