@@ -16,10 +16,24 @@ import { useDamageDetailsStore } from '@/store/claimSubmission/damage-details';
 
 export default function ClaimPreview() {
   const router = useRouter();
+  const { selectedPolicy, policies } = useClaimPolicyStore.getState();
 
-  // Get all data from stores and their update functions
-  const { selectedVehicle } = useVehicleSelectionStore();
-  const { selectedPolicy } = useClaimPolicyStore();
+  const selectedPolicyObj = policies.find(p => p._id === selectedPolicy);
+
+  if (!selectedPolicyObj?._id) {
+    console.error('No policy selected or policy not found');
+    return;
+  }
+
+  const generalDetails =
+    selectedPolicyObj?.privateVehicle?.generalDetails ||
+    selectedPolicyObj?.commercialVehicle?.generalDetails;
+
+  const selectedVehicle = generalDetails
+    ? `${generalDetails.make} ${generalDetails.model}`
+    : '';
+
+
   const {
     isDriverSameAsInsured,
     formData: driver,
@@ -134,7 +148,7 @@ export default function ClaimPreview() {
 
   const handleSubmit = async () => {
     const claimData = {
-      policyId: "67fd5e03c2f1bd131f38a8ab",
+      policyId: selectedPolicyObj._id,
       isDriverSameAsInsured,
       driver: {
         ...driver
@@ -200,10 +214,19 @@ export default function ClaimPreview() {
 
     console.log(claimData);
 
-    const accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2N2ZkNTRlY2QzZGM1MzIxYTkwOWIyNDYiLCJyb2xlcyI6WyJ1c2VyIl0sImlhdCI6MTc0Njg5NDgzMSwiZXhwIjoxNzQ2ODk4NDMxfQ.oAQyZ5boJnsWWvFZm3aSehnD9JFaamufPIaoVmLU0CA"; // Provided accessToken
+    const getAuthTokenFromCookie = (): string | null => {
+      const match = document.cookie.match(/(?:^|;\s*)auth_token=([^;]*)/);
+      return match ? decodeURIComponent(match[1]) : null;
+    };
+
 
     try {
-      // Sending the claim data using Axios
+      const accessToken = getAuthTokenFromCookie();
+      if (!accessToken) {
+        console.warn('No auth token found in cookies.');
+        return;
+      }
+
       const response = await axios.post("https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/claims", claimData, {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
