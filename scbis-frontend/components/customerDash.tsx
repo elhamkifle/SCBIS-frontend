@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePoliciesStore } from "@/store/dashboard/policies";
 import { useClaimsStore } from "@/store/dashboard/claims";
+import { useUserStore } from "@/store/authStore/useUserStore";
 
 const actionImages: Record<string, string> = {
   "New Policy Purchase": "/purchase.png",
@@ -25,6 +26,8 @@ const actionLinks: Record<typeof actionLabels[number], string> = {
 export default function Dashboard() {
   const { policies } = usePoliciesStore();
   const { claims } = useClaimsStore();
+  const user = useUserStore((state) => state.user);
+  const profileName = user?.fullname.split(' ') || []
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -46,8 +49,8 @@ export default function Dashboard() {
   return (
     <main className="bg-white min-h-screen text-gray-800">
       <div className="max-w-7xl mx-auto px-4 pt-8 pb-12">
-        <h1 className="text-4xl font-bold text-blue-500 mb-10 text-center" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-          Hello UserName
+        <h1 className="text-lg font-syne md:text-4xl font-bold text-blue-500 mb-10 text-center" style={{ fontFamily: 'Montserrat, sans-serif' }}>
+          Hello {`${profileName[0]} ${profileName[1][0]}.`}
         </h1>
 
         <div className="flex flex-row flex-wrap justify-between items-center gap-8 mb-14">
