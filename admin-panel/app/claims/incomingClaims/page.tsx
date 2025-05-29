@@ -148,9 +148,13 @@ export default function IncomingClaimsPage() {
                   ))}
                 </div>
               </div>
-              <Button variant="outline" className="w-full mt-2 flex items-center gap-2">
+                <Button
+                variant="outline"
+                className="w-full mt-2 flex items-center gap-2"
+                onClick={() => window.location.href = `/claims/incomingClaims/${claim.id}`}
+                >
                 <Eye size={16} /> View Full Details
-              </Button>
+                </Button>
             </CardContent>
           </Card>
         ))}
