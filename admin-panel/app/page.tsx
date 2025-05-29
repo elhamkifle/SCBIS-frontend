@@ -2,8 +2,8 @@
 import { useState } from "react";
 import AdminSidebar from "@/components/AdminSideBar.";
 import AdminDashboardPage from "@/components/dashboard/AdminDashboard";
-import SummaryStats from "@/components/dashboard/SummaryStats";
-import PolicyPieChart from "@/components/dashboard/PolicyPieChart";
+
+
 
 export default function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -44,16 +44,6 @@ export default function Home() {
         <div className="flex-1 overflow-auto">
           <div className="p-4">
             <AdminDashboardPage />
-
-            {/* Summary Cards */}
-            <SummaryStats
-              totalPolicies={10234}
-              totalRevenue={189230}
-              onCardClick={() => {}}
-            />
-
-            {/* Policy Distribution Chart */}
-            <PolicyPieChart />
           </div>
         </div>
       </div>
