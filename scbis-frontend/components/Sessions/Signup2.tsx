@@ -9,7 +9,6 @@ export default function SignupStep2() {
   const {
     fName, 
     lName, 
-    dob, 
     pNo,
     email,
     password,
