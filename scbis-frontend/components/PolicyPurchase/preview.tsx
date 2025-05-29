@@ -10,7 +10,7 @@ import { useDriverInformationStore } from '@/store/policyPurchase/driverInformat
 
 export default function PolicyPreview() {
   const router = useRouter();
-  
+
   // Get all data from stores
   const { selectedPolicy } = usePolicyStore();
   const { policyDuration, jurisdiction, updateFormData: updateDuration } = usePolicyDurationStore();
@@ -71,7 +71,7 @@ export default function PolicyPreview() {
   };
 
   const saveChanges = (section: keyof typeof isEditing) => {
-    switch(section) {
+    switch (section) {
       case 'duration':
         updateDuration({
           policyDuration: formData.policyDuration,
@@ -124,9 +124,8 @@ export default function PolicyPreview() {
   const YesNoDisplay = ({ value }: { value: string | boolean }) => {
     const displayValue = typeof value === 'boolean' ? (value ? 'yes' : 'no') : value;
     return (
-      <span className={`px-2 py-1 rounded-full text-sm font-medium ${
-        displayValue === 'yes' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-      }`}>
+      <span className={`px-2 py-1 rounded-full text-sm font-medium ${displayValue === 'yes' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+        }`}>
         {displayValue === 'yes' ? 'Yes' : 'No'}
       </span>
     );
@@ -175,7 +174,7 @@ export default function PolicyPreview() {
         acceptTerms: formData.acceptTerms
       }
     });
-    
+
     alert('Policy submitted successfully!');
     router.push('/claim-submission/accident-details');
   };
@@ -196,7 +195,7 @@ export default function PolicyPreview() {
             <h2 className="text-lg font-bold text-blue-600">1. Policy Selection</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 px-4">
-            <div><strong>Selected Policy:</strong> {selectedPolicy}</div>
+            <div><strong>Selected Policy:</strong> <p> {selectedPolicy} </p> </div>
           </div>
         </div>
 
@@ -246,8 +245,8 @@ export default function PolicyPreview() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 px-4">
-              <div><strong>Policy Duration:</strong> {formData.policyDuration}</div>
-              <div><strong>Coverage Area:</strong> {formData.jurisdiction}</div>
+              <div><strong>Policy Duration:</strong> <p>  {formData.policyDuration} </p></div>
+              <div><strong>Coverage Area:</strong> <p> {formData.jurisdiction} </p></div>
             </div>
           )}
         </div>
@@ -530,47 +529,58 @@ export default function PolicyPreview() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 px-4">
-              <div><strong>Cover Required:</strong> {formData.coverRequired}</div>
-              <div><strong>Make:</strong> {formData.make}</div>
-              <div><strong>Value:</strong> {formData.value}</div>
+              <div><strong>Cover Required:</strong> <YesNoDisplay value={formData.coverRequired} /> </div>
+              <div><strong>Make:</strong> <p>{formData.make}</p></div>
+              <div><strong>Value:</strong> <p>{formData.value}</p></div>
+
               <div>
-                <strong>Vehicle in Good Repair:</strong> 
+                <strong>Vehicle in Good Repair:</strong>
                 <YesNoDisplay value={formData.vehicleInGoodRepair} />
               </div>
+
               <div>
-                <strong>Vehicle Left Overnight:</strong> 
+                <strong>Vehicle Left Overnight:</strong>
                 <YesNoDisplay value={formData.vehicleLeftOvernight} />
               </div>
+
               <div>
-                <strong>Sole Property:</strong> 
+                <strong>Sole Property:</strong>
                 <YesNoDisplay value={formData.soleProperty} />
               </div>
-              <div><strong>Owner Name:</strong> {formData.ownerName}</div>
-              <div><strong>Owner Address:</strong> {formData.ownerAddress}</div>
+
+              <div><strong>Owner Name:</strong> <p>{formData.ownerName}</p></div>
+              <div><strong>Owner Address:</strong> <p>{formData.ownerAddress}</p></div>
+
               <div>
-                <strong>Private Use:</strong> 
+                <strong>Private Use:</strong>
                 <YesNoDisplay value={formData.privateUse} />
               </div>
-              <div><strong>Other Uses:</strong> {formData.otherUses}</div>
+
+              <div><strong>Other Uses:</strong> <p>{formData.otherUses}</p></div>
+
               <div>
-                <strong>Convicted of Motoring Offense:</strong> 
+                <strong>Convicted of Motoring Offense:</strong>
                 <YesNoDisplay value={formData.convicted} />
               </div>
+
               {formData.convicted === 'yes' && (
                 <div className="col-span-2">
-                  <strong>Conviction Details:</strong> 
+                  <strong>Conviction Details:</strong>
                   <p className="whitespace-pre-line">{formData.convictionDetails}</p>
                 </div>
               )}
+
               <div>
-                <strong>Insured Before:</strong> 
+                <strong>Insured Before:</strong>
                 <YesNoDisplay value={formData.insuredBefore} />
               </div>
+
               {formData.insuredBefore === 'yes' && (
                 <div>
-                  <strong>Insurer Name:</strong> {formData.insurerName}
+                  <strong>Insurer Name:</strong> <p>{formData.insurerName}</p>
                 </div>
               )}
+
               <div className="col-span-2">
                 <strong>Company History:</strong>
                 <ul className="list-disc pl-5">
@@ -579,45 +589,54 @@ export default function PolicyPreview() {
                   ))}
                 </ul>
               </div>
+
               <div>
-                <strong>Had Accidents:</strong> 
+                <strong>Had Accidents:</strong>
                 <YesNoDisplay value={formData.hadAccidents} />
               </div>
+
               {formData.hadAccidents === 'yes' && (
                 <div className="col-span-2">
-                  <strong>Accident Details:</strong> 
+                  <strong>Accident Details:</strong>
                   <p className="whitespace-pre-line">{formData.accidentDetails}</p>
                 </div>
               )}
+
               <div>
-                <strong>Claims for Injury:</strong> 
+                <strong>Claims for Injury:</strong>
                 <YesNoDisplay value={formData.claimsInjury} />
               </div>
+
               {formData.claimsInjury === 'yes' && (
                 <div className="col-span-2">
-                  <strong>Injury Claim Details:</strong> 
+                  <strong>Injury Claim Details:</strong>
                   <p className="whitespace-pre-line">{formData.claimsInjuryDetails}</p>
                 </div>
               )}
+
               <div>
-                <strong>Claims for Property Damage:</strong> 
+                <strong>Claims for Property Damage:</strong>
                 <YesNoDisplay value={formData.claimsProperty} />
               </div>
+
               {formData.claimsProperty === 'yes' && (
                 <div className="col-span-2">
-                  <strong>Property Claim Details:</strong> 
+                  <strong>Property Claim Details:</strong>
                   <p className="whitespace-pre-line">{formData.claimsPropertyDetails}</p>
                 </div>
               )}
+
               <div>
-                <strong>Personal Accident Cover:</strong> 
+                <strong>Personal Accident Cover:</strong>
                 <YesNoDisplay value={formData.personalAccident} />
               </div>
+
               <div>
-                <strong>Passengers Insured:</strong> 
+                <strong>Passengers Insured:</strong>
                 <YesNoDisplay value={formData.passengersInsured} />
               </div>
             </div>
+
           )}
         </div>
 
@@ -767,7 +786,7 @@ export default function PolicyPreview() {
                   <YesNoDisplay value={formData.employDriver} />
                 </p>
               </div>
-              
+
               {formData.employDriver === 'yes' && formData.drivers.map((driver, index) => (
                 <div key={index} className="col-span-2 border-t pt-4 mt-4">
                   <h3 className="font-medium">Driver {index + 1}</h3>
@@ -782,33 +801,33 @@ export default function PolicyPreview() {
                     </div>
                     <div>
                       <p className="font-medium">Experience (years):</p>
-                      <p className="text-gray-700">{driver.drivingExperience}</p>
+                      <p>{driver.drivingExperience}</p>
                     </div>
                   </div>
                 </div>
               ))}
-              
+
               <div>
                 <p className="font-medium">Employ drivers under 21?</p>
-                <p className="text-gray-700">
+                <p>
                   <YesNoDisplay value={formData.employDriverUnder21} />
                 </p>
               </div>
-              
+
               <div>
                 <p className="font-medium">Physical infirmity?</p>
                 <p className="text-gray-700">
                   <YesNoDisplay value={formData.physicalInfirmity} />
                 </p>
               </div>
-              
+
               <div>
                 <p className="font-medium">Less than 6 months experience?</p>
                 <p className="text-gray-700">
                   <YesNoDisplay value={formData.lessThanSixMonthsExperience} />
                 </p>
               </div>
-              
+
               <div className="col-span-2 border-t pt-4 mt-4">
                 <h3 className="font-medium">Declaration</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">

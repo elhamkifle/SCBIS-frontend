@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import useLoginStore from "@/store/authStore/useLoginStore";
-import { AuthSchemaType,AuthSchema } from "@/schema/zodSchema";
+import { AuthSchemaType } from "@/schema/zodSchema";
 import { useUserStore } from "@/store/authStore/useUserStore";
 import Link from "next/link";
 
@@ -28,16 +28,18 @@ export default function Login() {
         setIsLoading(true);
         setError(false);
 
-        const validation = AuthSchema.safeParse({ email, password });
-        if (!validation.success) {
-            const errors = validation.error.flatten();
-            setZodError({
-                email: errors.fieldErrors.email ? errors.fieldErrors.email[0] : '',
-                password: errors.fieldErrors.password ? errors.fieldErrors.password[0] : ''
-            });
-            setIsLoading(false);
-            return;
-        }
+        // const validation = AuthSchema.safeParse({ email, password });
+        // if (!validation.success) {
+        //     const errors = validation.error.flatten();
+        //     setZodError({
+        //         email: errors.fieldErrors.email ? errors.fieldErrors.email[0] : '',
+        //         password: errors.fieldErrors.password ? errors.fieldErrors.password[0] : ''
+        //     });
+
+        //     setIsLoading(false)
+            
+        //     return;
+        // }
 
         try {
             const serverResponse = await fetch(`https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/auth/login`, {
@@ -99,7 +101,7 @@ export default function Login() {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)} 
                             className="p-2 rounded placeholder:text-black placeholder:font-semibold placeholder:italic placeholder:text-xs" 
-                            type="email" 
+                            type="text" 
                             id="email" 
                             name="email"
                             placeholder="Type email address"

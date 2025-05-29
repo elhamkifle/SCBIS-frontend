@@ -1,5 +1,5 @@
 import axios from "axios";
-import { refreshToken } from "./authService";
+// import { refreshToken } from "./authService";
 import { useUserStore } from "@/store/authStore/useUserStore";
 
 // Create a new axios instance for authenticated requests
@@ -35,7 +35,7 @@ apiClient.interceptors.response.use(
 
       try {
         // Attempt to refresh token
-        await refreshToken();
+        // await refreshToken();
         
         // Update authorization header with new token
         const user = useUserStore.getState().user;

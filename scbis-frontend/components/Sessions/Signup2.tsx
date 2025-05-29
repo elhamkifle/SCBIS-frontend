@@ -3,7 +3,6 @@
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import useSignupStore from "@/store/authStore/useSignupStore"
-
 export default function SignupStep2() {
   const router = useRouter()
   const {
@@ -69,7 +68,7 @@ export default function SignupStep2() {
 
     }
 
-    catch (err) {
+    catch {
       setError("Network error. Please check your connection and try again.")
     } finally {
       setLoading(false)

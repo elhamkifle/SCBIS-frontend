@@ -6,14 +6,14 @@ import { useAddressStore } from '@/store/customerInformationStore/addressStore';
 import { useRouter } from 'next/navigation';
 import { useUserStore } from '@/store/authStore/useUserStore';
 import { fetchUserData, updateUserData } from '@/utils/userUtils';
-import { baseAPI } from '@/utils/axiosInstance';
+// import { baseAPI } from '@/utils/axiosInstance';
 // import { set } from 'zod';
 // import { span } from 'framer-motion/client';
 
 export default function Preview() {
   const user = useUserStore((state) => state.user);
-  const setUser = useUserStore((state) => state.setUser);
- 
+  // const setUser = useUserStore((state) => state.setUser);
+
   const router = useRouter();
   const { formData: personalData, resetForm } = usePersonalDetailStore();
   const { address: addressData, resetAddress } = useAddressStore();
@@ -58,7 +58,7 @@ export default function Preview() {
         setLoading(false);
       }
     };
-    
+
     if (user?._id) {
       loadUserData();
     }
@@ -80,11 +80,11 @@ export default function Preview() {
     } : {};
 
     // Merge all data sources with priority: personalData/addressData > userData > current formData
-    setFormData((prev) => ({ 
-      ...prev, 
+    setFormData((prev) => ({
+      ...prev,
       ...userData,
-      ...addressData, 
-      ...personalData 
+      ...addressData,
+      ...personalData
     }));
   }, [personalData, addressData, user]);
 
@@ -138,7 +138,7 @@ export default function Preview() {
         email: formData.email || user.email, // Use existing email as fallback
         phoneNumber: formData.phone || user.phoneNumber, // Use existing phone as fallback
         tinNumber: formData.tin,
-        
+
         // Address details
         country: formData.country,
         state: formData.state,
@@ -152,36 +152,47 @@ export default function Preview() {
 
       // Use the updateUserData utility instead of direct API call
       await updateUserData(submissionData);
-      
+
       alert('Application Submitted!');
       router.push('/policy-purchase/vehicle-information/purpose');
-      
+
       // Clear personal details and address from localStorage
       localStorage.removeItem('personal-details-storage');
       localStorage.removeItem('address-details-storage');
-      
+
       // Reset the Zustand stores
       resetForm();  // Reset personal data store
       resetAddress();  // Reset address data store
-      
-    } catch (err) {
+
+    } catch (err: unknown) {
       console.error('Form submission error:', err);
-      const error = err as { response?: any, request?: any, message?: string };
-      
-      if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
-        setError(`❌ ${error.response.data?.message || `Error ${error.response.status}: ${error.response.statusText}`}`);
-      } else if (error.request) {
-        // The request was made but no response was received
-        setError('❌ Network error: No response from server. Please check your connection.');
+
+      if (err instanceof Error) {
+        const error = err as Error & {
+          response?: {
+            data?: { message?: string };
+            status?: number;
+            statusText?: string;
+          };
+          request?: unknown;
+        };
+
+        if (error.response) {
+          setError(
+            `❌ ${error.response.data?.message || `Error ${error.response.status}: ${error.response.statusText}`}`
+          );
+        } else if (error.request) {
+          setError('❌ Network error: No response from server. Please check your connection.');
+        } else {
+          setError(`❌ ${error.message || 'An unknown error occurred'}`);
+        }
       } else {
-        // Something happened in setting up the request that triggered an Error
-        setError(`❌ ${error.message || 'An unknown error occurred'}`);
+        setError('❌ An unexpected error occurred.');
       }
     } finally {
       setLoading(false);
     }
+
   };
 
 
@@ -204,10 +215,10 @@ export default function Preview() {
               {/* Editable fields: title, firstName, lastName, gender, dateOfBirth, nationality, email, phone, tin */}
               <div className="relative">
                 <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Title *</label>
-                <select 
-                  name="title" 
-                  value={formData.title} 
-                  onChange={handleChange} 
+                <select
+                  name="title"
+                  value={formData.title}
+                  onChange={handleChange}
                   className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                 >
                   <option value="Mr">Mr</option>
@@ -229,21 +240,21 @@ export default function Preview() {
 
               <div className="relative">
                 <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Last Name *</label>
-                <input 
-                  type="text" 
-                  name="lastName" 
-                  value={formData.lastName} 
-                  onChange={handleChange} 
-                  className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400" 
+                <input
+                  type="text"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
               </div>
 
               <div className="relative">
                 <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Gender *</label>
-                <select 
-                  name="gender" 
-                  value={formData.gender} 
-                  onChange={handleChange} 
+                <select
+                  name="gender"
+                  value={formData.gender}
+                  onChange={handleChange}
                   className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                 >
                   <option value="Male">Male</option>
@@ -253,21 +264,21 @@ export default function Preview() {
 
               <div className="relative">
                 <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Date of Birth *</label>
-                <input 
-                  type="date" 
-                  name="dateOfBirth" 
-                  value={formData.dateOfBirth} 
-                  onChange={handleChange} 
-                  className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400" 
+                <input
+                  type="date"
+                  name="dateOfBirth"
+                  value={formData.dateOfBirth}
+                  onChange={handleChange}
+                  className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
               </div>
 
               <div className="relative">
                 <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Nationality *</label>
-                <select 
-                  name="nationality" 
-                  value={formData.nationality} 
-                  onChange={handleChange} 
+                <select
+                  name="nationality"
+                  value={formData.nationality}
+                  onChange={handleChange}
                   className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                 >
                   <option value="Ethiopian">Ethiopian</option>
@@ -276,48 +287,48 @@ export default function Preview() {
 
               <div className="relative">
                 <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Email</label>
-                <input 
-                  type="email" 
-                  name="email" 
-                  value={formData.email} 
-                  onChange={handleChange} 
-                  className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400" 
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
               </div>
 
               <div className="relative">
                 <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Phone</label>
-                <input 
-                  type="text" 
-                  name="phone" 
-                  value={formData.phone} 
-                  onChange={handleChange} 
-                  className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400" 
+                <input
+                  type="text"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
               </div>
 
               <div className="relative">
                 <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1">TIN No.</label>
-                <input 
-                  type="text" 
-                  name="tin" 
-                  value={formData.tin} 
-                  onChange={handleChange} 
-                  className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400" 
+                <input
+                  type="text"
+                  name="tin"
+                  value={formData.tin}
+                  onChange={handleChange}
+                  className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
               </div>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 px-4">
-              <div><strong>Title:</strong> {formData.title}</div>
-              <div><strong>First Name:</strong> {formData.firstName}</div>
-              <div><strong>Last Name:</strong> {formData.lastName}</div>
-              <div><strong>Gender:</strong> {formData.gender}</div>
-              <div><strong>Date of Birth:</strong> {formData.dateOfBirth}</div>
-              <div><strong>Nationality:</strong> {formData.nationality}</div>
-              <div><strong>Email:</strong> {formData.email || 'Not provided'}</div>
-              <div><strong>Phone:</strong> {formData.phone || 'Not provided'}</div>
-              <div><strong>TIN No.:</strong> {formData.tin || 'Not provided'}</div>
+              <div><strong>Title:</strong> <p> {formData.title} </p> </div>
+              <div><strong>First Name:</strong> <p> {formData.firstName} </p></div>
+              <div><strong>Last Name:</strong> <p>{formData.lastName} </p></div>
+              <div><strong>Gender:</strong> <p>{formData.gender} </p> </div>
+              <div><strong>Date of Birth:</strong> <p> {formData.dateOfBirth} </p></div>
+              <div><strong>Nationality:</strong> <p> {formData.nationality} </p></div>
+              <div><strong>Email:</strong> <p>{formData.email || 'Not provided'} </p> </div>
+              <div><strong>Phone:</strong> <p> {formData.phone || 'Not provided'} </p> </div>
+              <div><strong>TIN No.:</strong> <p> {formData.tin || 'Not provided'} </p></div>
             </div>
           )}
         </div>
@@ -335,10 +346,10 @@ export default function Preview() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 p-4 border rounded-lg">
               <div className="relative">
                 <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Country *</label>
-                <select 
-                  name="country" 
-                  value={formData.country} 
-                  onChange={handleChange} 
+                <select
+                  name="country"
+                  value={formData.country}
+                  onChange={handleChange}
                   className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                 >
                   <option value="Ethiopia">Ethiopia</option>
@@ -424,15 +435,32 @@ export default function Preview() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 px-4">
-              <div><strong>Country:</strong> {formData.country}</div>
-              <div><strong>State:</strong> {formData.state || 'Not provided'}</div>
-              <div><strong>City:</strong> {formData.city || 'Not provided'}</div>
-              <div><strong>Subcity:</strong> {formData.subcity || 'Not provided'}</div>
-              <div><strong>Zone:</strong> {formData.zone || 'Not provided'}</div>
-              <div><strong>Wereda:</strong> {formData.wereda || 'Not provided'}</div>
-              <div><strong>Kebele:</strong> {formData.kebele || 'Not provided'}</div>
-              <div><strong>House No.:</strong> {formData.houseNo || 'Not provided'}</div>
+              <div>
+                <strong>Country:</strong> <p>{formData.country}</p>
+              </div>
+              <div>
+                <strong>State:</strong> <p>{formData.state || 'Not provided'}</p>
+              </div>
+              <div>
+                <strong>City:</strong> <p>{formData.city || 'Not provided'}</p>
+              </div>
+              <div>
+                <strong>Subcity:</strong> <p>{formData.subcity || 'Not provided'}</p>
+              </div>
+              <div>
+                <strong>Zone:</strong> <p>{formData.zone || 'Not provided'}</p>
+              </div>
+              <div>
+                <strong>Wereda:</strong> <p>{formData.wereda || 'Not provided'}</p>
+              </div>
+              <div>
+                <strong>Kebele:</strong> <p>{formData.kebele || 'Not provided'}</p>
+              </div>
+              <div>
+                <strong>House No.:</strong> <p>{formData.houseNo || 'Not provided'}</p>
+              </div>
             </div>
+
           )}
         </div>
 
