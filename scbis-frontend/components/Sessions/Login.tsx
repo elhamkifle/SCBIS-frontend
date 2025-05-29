@@ -68,7 +68,7 @@ export default function Login() {
                     refreshToken: data.refreshToken
                 });
                 console.log(data.user)
-                router.push('/policy-purchase/personal-information/personalDetails');
+                router.push('/dashboard');
             } else {
                 setError(data.message || "Login failed. Please check your credentials.");
             }
