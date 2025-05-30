@@ -2,14 +2,42 @@
 
 import { useRouter } from 'next/navigation';
 import { useVehiclePurposeStore } from '@/store/vehicleDetails/purpose';
-import { useState } from 'react';
+import { useVehicleSelectionStore } from '@/store/vehicleSelection/vehicleSelectionStore';
+import { useState, useEffect } from 'react';
 
 export default function ChoosePurposeForm() {
     const router = useRouter();
     const { selectedType, setSelectedType } = useVehiclePurposeStore();
+    const { isExistingVehicle, vehicleData } = useVehicleSelectionStore();
     const [error, setError] = useState('');
 
+    // Pre-fill form based on selected vehicle data
+    useEffect(() => {
+        console.log('🔍 Checking for pre-selected vehicle data...');
+        console.log('📋 Vehicle selection state:', { isExistingVehicle, vehicleData });
+        
+        if (isExistingVehicle && vehicleData) {
+            console.log('✅ Pre-filling purpose form with existing vehicle data');
+            
+            // Determine vehicle type from the selected vehicle
+            const vehicleType = vehicleData.vehicleType?.toLowerCase();
+            console.log(`🚗 Vehicle type from data: ${vehicleType}`);
+            
+            if (vehicleType === 'private' || vehicleType === 'commercial') {
+                setSelectedType(vehicleType);
+                console.log(`✅ Purpose pre-filled: ${vehicleType}`);
+            } else {
+                console.log('⚠️ Unknown vehicle type, user will need to select manually');
+            }
+        } else {
+            console.log('🆕 New vehicle creation - form will remain empty');
+            // Clear any previous selection for new vehicle
+            setSelectedType('');
+        }
+    }, [isExistingVehicle, vehicleData, setSelectedType]);
+
     const handleSelect = (type: string) => {
+        console.log(`👆 User manually selected: ${type}`);
         setSelectedType(type);
         setError('');
     };
@@ -19,7 +47,7 @@ export default function ChoosePurposeForm() {
             setError('Please select an insurance type.');
             return;
         }
-        console.log('Selected Insurance Type:', selectedType);
+        console.log('➡️ Proceeding with selected insurance type:', selectedType);
         router.push(
             selectedType === "private"
               ? "/policy-purchase/vehicle-information/privateVehicleCategory"

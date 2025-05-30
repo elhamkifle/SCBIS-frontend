@@ -1,14 +1,16 @@
 'use client';
 
-import { Edit, Check } from 'lucide-react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Edit, Check } from 'lucide-react';
 import { useVehiclePurposeStore } from '@/store/vehicleDetails/purpose';
 import { usePrivateVehicleCategoryStore } from '@/store/vehicleDetails/privateVehicleCategory';
 import { useGeneralVehicleStore } from '@/store/vehicleDetails/generalVehicle';
 import { useOwnershipUsageStore } from '@/store/vehicleDetails/ownershipAndUsage';
-import { useState } from 'react';
-import { useUserStore } from '@/store/authStore/useUserStore';
+import { useVehicleSelectionStore } from '@/store/vehicleSelection/vehicleSelectionStore';
+import { vehiclePersistenceService } from '@/utils/vehicleApi';
 import { baseAPI } from '@/utils/axiosInstance';
+import { useUserStore } from '@/store/authStore/useUserStore';
 
 type VehicleDetails = {
   make: string;
@@ -30,6 +32,7 @@ export default function PolicyPreview() {
   const { carType, usageType, setCarType, setUsageType } = usePrivateVehicleCategoryStore();
   const { formData: vehicleData, setFormData: setVehicleData } = useGeneralVehicleStore();
   const { formData: ownershipData, setFormData: setOwnershipData } = useOwnershipUsageStore();
+  const { isExistingVehicle, selectedVehicleId, vehicleData: selectedVehicleData } = useVehicleSelectionStore();
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -45,90 +48,139 @@ export default function PolicyPreview() {
   };
 
   const handleSubmit = async () => {
+    console.log('🚀 Starting vehicle submission process...');
+    console.log('📋 Vehicle selection context:', {
+      isExistingVehicle,
+      selectedVehicleId,
+      hasSelectedVehicleData: !!selectedVehicleData
+    });
 
     setError('');
     setIsLoading(true);
 
-    const vehicleKey = selectedType === 'private' ? 'privateVehicle' : 'commercialVehicle';
-
-    let category: string;
-    let usage: string[];
-
-    if (selectedType === 'private') {
-      const mapCarTypeToBackendCategory = (privateCarType: string): string => {
-        switch (privateCarType) {
-          case 'passenger': return 'Passenger Car';
-          case 'suvs': return 'SUV'; 
-          case 'pickup': return 'Pickup Truck';
-          case 'minivan': return 'Van/Minibus';
-          default: return 'Passenger Car';
-        }
+    try {
+      // Step 1: Build vehicle payload from form data
+      const formData = {
+        selectedType,
+        carType,
+        usageType,
+        vehicleData,
+        ownershipData
       };
-      const mapPrivateUsageTypeToArray = (privateUsageType: string): string[] => {
-        if (privateUsageType === 'personal') return ['Personal Use'];
-        if (privateUsageType === 'business') return ['Private Business Use'];
-        return ['Personal Use'];
-      };
-      category = mapCarTypeToBackendCategory(carType);
-      usage = mapPrivateUsageTypeToArray(usageType);
-    } else { // Commercial
-      category = "Passenger Car"; 
-      usage = ["Personal Use"];  
-    }
 
-    const payload = {
-      vehicleType: selectedType === 'private' ? "Private" : "Commercial",
-      vehicleCategory: category,
-      usageType: usage,
-      generalDetails: {
-        make: vehicleData.make,
-        model: vehicleData.model,
-        engineCapacity: vehicleData.engineCapacity ? parseInt(vehicleData.engineCapacity, 10) : undefined,
-        plateNumber: vehicleData.plateNo,
-        bodyType: vehicleData.bodyType,
-        engineNumber: vehicleData.engineNo
-      },
-      ownershipUsage: {
-        ownerType: ownershipData.ownerType,
-        purchasedValue: ownershipData.purchasedValue ? parseInt(ownershipData.purchasedValue, 10) : undefined,
-        dutyFree: ownershipData.dutyFree === "Yes" ? true : false,
-        driverType: ownershipData.driverType,
-        seatingCapacity: ownershipData.seatingCapacity ? parseInt(ownershipData.seatingCapacity, 10) : undefined
-      },
-      "policyType": "Comprehensive Cover",
-      "duration": 30,
-      "coverageArea": "Ethiopia Only",
-      "premium": 5000
-    };
+      const vehiclePayload = vehiclePersistenceService.buildVehiclePayload(formData);
+      console.log('🏗️ Built vehicle payload:', vehiclePayload);
 
-    console.log('Data being sent to backend:', payload);
-
-    const serverResponse = await baseAPI.post('/policy/vehicle-details', payload, {
-      headers: {
-        Authorization: `Bearer ${user?.accessToken}`
+      // Step 2: Save or update vehicle data
+      let vehiclePersistenceResult;
+      
+      if (isExistingVehicle && selectedVehicleId) {
+        console.log('🔄 Updating existing vehicle...');
+        vehiclePersistenceResult = await vehiclePersistenceService.saveVehicleData(
+          vehiclePayload,
+          true,
+          selectedVehicleId
+        );
+      } else {
+        console.log('🆕 Creating new vehicle...');
+        vehiclePersistenceResult = await vehiclePersistenceService.saveVehicleData(
+          vehiclePayload,
+          false
+        );
       }
-    });
 
-    if (serverResponse.status === 201) {
-      console.log('Policy submitted successfully:', serverResponse.data);
-      localStorage.removeItem('insurance-storage');
-      localStorage.removeItem('private-vehicle-storage');
-      localStorage.removeItem('general-vehicle-storage');
-      localStorage.removeItem('ownership-usage-storage');
-      router.push('/policy-purchase/purchase/policySelection');
-      alert('Policy submitted successfully!');
+      console.log('✅ Vehicle persistence completed:', vehiclePersistenceResult);
 
-    } else {
-      console.error('Error submitting policy:', serverResponse.data);
-      setError('❌ Some error occurred. Please try again.');
+      // Step 3: Continue with policy submission (existing logic)
+      const vehicleKey = selectedType === 'private' ? 'privateVehicle' : 'commercialVehicle';
+
+      let category: string;
+      let usage: string[];
+
+      if (selectedType === 'private') {
+        const mapCarTypeToBackendCategory = (privateCarType: string): string => {
+          switch (privateCarType) {
+            case 'passenger': return 'Passenger Car';
+            case 'suvs': return 'SUV'; 
+            case 'pickup': return 'Pickup Truck';
+            case 'minivan': return 'Van/Minibus';
+            default: return 'Passenger Car';
+          }
+        };
+        const mapPrivateUsageTypeToArray = (privateUsageType: string): string[] => {
+          if (privateUsageType === 'personal') return ['Personal Use'];
+          if (privateUsageType === 'business') return ['Private Business Use'];
+          return ['Personal Use'];
+        };
+        category = mapCarTypeToBackendCategory(carType);
+        usage = mapPrivateUsageTypeToArray(usageType);
+      } else { // Commercial
+        category = "Passenger Car"; 
+        usage = ["Personal Use"];  
+      }
+
+      const policyPayload =  {
+        vehicleType: selectedType === 'private' ? "Private" : "Commercial",
+        privateVehicle: {
+          vehicleCategory: category,
+          usageType: usage,
+          generalDetails: {
+            make: vehicleData.make,
+            model: vehicleData.model,
+            engineCapacity: vehicleData.engineCapacity ? parseInt(vehicleData.engineCapacity, 10) : undefined,
+            plateNumber: vehicleData.plateNo,
+            bodyType: vehicleData.bodyType,
+            engineNumber: vehicleData.engineNo
+          },
+          ownershipUsage: {
+            ownerType: ownershipData.ownerType,
+            purchasedValue: ownershipData.purchasedValue ? parseInt(ownershipData.purchasedValue, 10) : undefined,
+            dutyFree: ownershipData.dutyFree === "Yes" ? true : false,
+            driverType: ownershipData.driverType,
+            seatingCapacity: ownershipData.seatingCapacity ? parseInt(ownershipData.seatingCapacity, 10) : undefined
+          },
+        },
+      };
+
+      console.log('📋 Policy payload being sent to backend:', policyPayload);
+
+      const serverResponse = await baseAPI.post('/policy/vehicle-details', policyPayload, {
+        headers: {
+          Authorization: `Bearer ${user?.accessToken}`
+        }
+      });
+
+      if (serverResponse.status === 201) {
+        console.log('✅ Policy submitted successfully:', serverResponse.data);
+        
+        // Show success message with context
+        const successMessage = vehiclePersistenceResult.isUpdate 
+          ? 'Vehicle updated and policy submitted successfully!' 
+          : 'New vehicle created and policy submitted successfully!';
+        
+        alert(successMessage);
+        
+        // Clear form data
+        localStorage.removeItem('insurance-storage');
+        localStorage.removeItem('private-vehicle-storage');
+        localStorage.removeItem('general-vehicle-storage');
+        localStorage.removeItem('ownership-usage-storage');
+        localStorage.removeItem('vehicle-selection-storage');
+        
+        console.log('🧹 Cleared form storage');
+        router.push('/policy-purchase/purchase/policySelection');
+
+      } else {
+        console.error('❌ Error submitting policy:', serverResponse.data);
+        setError('❌ Some error occurred during policy submission. Please try again.');
+      }
+
+    } catch (error) {
+      console.error('❌ Vehicle submission failed:', error);
+      setError(`❌ Failed to save vehicle data: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
-  
-    
-  
-
-
   };
 
   const handlePrevious = () => {
