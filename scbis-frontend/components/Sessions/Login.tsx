@@ -43,6 +43,7 @@ export default function Login() {
 
         try {
             const serverResponse = await fetch(`https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/auth/login`, {
+            // const serverResponse = await fetch(`http://localhost:3001/auth/login`, {
                 method: "POST",
                 body: JSON.stringify({
                     identifier: email,

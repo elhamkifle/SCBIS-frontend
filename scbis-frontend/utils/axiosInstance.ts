@@ -3,6 +3,7 @@ import { useUserStore } from "@/store/authStore/useUserStore";
 
 export const baseAPI = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || "https://scbis-git-dev-hailes-projects-a12464a1.vercel.app",
+  // baseURL: 'http://localhost:3001',
   headers: {
     "Content-Type": "application/json",
     "Accept": "application/json"
