@@ -1,8 +1,8 @@
-"use client";
-// admin-panel/app/utils/withAuth.tsx
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import type { ComponentType, FC } from 'react';
+   "use client";
+   // admin-panel/app/utils/withAuth.tsx
+   import { useRouter } from 'next/navigation';
+   import { useEffect, useState } from 'react';
+   import type { ComponentType, FC } from 'react';
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 
 // Loading component for better UX
@@ -16,12 +16,12 @@ const LoadingSpinner = () => (
 );
 
 // Helper function to get and validate token
-const getAccessToken = (): string | null => {
-  if (typeof window !== "undefined") {
-    return localStorage.getItem('accessToken');
-  }
-  return null;
-};
+   const getAccessToken = (): string | null => {
+     if (typeof window !== "undefined") {
+       return localStorage.getItem('accessToken');
+     }
+     return null;
+   };
 
 // Helper function to check if token is expired (basic check)
 const isTokenExpired = (token: string): boolean => {
@@ -67,19 +67,19 @@ const clearAuthAndRedirect = (router: AppRouterInstance, currentPath?: string) =
   router.replace('/login');
 };
 
-const withAuth = <P extends object>(WrappedComponent: ComponentType<P>): FC<P> => {
-  const AuthComponent: FC<P> = (props) => {
-    const router = useRouter();
+   const withAuth = <P extends object>(WrappedComponent: ComponentType<P>): FC<P> => {
+     const AuthComponent: FC<P> = (props) => {
+       const router = useRouter();
     const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
+       useEffect(() => {
       const checkAuthentication = () => {
         try {
-          const token = getAccessToken();
+         const token = getAccessToken();
           const currentPath = window.location.pathname;
           
-          if (!token) {
+         if (!token) {
             console.log('No authentication token found. Redirecting to login...');
             clearAuthAndRedirect(router, currentPath);
             return;
@@ -101,7 +101,7 @@ const withAuth = <P extends object>(WrappedComponent: ComponentType<P>): FC<P> =
           }
 
           // All checks passed
-          setIsAuthenticated(true);
+           setIsAuthenticated(true);
         } catch (error) {
           console.error('Error during authentication check:', error);
           clearAuthAndRedirect(router);
@@ -121,16 +121,16 @@ const withAuth = <P extends object>(WrappedComponent: ComponentType<P>): FC<P> =
     // If not authenticated, show loading (redirect should be in progress)
     if (!isAuthenticated) {
       return <LoadingSpinner />;
-    }
+       }
 
-    // If authenticated, render the wrapped component
+       // If authenticated, render the wrapped component
     return <WrappedComponent {...props} />;
-  };
+     };
 
-  // Set a display name for easier debugging in React DevTools
-  AuthComponent.displayName = `WithAuth(${WrappedComponent.displayName || WrappedComponent.name || 'Component'})`;
+     // Set a display name for easier debugging in React DevTools
+     AuthComponent.displayName = `WithAuth(${WrappedComponent.displayName || WrappedComponent.name || 'Component'})`;
 
-  return AuthComponent;
-};
+     return AuthComponent;
+   };
 
-export default withAuth;
+   export default withAuth;

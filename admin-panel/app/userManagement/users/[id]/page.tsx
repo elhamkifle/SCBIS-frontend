@@ -38,7 +38,7 @@ export default function UserDetailsPage() {
         console.error("Failed to fetch user details:", err);
         setError(err instanceof Error ? err.message : "Failed to fetch user details");
       } finally {
-        setLoading(false);
+    setLoading(false);
       }
     };
 
@@ -252,44 +252,44 @@ ${user.claims.map(c => `- ${c.type} (${c.status}) - Submitted: ${c.submittedAt}`
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Basic Information */}
-          <Card>
+      <Card>
             <CardContent className="p-6">
               <h2 className="text-xl font-semibold mb-4">Basic Information</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-                <Detail label="Full Name" value={user.fullname} />
-                <Detail label="Phone Number" value={user.phoneNumber} />
-                <Detail label="Email" value={user.email} />
-                <Detail label="Roles" value={user.roles.join(", ")} />
-                <Detail label="Phone Verified" value={user.isPhoneVerified ? "Yes" : "No"} />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+            <Detail label="Full Name" value={user.fullname} />
+            <Detail label="Phone Number" value={user.phoneNumber} />
+            <Detail label="Email" value={user.email} />
+            <Detail label="Roles" value={user.roles.join(", ")} />
+            <Detail label="Phone Verified" value={user.isPhoneVerified ? "Yes" : "No"} />
                 <Detail label="Wallet Address" value={user.walletAddress || "Not provided"} />
                 <Detail label="Account Created" value={new Date(user.accountCreatedAt).toLocaleDateString()} />
                 <Detail label="Last Active" value={new Date(user.lastActive).toLocaleDateString()} />
                 <Detail label="TIN Number" value={user.tinNumber || "Not provided"} />
                 <Detail label="Title" value={user.title || "Not provided"} />
-                <Detail label="Country" value={user.country} />
+            <Detail label="Country" value={user.country} />
                 <Detail label="Region / State" value={user.regionOrState || "Not provided"} />
-                <Detail label="City" value={user.city} />
-                <Detail label="Subcity" value={user.subcity} />
-                <Detail label="Zone" value={user.zone} />
+            <Detail label="City" value={user.city} />
+            <Detail label="Subcity" value={user.subcity} />
+            <Detail label="Zone" value={user.zone} />
                 <Detail label="Woreda" value={user.woreda || "Not provided"} />
-                <Detail label="Kebele" value={user.kebele} />
+            <Detail label="Kebele" value={user.kebele} />
                 <Detail label="House Number" value={user.houseNumber || "Not provided"} />
-              </div>
-            </CardContent>
-          </Card>
+          </div>
+        </CardContent>
+      </Card>
 
           {/* Notes */}
-          <Card>
-            <CardContent className="p-6 space-y-2">
-              <h2 className="text-xl font-semibold mb-2">Notes / Flags</h2>
-              <p className="text-gray-700 bg-gray-100 p-3 rounded-md shadow-sm whitespace-pre-line">
+      <Card>
+        <CardContent className="p-6 space-y-2">
+          <h2 className="text-xl font-semibold mb-2">Notes / Flags</h2>
+          <p className="text-gray-700 bg-gray-100 p-3 rounded-md shadow-sm whitespace-pre-line">
                 {user.notes || "No notes available for this user."}
-              </p>
-            </CardContent>
-          </Card>
+          </p>
+        </CardContent>
+      </Card>
 
           {/* Policies */}
-          <Card>
+      <Card>
             <CardContent className="p-6">
               <h2 className="text-xl font-semibold mb-4">Policies ({user.policies.length})</h2>
               {user.policies.length === 0 ? (
@@ -314,22 +314,22 @@ ${user.claims.map(c => `- ${c.type} (${c.status}) - Submitted: ${c.submittedAt}`
                           {policy.status}
                         </span>
                       </div>
-                    </div>
-                  ))}
+        </div>
+          ))}
                 </div>
-              )}
-            </CardContent>
-          </Card>
+          )}
+        </CardContent>
+      </Card>
 
           {/* Claims */}
-          <Card>
+      <Card>
             <CardContent className="p-6">
               <h2 className="text-xl font-semibold mb-4">Claims ({user.claims.length})</h2>
               {user.claims.length === 0 ? (
                 <p className="text-gray-500">No claims found.</p>
               ) : (
                 <div className="space-y-3">
-                  {user.claims.map((claim) => (
+          {user.claims.map((claim) => (
                     <div key={claim.id} className="border p-3 rounded-md">
                       <div className="flex justify-between items-start">
                         <div>
@@ -347,8 +347,8 @@ ${user.claims.map(c => `- ${c.type} (${c.status}) - Submitted: ${c.submittedAt}`
                           {claim.status}
                         </span>
                       </div>
-                    </div>
-                  ))}
+            </div>
+          ))}
                 </div>
               )}
             </CardContent>
@@ -400,8 +400,8 @@ ${user.claims.map(c => `- ${c.type} (${c.status}) - Submitted: ${c.submittedAt}`
                   <span className="font-medium">{user.claims.filter(c => c.status === 'Pending').length}</span>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+        </CardContent>
+      </Card>
         </div>
       </div>
 

@@ -114,6 +114,55 @@ export interface AuthResponse {
   user: AdminProfile;
 }
 
+export interface PurchaseRequest {
+  id: string;
+  user: {
+    id: string;
+    name: string;
+    email?: string;
+    phoneNumber?: string;
+  };
+  policyType: string;
+  submittedOn: string;
+  status: string;
+  duration?: number;
+  coverageArea?: string;
+  premium?: number;
+  createdAt?: string;
+  documents?: {
+    url?: string;
+    name?: string;
+    type?: string;
+  }[];
+  vehicle?: {
+    type: string;
+    details: {
+      usageType: string[];
+      vehicleCategory: string;
+      generalDetails: {
+        make: string;
+        model: string;
+        engineCapacity: number;
+        plateNumber: string;
+        bodyType: string;
+        engineNumber: string;
+      };
+      ownershipUsage: {
+        ownerType: string;
+        purchasedValue: number;
+        dutyFree: boolean;
+        driverType: string;
+        seatingCapacity: number;
+      };
+      _id: string;
+    };
+  };
+}
+
+export interface PurchaseRequestsResponse {
+  data: PurchaseRequest[];
+}
+
 // Helper function to get auth token
 const getAuthToken = (): string | null => {
   if (typeof window !== "undefined") {
@@ -301,4 +350,45 @@ export const authApi = {
   },
 };
 
-export default { userApi, adminApi, authApi }; 
+// Purchase Requests API
+export const purchaseRequestsApi = {
+  // Get list of purchase requests
+  getAll: async (params: {
+    status?: string;
+    page?: number;
+    limit?: number;
+  } = {}): Promise<PurchaseRequestsResponse> => {
+    const searchParams = new URLSearchParams();
+    
+    if (params.status) searchParams.append('status', params.status);
+    if (params.page) searchParams.append('page', params.page.toString());
+    if (params.limit) searchParams.append('limit', params.limit.toString());
+
+    const queryString = searchParams.toString();
+    const endpoint = `/admin/purchase-requests${queryString ? `?${queryString}` : ''}`;
+    
+    return apiRequest<PurchaseRequestsResponse>(endpoint);
+  },
+
+  // Get specific purchase request details
+  getById: async (id: string): Promise<PurchaseRequest> => {
+    return apiRequest<PurchaseRequest>(`/admin/purchase-requests/${id}`);
+  },
+
+  // Approve a purchase request (if needed)
+  approve: async (id: string): Promise<{ message: string }> => {
+    return apiRequest<{ message: string }>(`/admin/purchase-requests/${id}/approve`, {
+      method: 'PUT',
+    });
+  },
+
+  // Reject a purchase request (if needed)
+  reject: async (id: string, reason: string): Promise<{ message: string }> => {
+    return apiRequest<{ message: string }>(`/admin/purchase-requests/${id}/reject`, {
+      method: 'POST',
+      body: JSON.stringify({ reason }),
+    });
+  },
+};
+
+export default { userApi, adminApi, authApi, purchaseRequestsApi }; 
