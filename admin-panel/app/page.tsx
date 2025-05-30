@@ -39,9 +39,11 @@ function Home() {
           ></div>
         )}
 
-        {/* Dashboard Content */}
-        <div className="flex-1">
-          <AdminDashboardPage />
+        {/* Dashboard + Summary + Pie Chart */}
+        <div className="flex-1 overflow-auto">
+          <div className="p-4">
+            <AdminDashboardPage />
+          </div>
         </div>
       </div>
     </div>
