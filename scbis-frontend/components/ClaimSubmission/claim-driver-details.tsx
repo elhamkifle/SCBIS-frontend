@@ -127,7 +127,7 @@ export default function ClaimDriverDetails() {
           <p className="text-lg">Please State the Driver&rsquo;s</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
             <div className="relative w-full">
-              <label className="absolute left-4 -top-2 text-black text-md bg-white px-1">First Name</label>
+              <label htmlFor="firstName"  aria-label="First Name" className="absolute left-4 -top-2 text-black text-md bg-white px-1">First Name</label>
               <input
                 type="text"
                 name="firstName"
@@ -138,7 +138,7 @@ export default function ClaimDriverDetails() {
               />
             </div>
             <div className="relative w-full">
-              <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Last Name</label>
+              <label aria-label="Last Name"  className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Last Name</label>
               <input
                 type="text"
                 name="lastName"
@@ -149,7 +149,7 @@ export default function ClaimDriverDetails() {
               />
             </div>
             <div className="relative w-full">
-              <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Age</label>
+              <label aria-label="age" className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Age</label>
               <input
                 type="text"
                 name="age"
@@ -164,7 +164,7 @@ export default function ClaimDriverDetails() {
           <h3 className="mt-6 text-blue-600 font-semibold">Address</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
             <div className="relative w-full">
-              <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">City</label>
+              <label aria-label="city" className="absolute left-4 -top-2 text-black bg-white text-sm px-1">City</label>
               <select
                 name="city"
                 value={formData.city}
@@ -179,7 +179,7 @@ export default function ClaimDriverDetails() {
               </select>
             </div>
             <div className="relative w-full">
-              <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Subcity</label>
+              <label aria-label="subCity" className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Subcity</label>
               <input
                 type="text"
                 name="subCity"
@@ -190,7 +190,7 @@ export default function ClaimDriverDetails() {
               />
             </div>
             <div className="relative w-full">
-              <label className="absolute left-4 -top-2 text-black text-md bg-white px-1">Kebele</label>
+              <label aria-label="kebele" className="absolute left-4 -top-2 text-black text-md bg-white px-1">Kebele</label>
               <input
                 type="text"
                 name="kebele"
@@ -203,7 +203,7 @@ export default function ClaimDriverDetails() {
           </div>
 
           <div className="relative max-w-xs md:mt-6 mt-2">
-            <label className="absolute left-4 -top-2 text-black text-md bg-white px-1">Phone Number</label>
+            <label aria-label="phoneNumber" className="absolute left-4 -top-2 text-black text-md bg-white px-1">Phone Number</label>
             <input
               type="text"
               name="phoneNumber"
@@ -217,7 +217,7 @@ export default function ClaimDriverDetails() {
           <h3 className="mt-6 text-blue-600 font-semibold">Driver&rsquo;s License</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
             <div className="relative w-full">
-              <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">License No.</label>
+              <label aria-label="licenseNo" className="absolute left-4 -top-2 text-black bg-white text-sm px-1">License No.</label>
               <input
                 type="text"
                 name="licenseNo"
@@ -228,7 +228,7 @@ export default function ClaimDriverDetails() {
               />
             </div>
             <div className="relative w-full">
-              <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Grade</label>
+              <label aria-label="grade" className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Grade</label>
               <select
                 name="grade"
                 value={formData.grade}
@@ -243,7 +243,7 @@ export default function ClaimDriverDetails() {
               </select>
             </div>
             <div className="relative w-full">
-              <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Expiration Date</label>
+              <label aria-label="date" className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Expiration Date</label>
               <input
                 type="date"
                 name="expirationDate"
