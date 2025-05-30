@@ -153,6 +153,8 @@ export default function Preview() {
       // Use the updateUserData utility instead of direct API call
       await updateUserData(submissionData);
 
+      console.log('✅ Personal information submitted successfully!');
+      console.log('➡️ Navigating to vehicle list page...');
       alert('Application Submitted!');
       router.push('/policy-purchase/vehicle-information/vehicle-list');
       
