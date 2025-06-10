@@ -131,7 +131,7 @@ export default function Header() {
         <Link href="/policy-purchase/personal-information/personalDetails" className="text-white hover:text-green-400 font-syne">
           Policy Purchase
         </Link>
-        <Link href="/claim-submission/vehicle-selection" className="text-white hover:text-green-400 font-syne">
+        <Link href="/claim-submission/claim-policy-selection" className="text-white hover:text-green-400 font-syne">
           Claim Submission
         </Link>
         <Link href="#" className="text-white hover:text-green-400 font-syne">
@@ -198,7 +198,7 @@ export default function Header() {
             <Link href="/policy-purchase/personal-information/personalDetails" className="text-white hover:text-green-400">
               Policy Purchase
             </Link>
-            <Link href="/claim-submission/vehicle-selection" className="text-white hover:text-green-400">
+            <Link href="/claim-submission/claim-policy-selection" className="text-white hover:text-green-400">
               Claim Submission
             </Link>
             <Link href="#" className="text-white hover:text-green-400">

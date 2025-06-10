@@ -23,7 +23,7 @@ const actionLabels = [
 
 const actionLinks: Record<typeof actionLabels[number], string> = {
   "New Policy Purchase": "/policy-purchase/personal-information/personalDetails",
-  "Submit a Claim": "/claim-submission/vehicle-selection",
+  "Submit a Claim": "/claim-submission/claim-policy-selection",
   "Renew Policy": "/policy-purchase/personal-information/personalDetails",
 };
 
