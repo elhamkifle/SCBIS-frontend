@@ -154,8 +154,8 @@ export default function Preview() {
       await updateUserData(submissionData);
 
       alert('Application Submitted!');
-      router.push('/policy-purchase/vehicle-information/purpose');
-
+      router.push('/policy-purchase/vehicle-information/vehicle-list');
+      
       // Clear personal details and address from localStorage
       localStorage.removeItem('personal-details-storage');
       localStorage.removeItem('address-details-storage');

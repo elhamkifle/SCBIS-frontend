@@ -1,36 +1,96 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Menu, X, Bell, HelpCircle, Settings, LogOut, User, Expand, CheckCheck } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useNotificationStore } from "@/store/notificationStore/notifications";;
 import { useUserStore } from "@/store/authStore/useUserStore";
+import { fetchUserData } from '@/utils/userUtils';
+
+const API_BASE_URL = "https://scbis-git-dev-hailes-projects-a12464a1.vercel.app";
 
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
-  const [filter, setFilter] = useState<"All" | "Unread">("All");
 
-  // Use the Zustand store
   const {
     notifications,
+    filter,
     markAsRead,
     markAllAsRead,
+    setFilter,
+    setNotifications,
   } = useNotificationStore();
+
+  const { user } = useUserStore();
+  const [, setLoading] = useState(true);
+  const [, setError] = useState("");
+
+  const filteredNotifications =
+    filter === "All" ? notifications : notifications.filter((n) => n.category === filter);
+
+  useEffect(() => {
+    const loadUserData = async () => {
+      try {
+        setLoading(true);
+        await fetchUserData(); // This internally sets user
+      } catch (err) {
+        console.error("Error fetching user data:", err);
+        setError("Failed to load the latest user data.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUserData();
+  }, []);
+
+  useEffect(() => {
+    if (!user?._id || !user.accessToken) return;
+
+    // Initial fetch of notifications
+    fetch(`${API_BASE_URL}/notifications/user/${user._id}`, {
+      headers: {
+        Authorization: `Bearer ${user.accessToken}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => setNotifications(data))
+      .catch((err) => console.error("Failed to fetch notifications", err));
+
+    // Socket.io logic commented out until backend supports it
+    /*
+    const socket = io(SOCKET_URL, {
+      auth: {
+        token: user.accessToken,
+      },
+    });
+
+    socket.emit("joinNotifications", user._id);
+
+    socket.on("newNotification", (notification) => {
+      addNotification(notification);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+    */
+  }, [user]);
 
   const router = useRouter();
   const logout = useUserStore((state) => state.logout);
 
-  const filteredNotifications = filter === "Unread"
-    ? notifications.filter(n => n.unread)
-    : notifications;
 
-  const handleNotificationClick = (notificationId: number) => {
+  const unreadCount = notifications.filter(n => !n.isRead).length;
+
+  const handleNotificationClick = (notificationId: string) => {
     markAsRead(notificationId);
     router.push("/notifications");
+    setNotificationsOpen(false);
   };
 
   const handleExpandClick = () => {
@@ -41,7 +101,22 @@ export default function Header() {
     const confirmLogout = window.confirm("Are you sure you want to log out?");
     if (confirmLogout) {
       logout();
-      router.push('/');
+      router.push('/login');
+    }
+  };
+
+   const handleMarkAllAsRead = async () => {
+    if (!user?.accessToken) return;
+    try {
+      await fetch(`${API_BASE_URL}/notifications/read-all/${user._id}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${user.accessToken}`,
+        },
+      });
+      markAllAsRead();
+    } catch (err) {
+      console.error("Failed to mark all notifications as read", err);
     }
   };
 
@@ -50,7 +125,7 @@ export default function Header() {
     <header className="bg-[#1F4878] font-semibold text-white p-8 flex justify-between items-center relative">
       {/* Navigation Links (Desktop) */}
       <nav className="hidden lg:flex lg:space-x-8 lg:items-center w-full justify-center">
-        <Link href="/landing-page" className="text-white hover:text-green-400 font-syne">
+        <Link href="/dashboard" className="text-white hover:text-green-400">
           Home
         </Link>
         <Link href="/policy-purchase/personal-information/personalDetails" className="text-white hover:text-green-400 font-syne">
@@ -67,6 +142,7 @@ export default function Header() {
         </Link>
       </nav>
 
+
       {/* Bell Icon (Right side on large screens) */}
       <div className="hidden lg:block absolute right-4">
         <div className="relative">
@@ -75,7 +151,7 @@ export default function Header() {
             className="cursor-pointer"
             onClick={() => setNotificationsOpen(!notificationsOpen)}
           />
-          {notifications.some(n => n.unread) && (
+          {unreadCount > 0 && (
             <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
           )}
         </div>
@@ -97,7 +173,7 @@ export default function Header() {
             className="cursor-pointer"
             onClick={() => setNotificationsOpen(!notificationsOpen)}
           />
-          {notifications.some(n => n.unread) && (
+          {unreadCount > 0 && (
             <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
           )}
         </div>
@@ -116,7 +192,7 @@ export default function Header() {
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className="w-full bg-[#1F4878] font-semibold flex flex-col items-center space-y-4 p-8 lg:hidden absolute top-16 left-0 right-0 shadow-md"
           >
-            <Link href="landing-page" className="text-white hover:text-green-400">
+            <Link href="/" className="text-white hover:text-green-400">
               Home
             </Link>
             <Link href="/policy-purchase/personal-information/personalDetails" className="text-white hover:text-green-400">
@@ -162,7 +238,7 @@ export default function Header() {
             className="absolute top-16 right-4 bg-white text-black rounded-lg shadow-lg w-80 lg:w-1/2 p-4 z-50"
           >
             <div className="flex justify-between items-center mb-6 pt-2">
-              <p className="text-xl"> Notifications </p>
+              <p className="text-xl font-semibold">Notifications</p>
 
               <div className="flex gap-2 items-center">
                 <Expand
@@ -182,43 +258,56 @@ export default function Header() {
                 <span
                   className={`cursor-pointer ${filter === "All" ? "font-bold" : "text-gray-500"}`}
                   onClick={() => setFilter("All")}
-                >All</span>
+                >
+                  All ({notifications.length})
+                </span>
                 <span
                   className={`cursor-pointer ${filter === "Unread" ? "font-bold" : "text-gray-500"}`}
                   onClick={() => setFilter("Unread")}
-                >Unread ({notifications.filter(n => n.unread).length})</span>
+                >
+                  Unread ({unreadCount})
+                </span>
               </div>
               <div className="flex gap-2 items-center">
-                <CheckCheck size={20} className="text-blue-500 cursor-pointer" onClick={markAllAsRead} />
-                <span className="text-black cursor-pointer hover:underline" onClick={markAllAsRead}>Mark All as Read</span>
+                <CheckCheck
+                  size={20}
+                  className="text-blue-500 cursor-pointer"
+                  onClick={handleMarkAllAsRead}
+                />
+                <span
+                  className="text-black cursor-pointer hover:underline"
+                  onClick={handleMarkAllAsRead}
+                >
+                  Mark All as Read
+                </span>
               </div>
             </div>
-            <div className="space-y-2 lg:space-y-6">
+            <div className="space-y-2 lg:space-y-6 max-h-[300px] overflow-y-auto">
+              {filteredNotifications.length === 0 && (
+                <p className="text-center text-gray-500">No notifications found.</p>
+              )}
               {filteredNotifications.map((notification) => (
                 <div
-                  key={notification.id}
+                  key={notification._id}
                   className="px-4 py-2 rounded flex justify-between items-start hover:bg-gray-100 cursor-pointer"
-                  onClick={() => handleNotificationClick(notification.id)}
+                  onClick={() => handleNotificationClick(notification._id)}
                 >
                   <div className="w-full flex flex-col justify-between">
-                    <div className={`${notification.unread ? "font-bold" : ""} text-black mb-2`}>
-                      {notification.title}
+                    <div className={`${!notification.isRead ? "font-bold" : ""} text-black mb-2`}>
+                      {/* {notification.title} */}
                     </div>
+
+                     <div className="flex flex-col gap-4">
+                  {notification.message && (
+                    <div className="text-sm text-gray-600">
+                      {notification.message}
+                    </div>
+                  )}
+                </div>
                     <div className="text-xs text-gray-400">
-                      {notification.date} | {notification.time}
+                      {new Date(notification.createdAt).toLocaleDateString()} |{" "}
+                      {new Date(notification.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {notification.unread && (
-                      <CheckCheck
-                        size={20}
-                        className="cursor-pointer text-green-500 hover:text-green-700"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          markAsRead(notification.id);
-                        }}
-                      />
-                    )}
                   </div>
                 </div>
               ))}

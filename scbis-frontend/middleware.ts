@@ -10,9 +10,9 @@ const protectedRoutes = [
 
 // Define which routes are public (login, signup, etc.)
 const authRoutes = [
-  '/',
   '/login',
   '/signup',
+  '/signup2',
   '/verification'
 ];
 
@@ -51,7 +51,7 @@ export function middleware(request: NextRequest) {
   // If user is already authenticated and tries to access login/signup pages,
   // redirect them to the personal details page
   if (isAuthRoute && authToken) {
-    const url = new URL('/policy-purchase/personal-information/personalDetails', request.url);
+    const url = new URL('/', request.url);
     return NextResponse.redirect(url);
   }
   

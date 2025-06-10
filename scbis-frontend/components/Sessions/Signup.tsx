@@ -19,7 +19,7 @@ export default function Signup() {
     }
 
     const Login = () => {
-        router.push('/')
+        router.push('/login')
     }
 
     return (

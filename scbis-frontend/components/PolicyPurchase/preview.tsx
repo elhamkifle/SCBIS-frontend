@@ -7,6 +7,8 @@ import { usePolicyStore } from '@/store/policyPurchase/policySelection';
 import { usePolicyDurationStore } from '@/store/policyPurchase/policyDurationAndJurisdiction';
 import { useVehicleInfoStore } from '@/store/policyPurchase/vehicleDetails';
 import { useDriverInformationStore } from '@/store/policyPurchase/driverInformation';
+import { useVehicleSelectionStore } from '@/store/vehicleSelection/vehicleSelectionStore';
+import { policySelectionService, buildPolicySelectionPayload } from '@/utils/policyApi';
 
 export default function PolicyPreview() {
   const router = useRouter();
@@ -16,6 +18,7 @@ export default function PolicyPreview() {
   const { policyDuration, jurisdiction, updateFormData: updateDuration } = usePolicyDurationStore();
   const { formData: vehicleData, updateFormData: updateVehicle } = useVehicleInfoStore();
   const { formData: driverData, updateFormData: updateDriver } = useDriverInformationStore();
+  const { selectedVehicleId, vehicleData: selectedVehicleData } = useVehicleSelectionStore();
 
   // Local state for editable fields
   const [formData, setFormData] = useState({
@@ -24,6 +27,9 @@ export default function PolicyPreview() {
     ...vehicleData,
     ...driverData
   });
+
+  // Loading state for submission
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Merge store data into local state
   useEffect(() => {
@@ -131,10 +137,41 @@ export default function PolicyPreview() {
     );
   };
 
-  const handleSubmit = () => {
-    console.log('Submitting policy:', {
-      selectedPolicy,
-      durationData: {
+  const handleSubmit = async () => {
+    // Validation checks
+    if (!selectedVehicleId && !selectedVehicleData?._id) {
+      alert('Error: No vehicle selected. Please go back and select a vehicle.');
+      return;
+    }
+
+    if (!selectedPolicy) {
+      alert('Error: No policy selected. Please select a policy type.');
+      return;
+    }
+
+    if (!formData.policyDuration || !formData.jurisdiction) {
+      alert('Error: Please complete policy duration and jurisdiction information.');
+      return;
+    }
+
+    if (!formData.acceptTerms) {
+      alert('Error: Please accept the terms and conditions to continue.');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Get the vehicle ID (either from selected existing vehicle or newly created vehicle)
+      const vehicleId = selectedVehicleId || selectedVehicleData?._id;
+      
+      if (!vehicleId) {
+        throw new Error('Vehicle ID not found. Please complete vehicle information first.');
+      }
+
+      console.log('🔄 Submitting policy application with data:', {
+        vehicleId,
+        selectedPolicy,
         policyDuration: formData.policyDuration,
         jurisdiction: formData.jurisdiction
       },
@@ -855,10 +892,15 @@ export default function PolicyPreview() {
         <div className="w-full max-w-5xl flex items-center justify-end mt-8">
           <button
             type="submit"
-            className="bg-green-500 text-white p-10 py-2 rounded hover:bg-green-600"
+            disabled={isSubmitting}
+            className={`px-10 py-2 rounded text-white font-medium transition-colors ${
+              isSubmitting 
+                ? 'bg-gray-400 cursor-not-allowed' 
+                : 'bg-green-500 hover:bg-green-600'
+            }`}
             onClick={handleSubmit}
           >
-            Submit Application
+            {isSubmitting ? 'Submitting...' : 'Submit Application'}
           </button>
         </div>
       </div>

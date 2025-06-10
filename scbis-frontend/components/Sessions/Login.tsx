@@ -7,6 +7,7 @@ import { AuthSchemaType } from "@/schema/zodSchema";
 import { useUserStore } from "@/store/authStore/useUserStore";
 import Link from "next/link";
 
+
 export default function Login() {
     const setUser = useUserStore((state) => state.setUser);
     const { email, password, error, setEmail, setPassword, setError, resetLogin } = useLoginStore();
@@ -43,6 +44,7 @@ export default function Login() {
 
         try {
             const serverResponse = await fetch(`https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/auth/login`, {
+            // const serverResponse = await fetch(`http://localhost:3001/auth/login`, {
                 method: "POST",
                 body: JSON.stringify({
                     identifier: email,
@@ -68,7 +70,7 @@ export default function Login() {
                     refreshToken: data.refreshToken
                 });
                 console.log(data.user)
-                router.push('/policy-purchase/personal-information/personalDetails');
+                router.push('/dashboard');
             } else {
                 setError(data.message || "Login failed. Please check your credentials.");
             }

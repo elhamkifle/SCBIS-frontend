@@ -44,6 +44,11 @@ export default function DamageDetails() {
   };
 
   const handleNext = async () => {
+    if (!vehicleDamageDesc && !thirdPartyDamageDesc && !injuriesAny) {
+      setError('Please fill at least one damage detail');
+      return;
+    }
+
     if (!vehicleFiles.length && !vehicleDamageDesc.trim()) {
       return setError('❌ Please upload a photo or provide a description of the damage to your vehicle.');
     }
@@ -84,8 +89,8 @@ export default function DamageDetails() {
   };
 
   const renderDropArea = (
-    files: File[], 
-    setFiles: React.Dispatch<React.SetStateAction<File[]>>, 
+    files: File[],
+    setFiles: React.Dispatch<React.SetStateAction<File[]>>,
     inputId: string
   ) => (
     <div
@@ -99,15 +104,15 @@ export default function DamageDetails() {
     >
       <p className='text-xl font-bold mb-2'>Drop Files Here</p>
       <p className='text-md font-bold mb-4'>Or</p>
-      <input 
-        type="file" 
-        id={inputId} 
-        accept=".pdf,.jpg,.png" 
+      <input
+        type="file"
+        id={inputId}
+        accept=".pdf,.jpg,.png"
         onChange={(e) => {
           const file = e.target.files?.[0];
           if (file) setFiles([file]); // Only one file allowed
-        }} 
-        className="hidden" 
+        }}
+        className="hidden"
       />
       <label htmlFor={inputId} className="bg-green-500 text-white px-4 py-2 rounded cursor-pointer hover:bg-green-600">
         Browse Files
@@ -115,8 +120,8 @@ export default function DamageDetails() {
       {files.map((file, index) => (
         <div key={index} className="mt-2 text-green-500 text-sm">
           ✅ File ready for upload: {file.name}
-          <button 
-            onClick={() => setFiles([])} 
+          <button
+            onClick={() => setFiles([])}
             className="ml-2 text-red-500 hover:text-red-700"
           >
             Delete
@@ -171,23 +176,23 @@ export default function DamageDetails() {
         <label className="block font-semibold mb-2">Were there any injuries resulting from the accident?</label>
         <div className="flex gap-4 mb-2">
           <label className="flex items-center">
-            <input 
-              type="radio" 
-              name="injuriesAny" 
-              onChange={() => setinjuriesAny(true)} 
-              checked={injuriesAny} 
-              className="mr-2" 
-            /> 
+            <input
+              type="radio"
+              name="injuriesAny"
+              onChange={() => setinjuriesAny(true)}
+              checked={injuriesAny}
+              className="mr-2"
+            />
             Yes
           </label>
           <label className="flex items-center">
-            <input 
-              type="radio" 
-              name="injuriesAny" 
-              onChange={() => setinjuriesAny(false)} 
-              checked={!injuriesAny} 
-              className="mr-2" 
-            /> 
+            <input
+              type="radio"
+              name="injuriesAny"
+              onChange={() => setinjuriesAny(false)}
+              checked={!injuriesAny}
+              className="mr-2"
+            />
             No
           </label>
         </div>
@@ -196,18 +201,18 @@ export default function DamageDetails() {
             <label className='font-semibold'>If so, please state</label>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
               <div className="relative w-full">
-                <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Name of the Person</label>
+                <label htmlFor='injuredPersonName' className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Name of the Person</label>
                 <input
                   className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-                  value={injuredPersons.name}
+                  value={injuredPersons.name} id='injuredPersonName'
                   onChange={(e) => setInjuredPersons({ name: e.target.value })}
                 />
               </div>
               <div className="relative w-full">
-                <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Address of the Person</label>
+                <label htmlFor='injuredPersonAddress' className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Address of the Person</label>
                 <input
                   className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-                  value={injuredPersons.address}
+                  value={injuredPersons.address} id='injuredPersonAddress'
                   onChange={(e) => setInjuredPersons({ address: e.target.value })}
                 />
               </div>

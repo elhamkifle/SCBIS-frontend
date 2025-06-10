@@ -23,7 +23,7 @@ export function withAuth(Component: React.ComponentType, requireAuth = true) {
 
       // If auth is required but user isn't authenticated
       if (requireAuth && !isAuthenticated) {
-        router.push('/');
+        router.push('/login');
       }
       
       // If auth is not required but user is authenticated (for login/signup pages)

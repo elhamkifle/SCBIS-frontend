@@ -24,6 +24,7 @@ export default function AccidentDetails() {
     visibilityObstructions,
     intersectionType,
     // sketchFiles,
+    // sketchFiles,
     error,
     addVehicle,
     removeVehicle,
@@ -143,7 +144,7 @@ export default function AccidentDetails() {
         formData.append('upload_preset', 'docuploads'); // your Cloudinary preset
 
         const res = await axios.post(
-          'https://api.cloudinary.com/v1_1/dmzvqehan/upload', // replace with your cloud name
+          'https://api.cloudinary.com/v1_1/dmzvqehan/upload',
           formData
         );
 
@@ -213,8 +214,9 @@ export default function AccidentDetails() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="relative w-full">
-          <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Date of Accident *</label>
+          <label htmlFor='dateOfAccident' aria-label='dateOfAccident' className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Date of Accident *</label>
           <input
+             id="dateOfAccident"
             type="date"
             name="dateOfAccident"
             value={dateOfAccident}
@@ -226,8 +228,9 @@ export default function AccidentDetails() {
 
         {/* Time of Accident */}
         <div className="relative w-full">
-          <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Time of Accident *</label>
+          <label htmlFor='timeOfAccident' aria-label='time' className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Time of Accident *</label>
           <input
+            id='timeOfAccident'
             type="time"
             name="timeOfAccident"
             value={timeOfAccident}
@@ -239,8 +242,9 @@ export default function AccidentDetails() {
 
         {/* Speed */}
         <div className="relative w-full">
-          <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Speed (km/h) *</label>
+          <label htmlFor='speed' aria-label='speed' className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Speed (km/h) *</label>
           <input
+            id='speed'
             type="number"
             name="speed"
             value={speed}
@@ -256,7 +260,7 @@ export default function AccidentDetails() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-2">
         {['city', 'subCity', 'kebele', 'sefer'].map((field) => (
           <div className="relative w-full" key={field}>
-            <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1 capitalize">
+            <label aria-label={field} className="absolute left-4 -top-2 text-black text-sm bg-white px-1 capitalize">
               {field} *
             </label>
             <input
@@ -277,8 +281,9 @@ export default function AccidentDetails() {
         <p className="font-semibold">Position of Vehicle on Road (Relative to Road Edge)</p>
         <div className="flex flex-wrap lg:flex-nowrap gap-4">
           {['Left Side of Lane', 'Center of Lane', 'Right of Lane', 'Accident Was Not on a Road'].map((pos) => (
-            <label key={pos} className="flex items-center">
+            <label htmlFor='positionOnRoad' key={pos} className="flex items-center">
               <input
+                id='positionOnRoad'
                 type="radio"
                 name="positionOnRoad"
                 value={pos}
@@ -299,9 +304,10 @@ export default function AccidentDetails() {
           <div key={index} className="mt-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="relative w-full">
-                <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Driver&rsquo;s Name</label>
+                <label htmlFor='driverName' aria-label='driverName' className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Driver&rsquo;s Name</label>
                 <input
                   type="text"
+                  id='driverName'
                   name="driverName"
                   value={vehicle.driverName}
                   onChange={(e) => handleVehicleChange(index, e)}
@@ -310,7 +316,7 @@ export default function AccidentDetails() {
                 />
               </div>
               <div className="relative w-full">
-                <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Home/Work Address</label>
+                <label aria-label='driverAddress' className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Home/Work Address</label>
                 <input
                   type="text"
                   name="driverAddress"
@@ -321,7 +327,7 @@ export default function AccidentDetails() {
                 />
               </div>
               <div className="relative w-full">
-                <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Phone Number</label>
+                <label aria-label='driverPhone' className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Phone Number</label>
                 <input
                   type="text"
                   name="driverPhone"
@@ -366,7 +372,7 @@ export default function AccidentDetails() {
         <p className="font-semibold">What type of road surface was it?</p>
         <div className="flex flex-wrap lg:flex-nowrap gap-4">
           {['Asphalt', 'Cobble Stone', 'Concrete', 'Other'].map((surface) => (
-            <label key={surface} className="flex items-center">
+            <label aria-label='roadSurface' key={surface} className="flex items-center">
               <input
                 type="radio"
                 name="roadSurface"
@@ -386,7 +392,7 @@ export default function AccidentDetails() {
         <p className="font-semibold">Was the road crowded?</p>
         <div className="flex flex-wrap lg:flex-nowrap gap-4">
           {['Not Crowded', 'Light Traffic', 'Moderate Traffic', 'Heavy Traffic'].map((traffic) => (
-            <label key={traffic} className="flex items-center">
+            <label aria-label='trafficCondition' key={traffic} className="flex items-center">
               <input
                 type="radio"
                 name="trafficCondition"
@@ -405,7 +411,7 @@ export default function AccidentDetails() {
         <p className="font-semibold"> Were you in the vehicle?</p>
         <div className="flex flex-wrap lg:flex-nowrap gap-4">
           {['Yes', 'No'].map((option) => (
-            <label key={option} className="flex items-center">
+            <label aria-label='wereYouInVehicle' key={option} className="flex items-center">
               <input
                 type="radio"
                 name="wereYouInVehicle"
@@ -425,7 +431,7 @@ export default function AccidentDetails() {
         <p className="font-semibold">What was the time of day?</p>
         <div className="flex flex-wrap lg:flex-nowrap gap-4">
           {['Day Time', 'Night Time'].map((time) => (
-            <label key={time} className="flex items-center">
+            <label aria-label='timeOfDay' key={time} className="flex items-center">
               <input
                 type="radio"
                 name="timeOfDay"
@@ -446,7 +452,7 @@ export default function AccidentDetails() {
           <p className="font-semibold">If so, please state, Were your vehicle&rsquo;s headlights on?</p>
           <div className="flex flex-wrap lg:flex-nowrap gap-4">
             {['Yes', 'No'].map((option) => (
-              <label key={option} className="flex items-center">
+              <label aria-label='headlightsOn' key={option} className="flex items-center">
                 <input
                   type="radio"
                   name="headlightsOn"
@@ -466,7 +472,7 @@ export default function AccidentDetails() {
         <p className="font-semibold">Was horn sounded?</p>
         <div className="flex flex-wrap lg:flex-nowrap gap-4">
           {['Yes', 'No'].map((option) => (
-            <label key={option} className="flex items-center">
+            <label aria-label='hornSounded' key={option} className="flex items-center">
               <input
                 type="radio"
                 name="hornSounded"
@@ -486,7 +492,7 @@ export default function AccidentDetails() {
         <p className="font-semibold">Were there any obstructions to visibility?</p>
         <div className="flex flex-wrap lg:flex-nowrap gap-4">
           {['No', 'Light Rain', 'Heavy Rain', 'Fog'].map((obstruction) => (
-            <label key={obstruction} className="flex items-center">
+            <label aria-label='visibilityObstructions' key={obstruction} className="flex items-center">
               <input
                 type="radio"
                 name="visibilityObstructions"
@@ -506,7 +512,7 @@ export default function AccidentDetails() {
         <p className="font-semibold">Did the accident occur at</p>
         <div className="flex flex-wrap lg:flex-nowrap gap-4">
           {['Intersection', 'A Round About', 'Neither'].map((location) => (
-            <label key={location} className="flex items-center">
+            <label aria-label='intersectionType' key={location} className="flex items-center">
               <input
                 type="radio"
                 name="intersectionType"
@@ -581,6 +587,7 @@ export default function AccidentDetails() {
         </button>
         <button
           type="submit"
+          aria-label="Next Step"
           className="bg-blue-500 text-white p-10 py-2 rounded"
           onClick={handleNext}
         >

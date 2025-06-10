@@ -2,6 +2,8 @@
 
 import { useRouter } from 'next/navigation';
 import { usePrivateVehicleCategoryStore } from '@/store/vehicleDetails/privateVehicleCategory';
+import { useVehicleSelectionStore } from '@/store/vehicleSelection/vehicleSelectionStore';
+import { useEffect } from 'react';
 
 export default function PrivateVehicleCategory() {
     const router = useRouter();
@@ -14,8 +16,52 @@ export default function PrivateVehicleCategory() {
         setError,
         logSelection
     } = usePrivateVehicleCategoryStore();
+    
+    const { isExistingVehicle, vehicleData } = useVehicleSelectionStore();
+
+    // Pre-fill form based on selected vehicle data
+    useEffect(() => {
+        console.log('🔍 Checking for pre-selected vehicle data in category page...');
+        console.log('📋 Vehicle selection state:', { isExistingVehicle, vehicleData });
+        
+        if (isExistingVehicle && vehicleData?.privateVehicle) {
+            console.log('✅ Pre-filling category form with existing vehicle data');
+            
+            const { vehicleCategory, usageType: vehicleUsageType } = vehicleData.privateVehicle;
+            
+            // Map vehicle category to carType
+            const categoryMapping: Record<string, string> = {
+                'Passenger Car': 'passenger',
+                'SUV': 'suvs',
+                'Pickup Truck': 'pickup',
+                'Van': 'minivan',
+                'Mini-Bus': 'minivan'
+            };
+            
+            const mappedCarType = categoryMapping[vehicleCategory] || '';
+            if (mappedCarType) {
+                setCarType(mappedCarType);
+                console.log(`✅ Vehicle category pre-filled: ${vehicleCategory} -> ${mappedCarType}`);
+            } else {
+                console.log(`⚠️ Unknown vehicle category: ${vehicleCategory}`);
+            }
+            
+            // Set usage type
+            if (vehicleUsageType && vehicleUsageType.length > 0) {
+                const firstUsageType = vehicleUsageType[0];
+                setUsageType(firstUsageType);
+                console.log(`✅ Usage type pre-filled: ${firstUsageType}`);
+            }
+        } else {
+            console.log('🆕 New vehicle creation - form will remain empty');
+            // Clear any previous selection for new vehicle
+            setCarType('');
+            setUsageType('');
+        }
+    }, [isExistingVehicle, vehicleData, setCarType, setUsageType]);
 
     const handleCheckboxChange = (type: string) => {
+        console.log(`👆 User manually selected usage type: ${type}`);
         setUsageType(type);
         setError(false);
     };

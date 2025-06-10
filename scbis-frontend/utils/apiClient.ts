@@ -1,10 +1,11 @@
 import axios from "axios";
-// import { refreshToken } from "./authService";
+import { refreshToken } from "./axiosInstance";
 import { useUserStore } from "@/store/authStore/useUserStore";
 
 // Create a new axios instance for authenticated requests
 const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
+  // baseURL: 'http://localhost:3001',
   headers: {
     "Content-Type": "application/json",
     "Accept": "application/json"

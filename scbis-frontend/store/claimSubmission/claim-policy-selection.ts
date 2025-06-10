@@ -1,59 +1,88 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
+interface GeneralDetails {
+  make: string;
+  model: string;
+  engineCapacity?: number;
+  plateNumber: string;
+  bodyType?: string;
+  engineNumber?: string;
+}
+
+interface PrivateVehicle {
+  usageType: string[];
+  vehicleCategory: string;
+  generalDetails: GeneralDetails;
+  ownershipUsage?: {
+    ownerType?: string;
+    purchasedValue?: number;
+    dutyFree?: boolean;
+    driverType?: string;
+    seatingCapacity?: number;
+  };
+  _id: string;
+}
+
+interface CommercialVehicle {
+  usageType: string[];
+  vehicleCategory: string;
+  generalDetails: GeneralDetails;
+  ownershipUsage?: {
+    companyName?: string;
+    driverType?: string;
+    purchasedValue?: number;
+  };
+  _id: string;
+}
+
 interface Policy {
+  _id: string;
   title: string;
   coverageEndDate: string;
   territory: string;
   duration: string;
+  privateVehicle?: PrivateVehicle;
+  commercialVehicle?: CommercialVehicle;
 }
 
 interface ClaimPolicyState {
   policies: Policy[];
   selectedPolicy: string | null;
-  addPolicy: (policy: Policy) => void;
-  removePolicy: (title: string) => void;
-  selectPolicy: (title: string) => void;
+  addPolicies: (policies: Policy[]) => void;
+  removePolicy: (policyId: string) => void;
+  selectPolicy: (policyId: string) => void;
   clearSelection: () => void;
   clearAllData: () => void;
 }
 
-const initialPolicies: Policy[] = [
-  {
-    title: 'Third Party',
-    coverageEndDate: '2023-12-31',
-    territory: 'Ethiopia',
-    duration: '1 Year',
-  },
-  {
-    title: 'Own Damage',
-    coverageEndDate: '2024-06-30',
-    territory: 'Ethiopia',
-    duration: '6 Months',
-  },
-];
-
 export const useClaimPolicyStore = create<ClaimPolicyState>()(
   persist(
     (set) => ({
-      policies: initialPolicies,
+      policies: [],
       selectedPolicy: null,
-      addPolicy: (policy) => set((state) => ({ policies: [...state.policies, policy] })),
-      removePolicy: (title) => 
-        set((state) => ({ 
-          policies: state.policies.filter(p => p.title !== title),
-          selectedPolicy: state.selectedPolicy === title ? null : state.selectedPolicy
+
+      addPolicies: (newPolicies) =>
+        set(() => ({ policies: newPolicies })),
+
+      removePolicy: (policyId) =>
+        set((state) => ({
+          policies: state.policies.filter((p) => p._id !== policyId),
+          selectedPolicy: state.selectedPolicy === policyId ? null : state.selectedPolicy,
         })),
-      selectPolicy: (title) => set({ selectedPolicy: title }),
+
+      selectPolicy: (policyId) => set({ selectedPolicy: policyId }),
+
       clearSelection: () => set({ selectedPolicy: null }),
-      clearAllData: () => set({ policies: initialPolicies, selectedPolicy: null }),
+
+      clearAllData: () => set({ policies: [], selectedPolicy: null }),
     }),
     {
       name: 'claim-policy-selection-storage',
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({ 
+      partialize: (state) => ({
         policies: state.policies,
-        selectedPolicy: state.selectedPolicy
+        selectedPolicy: state.selectedPolicy,
       }),
     }
   )

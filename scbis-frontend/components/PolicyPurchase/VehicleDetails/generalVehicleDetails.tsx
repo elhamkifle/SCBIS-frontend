@@ -2,12 +2,56 @@
 
 import { useRouter } from 'next/navigation';
 import { useGeneralVehicleStore } from '@/store/vehicleDetails/generalVehicle';
+import { useVehicleSelectionStore } from '@/store/vehicleSelection/vehicleSelectionStore';
+import { useEffect } from 'react';
 
 export default function GeneralVehicleDetailForm() {
     const router = useRouter();
     const { formData, setFormData, logFormData } = useGeneralVehicleStore();
+    const { isExistingVehicle, vehicleData } = useVehicleSelectionStore();
+
+    // Pre-fill form based on selected vehicle data
+    useEffect(() => {
+        console.log('🔍 Checking for pre-selected vehicle data in general details page...');
+        console.log('📋 Vehicle selection state:', { isExistingVehicle, vehicleData });
+        
+        if (isExistingVehicle && vehicleData?.privateVehicle?.generalDetails) {
+            console.log('✅ Pre-filling general details form with existing vehicle data');
+            
+            const { generalDetails } = vehicleData.privateVehicle;
+            
+            // Map the API data to form fields
+            const preFilledData = {
+                make: generalDetails.make || '',
+                model: generalDetails.model || '',
+                mfgYear: '', // This might need to be derived or added to API
+                engineCapacity: generalDetails.engineCapacity?.toString() || '',
+                chassisNo: '', // This might need to be added to API
+                engineNo: generalDetails.engineNumber || '',
+                plateNo: generalDetails.plateNumber || '',
+                bodyType: generalDetails.bodyType || '',
+            };
+            
+            setFormData(preFilledData);
+            console.log('✅ General details pre-filled:', preFilledData);
+        } else {
+            console.log('🆕 New vehicle creation - form will remain empty');
+            // Clear form for new vehicle
+            setFormData({
+                make: '',
+                model: '',
+                mfgYear: '',
+                engineCapacity: '',
+                chassisNo: '',
+                engineNo: '',
+                plateNo: '',
+                bodyType: '',
+            });
+        }
+    }, [isExistingVehicle, vehicleData, setFormData]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        console.log(`👆 User manually updated ${e.target.name}: ${e.target.value}`);
         setFormData({ [e.target.name]: e.target.value });
     };
 
