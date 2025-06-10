@@ -17,7 +17,9 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { purchaseRequestsApi, PurchaseRequest } from "../../services/api";
+import { usePurchaseRequestsSocket } from "../../services/socket";
 import withAuth from "../../utils/withAuth";
+import PurchaseRequestNotifications from "../../components/notifications/PurchaseRequestNotifications";
 
 function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params); // Unwrap the params Promise
@@ -33,6 +35,8 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const [requestData, setRequestData] = useState<PurchaseRequest | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const socket = usePurchaseRequestsSocket();
 
   useEffect(() => {
     const fetchRequestDetails = async () => {
@@ -52,6 +56,65 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
     if (id) {
       fetchRequestDetails();
     }
+
+    // Set up Socket.IO listeners for real-time updates
+    const setupSocketListeners = async () => {
+      try {
+        await socket.connect();
+
+        // Listen for status changes for this specific request
+        const unsubscribeStatusChange = socket.on('purchase-request-status-changed', (data) => {
+          if (data.data.id === id) {
+            console.log('Status changed for current request:', data);
+            setRequestData(prev => prev ? { ...prev, status: data.data.newStatus } : null);
+            
+            toast({
+              title: "Status Updated",
+              description: `Request status changed to ${data.data.newStatus}`,
+              variant: data.data.newStatus === 'approved' ? 'default' : 'destructive',
+            });
+          }
+        });
+
+        // Listen for approvals
+        const unsubscribeApproved = socket.on('purchase-request-approved', (data) => {
+          if (data.data.id === id) {
+            console.log('Current request approved:', data);
+            setRequestData(prev => prev ? { ...prev, status: 'approved' } : null);
+            
+            toast({
+              title: "Request Approved",
+              description: `This request has been approved by ${data.data.approvedBy}`,
+            });
+          }
+        });
+
+        // Listen for rejections
+        const unsubscribeRejected = socket.on('purchase-request-rejected', (data) => {
+          if (data.data.id === id) {
+            console.log('Current request rejected:', data);
+            setRequestData(prev => prev ? { ...prev, status: 'rejected' } : null);
+            
+            toast({
+              title: "Request Rejected",
+              description: `This request has been rejected: ${data.data.reason}`,
+              variant: "destructive",
+            });
+          }
+        });
+
+        // Return cleanup function
+        return () => {
+          unsubscribeStatusChange();
+          unsubscribeApproved();
+          unsubscribeRejected();
+        };
+      } catch (error) {
+        console.error('Failed to setup Socket.IO listeners:', error);
+      }
+    };
+
+    setupSocketListeners();
   }, [id]);
 
   const handleReject = async () => {
@@ -66,6 +129,9 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
         description: `Request #${requestData.id} has been rejected. Reason: ${rejectionReason}`,
         variant: "destructive",
       });
+
+      // Update local state immediately for better UX
+      setRequestData(prev => prev ? { ...prev, status: 'rejected' } : null);
 
       setIsRejecting(false);
       setRejectOpen(false);
@@ -422,6 +488,9 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Real-time notifications */}
+      <PurchaseRequestNotifications />
     </div>
   );
 }

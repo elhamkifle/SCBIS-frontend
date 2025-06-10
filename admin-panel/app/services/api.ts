@@ -161,6 +161,52 @@ export interface PurchaseRequest {
 
 export interface PurchaseRequestsResponse {
   data: PurchaseRequest[];
+  meta?: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages?: number;
+  };
+}
+
+// Claims interface based on backend specification
+export interface Claim {
+  id: string;
+  claimantName: string;
+  dateSubmitted?: string; // Made optional since backend returns undefined
+  policyNumber: string;
+  status: "draft" | "submitted" | "Under Review" | "Approved" | "Rejected" | "Needs More Info" | "Forwarded";
+  vehicleInfo: string;
+  accidentDate?: string | Date; // Made optional and allow Date object
+  location: string | object; // Allow object since backend returns [Object]
+  driverName: string;
+  damageImages: string[];
+  declaration: boolean;
+  statusHistory?: {
+    status: string;
+    note: string;
+    date: string;
+  }[];
+}
+
+export interface PaginatedClaims {
+  claims: Claim[];
+  pagination?: {
+    total: number;
+    page: number;
+    totalPages: number;
+  };
+}
+
+// Backend response structure
+interface ClaimsResponse {
+  data: Claim[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
 }
 
 // Helper function to get auth token
@@ -352,7 +398,7 @@ export const authApi = {
 
 // Purchase Requests API
 export const purchaseRequestsApi = {
-  // Get list of purchase requests
+  // Get list of purchase requests (pending only)
   getAll: async (params: {
     status?: string;
     page?: number;
@@ -366,6 +412,26 @@ export const purchaseRequestsApi = {
 
     const queryString = searchParams.toString();
     const endpoint = `/admin/purchase-requests${queryString ? `?${queryString}` : ''}`;
+    
+    return apiRequest<PurchaseRequestsResponse>(endpoint);
+  },
+
+  // Get all purchase requests with filtering (pending, approved, rejected)
+  getAllRequests: async (params: {
+    status?: 'pending' | 'approved' | 'rejected';
+    page?: number;
+    limit?: number;
+    search?: string;
+  } = {}): Promise<PurchaseRequestsResponse> => {
+    const searchParams = new URLSearchParams();
+    
+    if (params.status) searchParams.append('status', params.status);
+    if (params.page) searchParams.append('page', params.page.toString());
+    if (params.limit) searchParams.append('limit', params.limit.toString());
+    if (params.search) searchParams.append('search', params.search);
+
+    const queryString = searchParams.toString();
+    const endpoint = `/admin/purchase-requests/all${queryString ? `?${queryString}` : ''}`;
     
     return apiRequest<PurchaseRequestsResponse>(endpoint);
   },
@@ -391,4 +457,61 @@ export const purchaseRequestsApi = {
   },
 };
 
-export default { userApi, adminApi, authApi, purchaseRequestsApi }; 
+// Claims API
+export const claimsApi = {
+  // Get paginated list of claims
+  getClaims: async (params: {
+    search?: string;
+    status?: string;
+    page?: number;
+    limit?: number;
+  } = {}): Promise<PaginatedClaims> => {
+    const searchParams = new URLSearchParams();
+    
+    if (params.search) searchParams.append('search', params.search);
+    if (params.status) searchParams.append('status', params.status);
+    if (params.page) searchParams.append('page', params.page.toString());
+    if (params.limit) searchParams.append('limit', params.limit.toString());
+
+    const queryString = searchParams.toString();
+    const endpoint = `/admin/claims${queryString ? `?${queryString}` : ''}`;
+    
+    try {
+      const response = await apiRequest<ClaimsResponse>(endpoint);
+      
+      console.log('Raw claims API response:', response);
+      
+      // Map backend response structure to our expected format
+      return {
+        claims: response.data || [],
+        pagination: {
+          total: response.meta?.total || 0,
+          page: response.meta?.page || 1,
+          totalPages: response.meta?.totalPages || 1
+        }
+      };
+    } catch (error) {
+      console.error('Claims API error:', error);
+      throw error;
+    }
+  },
+
+  // Get specific claim details
+  getClaimById: async (id: string): Promise<Claim> => {
+    return apiRequest<Claim>(`/admin/claims/${id}`);
+  },
+
+  // Update claim status
+  updateClaimStatus: async (
+    id: string, 
+    status: string, 
+    note?: string
+  ): Promise<{ message: string }> => {
+    return apiRequest<{ message: string }>(`/admin/claims/${id}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status, note }),
+    });
+  },
+};
+
+export default { userApi, adminApi, authApi, purchaseRequestsApi, claimsApi }; 
