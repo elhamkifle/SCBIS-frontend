@@ -1,9 +1,13 @@
 "use client";
 
+import { useEffect } from "react";
+import axios from "axios";
 import Link from "next/link";
 import { usePoliciesStore } from "@/store/dashboard/policies";
 import { useClaimsStore } from "@/store/dashboard/claims";
 import { useUserStore } from "@/store/authStore/useUserStore";
+
+
 
 const actionImages: Record<string, string> = {
   "New Policy Purchase": "/purchase.png",
@@ -24,22 +28,74 @@ const actionLinks: Record<typeof actionLabels[number], string> = {
 };
 
 export default function Dashboard() {
-  const { policies } = usePoliciesStore();
+  const {
+    policies,
+    addPolicies,
+  } = usePoliciesStore();
+
+  const getAuthTokenFromCookie = (): string | null => {
+    const match = document.cookie.match(/(?:^|;\s*)auth_token=([^;]*)/);
+    return match ? decodeURIComponent(match[1]) : null;
+  };
+
+  useEffect(() => {
+    const fetchPolicies = async () => {
+      try {
+        const accessToken = getAuthTokenFromCookie();
+        const response = await axios.get(
+          'https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/policy/user-policies',
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+        console.log('Fetched policies:', response.data);
+        addPolicies(response.data);
+      } catch (error) {
+        console.error('Error fetching policies:', error);
+      }
+    };
+
+    fetchPolicies();
+  }, [addPolicies]);
+
+    useEffect(() => {
+    const fetchClaims = async () => {
+      try {
+        const accessToken = getAuthTokenFromCookie();
+        const response = await axios.get(
+          'https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/claims',
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+        console.log('Claims:', response.data);
+      } catch (error) {
+        console.error('Error fetching claims:', error);
+      }
+    };
+
+    fetchClaims();
+  }, );
+
+  
   const { claims } = useClaimsStore();
   const user = useUserStore((state) => state.user);
-  const profileName = user?.fullname.split(' ') || []
+  const profileName = user?.fullname.split(' ') || [];
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "Active":
+      case "active":
         return "text-green-600";
       case "Renewal":
-        return "text-yellow-500";
-      case "Under Review":
+      case "pending":
         return "text-yellow-500";
       case "Approved":
         return "text-green-600";
-      case "Rejected":
+      case "rejected":
         return "text-red-500";
       default:
         return "text-gray-600";
@@ -56,9 +112,7 @@ export default function Dashboard() {
         <div className="flex flex-row flex-wrap justify-between items-center gap-8 mb-14">
           {actionLabels.map((label) => (
             <Link key={label} href={actionLinks[label]} className="flex-1 min-w-[220px] max-w-[350px]">
-              <div
-                className="bg-blue-100 rounded-xl shadow-lg shadow-blue-100 h-28 flex flex-col justify-center items-center hover:shadow-xl transition cursor-pointer"
-              >
+              <div className="bg-blue-100 rounded-xl shadow-lg shadow-blue-100 h-28 flex flex-col justify-center items-center hover:shadow-xl transition cursor-pointer">
                 <img src={actionImages[label]} alt={label} className="w-8 h-8 mb-2" />
                 <p className="text-center text-base font-semibold">{label}</p>
               </div>
@@ -69,26 +123,42 @@ export default function Dashboard() {
         <section className="mb-14">
           <h2 className="text-xl font-semibold text-blue-500 mb-6" style={{ fontFamily: 'Montserrat, sans-serif' }}>Active Policies</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10 justify-items-center">
-            {policies.map((policy) => (
-              <div key={policy.id} className="bg-white border rounded-xl shadow-lg shadow-blue-100 w-full max-w-[400px] p-8">
-                <div className="flex justify-between items-center mb-3">
-                  <img src={policy.imageUrl} alt={policy.purpose} className="w-6 h-6" />
-                  <span className={`text-xs font-semibold ${getStatusColor(policy.status)}`}>{policy.status}</span>
+            {policies.map((policy) => {
+              const generalDetails =
+                policy.privateVehicle?.generalDetails ||
+                policy.commercialVehicle?.generalDetails;
+              const formattedDate = new Date(policy.createdAt).toLocaleDateString("en-KE", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              });
+
+              const imageUrl = policy.vehicleType === "Private" ? "/Private.png" : "/Commercial.png";
+
+              return (
+                <div key={policy._id} className="bg-white border rounded-xl shadow-lg shadow-blue-100 w-full max-w-[400px] p-8">
+                  <div className="flex justify-between items-center mb-3">
+                    <img src={imageUrl} alt={policy.vehicleType} className="w-6 h-6" />
+                    <span className={`text-xs font-semibold ${getStatusColor(policy.status?.value)}`}>
+                      {policy.status?.value}
+                    </span>
+                  </div>
+                  <div className="text-base leading-7">
+                    <p><span className="text-gray-500">Title:</span> <span className="font-bold">{policy.policyType}</span></p>
+                    <p><span className="text-gray-500">Plate No.:</span> <span className="font-bold">{generalDetails?.plateNumber}</span></p>
+                    <p><span className="text-gray-500">Duration:</span> <span className="font-bold">{policy.duration} days</span></p>
+                    <p><span className="text-gray-500">Issued On:</span> <span className="font-bold">{formattedDate}</span></p>
+                    <p><span className="text-gray-500">Coverage End Date:</span> <span className="font-bold">{policy.coverageEndDate} </span></p>
+                  </div>
+                  <Link href={`/policydetails/${policy._id}`}>
+                    <button className="mt-5 w-full text-base text-blue-600 border border-blue-600 rounded py-2 hover:bg-blue-50 font-semibold">
+                      View Details
+                    </button>
+                  </Link>
                 </div>
-                <div className="text-base leading-7">
-                  <p><span className="text-gray-500">Plate No.:</span> <span className="font-bold">{policy.plateNumber}</span></p>
-                  <p><span className="text-gray-500">Policy Type:</span> <span className="font-bold">{policy.policyType}</span></p>
-                  <p><span className="text-gray-500">Purpose:</span> <span className="font-bold">{policy.purpose}</span></p>
-                  <p><span className="text-gray-500">Passengers:</span> <span className="font-bold">{policy.passengers}</span></p>
-                  <p><span className="text-gray-500">Policy Period:</span> <span className="font-bold">{policy.policyPeriod.start} - {policy.policyPeriod.end}</span></p>
-                </div>
-                <Link href={`/policydetails?id=${policy.id}`}>
-                  <button className="mt-5 w-full text-base text-blue-600 border border-blue-600 rounded py-2 hover:bg-blue-50 font-semibold">
-                    View Details
-                  </button>
-                </Link>
-              </div>
-            ))}
+              );
+            })}
+
           </div>
         </section>
 
