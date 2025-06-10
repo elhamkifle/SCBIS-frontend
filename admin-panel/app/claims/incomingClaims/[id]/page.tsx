@@ -1,7 +1,6 @@
 "use client";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -10,61 +9,59 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Skeleton } from "@/components/ui/skeleton";
+import { claimsApi, type Claim } from "@/app/services/api";
+import { ArrowLeft, RefreshCw } from "lucide-react";
+import withAuth from "../../../utils/withAuth";
 
-interface Claim {
-  id: string;
-  claimantName: string;
-  dateSubmitted: string;
-  policyNumber: string;
-  status: string;
-  vehicleInfo: string;
-  accidentDate: string;
-  location: string;
-  driverName: string;
-  damageImages: string[];
-  declaration: boolean;
-  statusHistory?: { status: string; note: string; date: string }[];
-}
-
-const mockClaims: Claim[] = [
-  {
-    id: "1",
-    claimantName: "John Doe",
-    dateSubmitted: "2025-05-10",
-    policyNumber: "POL12345",
-    status: "Submitted",
-    vehicleInfo: "Toyota Corolla 2020",
-    accidentDate: "2025-05-08",
-    location: "Addis Ababa",
-    driverName: "John Doe",
-    damageImages: ["/sample-damage1.jpg"],
-    declaration: true,
-    statusHistory: [],
-  },
-];
-
-export default function ClaimDetailsPage() {
+function ClaimDetailsPage() {
   const { id } = useParams();
+  const router = useRouter();
   const [claim, setClaim] = useState<Claim | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [updating, setUpdating] = useState(false);
   const [note, setNote] = useState("");
   const [dialogAction, setDialogAction] = useState<string | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  // Fetch claim details
+  const fetchClaim = async () => {
+    if (!id || typeof id !== 'string') {
+      setError('Invalid claim ID');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response = await claimsApi.getClaimById(id);
+      setClaim(response);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to fetch claim details";
+      setError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const found = mockClaims.find((c) => c.id === id);
-    if (found) setClaim(found);
-    setLoading(false);
+    fetchClaim();
   }, [id]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "Submitted":
+      case "draft":
+        return "bg-gray-100 text-gray-700";
+      case "submitted":
         return "bg-blue-100 text-blue-700";
       case "Under Review":
         return "bg-yellow-100 text-yellow-800";
@@ -81,43 +78,232 @@ export default function ClaimDetailsPage() {
     }
   };
 
-  const handleStatusChange = (newStatus: string, note: string) => {
-    if (!claim) return;
-    const updatedHistory = [
-      ...(claim.statusHistory || []),
-      {
-        status: newStatus,
-        note,
-        date: new Date().toISOString(),
-      },
-    ];
-    setClaim({ ...claim, status: newStatus, statusHistory: updatedHistory });
-    toast.success(`Claim marked as ${newStatus}`);
+  // Helper function to format dates safely
+  const formatDate = (date: string | Date | undefined) => {
+    if (!date) return "Not specified";
+    try {
+      return new Date(date).toLocaleDateString();
+    } catch {
+      return "Invalid date";
+    }
   };
 
+  // Helper function to format location safely
+  const formatLocation = (location: string | object) => {
+    if (typeof location === 'string') return location;
+    if (typeof location === 'object' && location !== null) {
+      // Try to extract meaningful location info from object
+      const loc = location as Record<string, unknown>;
+      if (typeof loc.name === 'string') return loc.name;
+      if (typeof loc.city === 'string') return loc.city;
+      if (typeof loc.address === 'string') return loc.address;
+      return "Location specified";
+    }
+    return "Not specified";
+  };
+
+  const handleStatusChange = async (newStatus: string, note: string) => {
+    if (!claim || !id || typeof id !== 'string') return;
+
+    try {
+      setUpdating(true);
+      
+      await claimsApi.updateClaimStatus(id, newStatus, note);
+      
+      // Update local state
+      const updatedHistory = [
+        ...(claim.statusHistory || []),
+        {
+          status: newStatus,
+          note,
+          date: new Date().toISOString(),
+        },
+      ];
+      setClaim({ ...claim, status: newStatus as Claim["status"], statusHistory: updatedHistory });
+      
+      toast.success(`Claim ${newStatus.toLowerCase()} successfully`);
+      setIsDialogOpen(false);
+      setNote("");
+      setDialogAction(null);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to update claim status";
+      toast.error(errorMessage);
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handleRetry = () => {
+    fetchClaim();
+  };
+
+  const openStatusDialog = (action: string) => {
+    setDialogAction(action);
+    setNote("");
+    setIsDialogOpen(true);
+  };
+
+  const closeDialog = () => {
+    setIsDialogOpen(false);
+    setDialogAction(null);
+    setNote("");
+  };
+
+  // Loading state
   if (loading) {
     return (
-      <div className="p-8">
-        <Skeleton className="h-8 w-1/3 mb-4" />
-        <Skeleton className="h-60 w-full rounded-xl" />
+      <div className="max-w-5xl mx-auto p-8 space-y-6">
+        <div className="flex items-center gap-4 mb-6">
+          <Skeleton className="h-6 w-6" />
+          <Skeleton className="h-8 w-48" />
+        </div>
+        <Card>
+          <CardContent className="space-y-6 p-6">
+            <div className="flex justify-between items-center">
+              <div className="space-y-2">
+                <Skeleton className="h-6 w-40" />
+                <Skeleton className="h-4 w-32" />
+              </div>
+              <Skeleton className="h-6 w-24" />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="space-y-1">
+                  <Skeleton className="h-3 w-20" />
+                  <Skeleton className="h-8 w-full" />
+                </div>
+              ))}
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-32" />
+              <div className="flex gap-3">
+                <Skeleton className="h-36 w-36" />
+                <Skeleton className="h-36 w-36" />
+              </div>
+            </div>
+            <div className="flex justify-between">
+              <div className="flex gap-2">
+                <Skeleton className="h-10 w-20" />
+                <Skeleton className="h-10 w-20" />
+              </div>
+              <div className="flex gap-2">
+                <Skeleton className="h-10 w-32" />
+                <Skeleton className="h-10 w-32" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
+  // Error state
+  if (error) {
+    return (
+      <div className="max-w-5xl mx-auto p-8">
+        <div className="flex items-center gap-4 mb-6">
+          <Button
+            variant="ghost"
+            onClick={() => router.back()}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </Button>
+          <h1 className="text-3xl font-bold text-gray-800">Claim Details</h1>
+        </div>
+        
+        <Card className="border-red-200 bg-red-50">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <div className="text-red-600">
+                  <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-red-800 font-medium">Failed to load claim details</p>
+                  <p className="text-red-600 text-sm">{error}</p>
+                </div>
+              </div>
+              <Button onClick={handleRetry} variant="outline" size="sm">
+                Try Again
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // No claim found
   if (!claim) {
-    return <p className="p-8 text-red-600">Claim not found.</p>;
+    return (
+      <div className="max-w-5xl mx-auto p-8">
+        <div className="flex items-center gap-4 mb-6">
+          <Button
+            variant="ghost"
+            onClick={() => router.back()}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </Button>
+          <h1 className="text-3xl font-bold text-gray-800">Claim Details</h1>
+        </div>
+        
+        <Card className="border-gray-200 bg-gray-50">
+          <CardContent className="p-12 text-center">
+            <div className="text-gray-400 mb-4">
+              <svg className="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <p className="text-gray-600 font-medium">Claim not found</p>
+            <p className="text-gray-500 text-sm mt-1">
+              The claim you&apos;re looking for doesn&apos;t exist or has been removed.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   return (
     <div className="max-w-5xl mx-auto p-8 space-y-6">
-      <h1 className="text-3xl font-bold text-gray-800">Claim Details</h1>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            onClick={() => router.back()}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </Button>
+          <h1 className="text-3xl font-bold text-gray-800">Claim Details</h1>
+        </div>
+        
+        <Button 
+          variant="outline" 
+          onClick={handleRetry}
+          disabled={loading}
+          className="flex items-center gap-2"
+        >
+          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+          Refresh
+        </Button>
+      </div>
 
       <Card>
         <CardContent className="space-y-6 p-6">
           <div className="flex justify-between items-center">
             <div>
               <p className="text-lg font-semibold">{claim.claimantName}</p>
-              <p className="text-sm text-gray-500">Submitted on {claim.dateSubmitted}</p>
+              <p className="text-sm text-gray-500">
+                Submitted on {formatDate(claim.dateSubmitted)}
+              </p>
             </div>
             <Badge className={getStatusColor(claim.status)}>{claim.status}</Badge>
           </div>
@@ -125,82 +311,64 @@ export default function ClaimDetailsPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-700">
             <Detail label="Policy Number" value={claim.policyNumber} />
             <Detail label="Vehicle Info" value={claim.vehicleInfo} />
-            <Detail label="Accident Date" value={claim.accidentDate} />
-            <Detail label="Location" value={claim.location} />
+            <Detail label="Accident Date" value={formatDate(claim.accidentDate)} />
+            <Detail label="Location" value={formatLocation(claim.location)} />
             <Detail label="Driver Name" value={claim.driverName} />
             <Detail label="Declaration Signed" value={claim.declaration ? "Yes" : "No"} />
           </div>
 
           <div>
             <p className="font-medium text-sm mb-2">Damage Evidence</p>
-            <div className="flex gap-3 overflow-x-auto">
-              {claim.damageImages.map((src, i) => (
-                <Image
-                  key={i}
-                  src={src}
-                  alt="Damage Photo"
-                  width={150}
-                  height={150}
-                  className="rounded-lg border shadow"
-                />
-              ))}
-            </div>
+            {claim.damageImages && claim.damageImages.length > 0 ? (
+              <div className="flex gap-3 overflow-x-auto">
+                {claim.damageImages.map((src, i) => (
+                  <Image
+                    key={i}
+                    src={src}
+                    alt={`Damage Photo ${i + 1}`}
+                    width={150}
+                    height={150}
+                    className="rounded-lg border shadow object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = '/placeholder-image.jpg';
+                    }}
+                  />
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500 text-sm">No damage images uploaded</p>
+            )}
           </div>
 
-          <div className="flex justify-between items-center">
-            <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div className="flex gap-4 flex-wrap">
               {["Approve", "Reject"].map((action) => (
-                <Dialog key={action}>
-                  <DialogTrigger asChild>
-                    <Button
-                      variant={
-                        action === "Approve"
-                          ? "default"
-                          : action === "Reject"
-                          ? "destructive"
-                          : "outline"
-                      }
-                      className={
-                        action === "Approve"
-                          ? "bg-green-600 hover:bg-green-700 text-white"
-                          : ""
-                      }
-                      onClick={() => setDialogAction(action)}
-                    >
-                      {action}
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Add note for {action}</DialogTitle>
-                    </DialogHeader>
-                    <Textarea
-                      placeholder={`Enter note for ${action}`}
-                      value={note}
-                      onChange={(e) => setNote(e.target.value)}
-                    />
-                    <DialogFooter>
-                      <Button
-                        onClick={() => {
-                          handleStatusChange(action, note);
-                          setNote("");
-                          setDialogAction(null);
-                        }}
-                        className={
-                          action === "Approve"
-                            ? "bg-green-600 hover:bg-green-700 text-white"
-                            : ""
-                        }
-                      >
-                        Confirm {action}
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
+                <Button
+                  key={action}
+                  variant={
+                    action === "Approve"
+                      ? "default"
+                      : action === "Reject"
+                      ? "destructive"
+                      : "outline"
+                  }
+                  className={
+                    action === "Approve"
+                      ? "bg-green-600 hover:bg-green-700 text-white"
+                      : ""
+                  }
+                  onClick={() => openStatusDialog(action)}
+                  disabled={updating}
+                >
+                  {updating && dialogAction === action ? (
+                    <RefreshCw className="h-4 w-4 animate-spin mr-2" />
+                  ) : null}
+                  {action}
+                </Button>
               ))}
             </div>
 
-            <div className="flex gap-4">
+            <div className="flex gap-4 flex-wrap">
               {["Under Review", "Needs More Info", "Forwarded"].map((action) => {
                 let buttonClass = "";
                 if (action === "Under Review") {
@@ -212,39 +380,18 @@ export default function ClaimDetailsPage() {
                 }
 
                 return (
-                  <Dialog key={action}>
-                    <DialogTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={buttonClass}
-                        onClick={() => setDialogAction(action)}
-                      >
-                        {action}
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Add note for {action}</DialogTitle>
-                      </DialogHeader>
-                      <Textarea
-                        placeholder={`Enter note for ${action}`}
-                        value={note}
-                        onChange={(e) => setNote(e.target.value)}
-                      />
-                      <DialogFooter>
-                        <Button
-                          onClick={() => {
-                            handleStatusChange(action, note);
-                            setNote("");
-                            setDialogAction(null);
-                          }}
-                          className={buttonClass.replace("50", "100")}
-                        >
-                          Confirm {action}
-                        </Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
+                  <Button
+                    key={action}
+                    variant="outline"
+                    className={buttonClass}
+                    onClick={() => openStatusDialog(action)}
+                    disabled={updating}
+                  >
+                    {updating && dialogAction === action ? (
+                      <RefreshCw className="h-4 w-4 animate-spin mr-2" />
+                    ) : null}
+                    {action}
+                  </Button>
                 );
               })}
             </div>
@@ -258,7 +405,9 @@ export default function ClaimDetailsPage() {
                   <li key={i} className="bg-gray-50 p-3 rounded-md border">
                     <div className="flex justify-between">
                       <span className="font-semibold">{entry.status}</span>
-                      <span className="text-gray-500">{new Date(entry.date).toLocaleString()}</span>
+                      <span className="text-gray-500">
+                        {new Date(entry.date).toLocaleString()}
+                      </span>
                     </div>
                     {entry.note && <p className="text-gray-700 mt-1">Note: {entry.note}</p>}
                   </li>
@@ -268,6 +417,47 @@ export default function ClaimDetailsPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Status Update Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Update Claim Status: {dialogAction}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-gray-600">
+              Add a note to explain the reason for this status change:
+            </p>
+            <Textarea
+              placeholder={`Enter note for ${dialogAction || 'status change'}`}
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              rows={3}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={closeDialog} disabled={updating}>
+              Cancel
+            </Button>
+            <Button
+              onClick={() => handleStatusChange(dialogAction || "", note)}
+              disabled={updating || !note.trim()}
+              className={
+                dialogAction === "Approve"
+                  ? "bg-green-600 hover:bg-green-700 text-white"
+                  : dialogAction === "Reject"
+                  ? "bg-red-600 hover:bg-red-700 text-white"
+                  : ""
+              }
+            >
+              {updating ? (
+                <RefreshCw className="h-4 w-4 animate-spin mr-2" />
+              ) : null}
+              Confirm {dialogAction}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -280,3 +470,5 @@ function Detail({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
+
+export default withAuth(ClaimDetailsPage);

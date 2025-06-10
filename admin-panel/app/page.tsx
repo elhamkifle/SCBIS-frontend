@@ -2,10 +2,9 @@
 import { useState } from "react";
 import AdminSidebar from "@/components/AdminSideBar.";
 import AdminDashboardPage from "@/components/dashboard/AdminDashboard";
+import withAuth from "./utils/withAuth";
 
-
-
-export default function Home() {
+function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
@@ -50,3 +49,5 @@ export default function Home() {
     </div>
   );
 }
+
+export default withAuth(Home);

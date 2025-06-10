@@ -1,0 +1,197 @@
+import { io, Socket } from 'socket.io-client';
+import { PurchaseRequest } from './api';
+
+class SocketService {
+  private socket: Socket | null = null;
+  private reconnectAttempts = 0;
+  private maxReconnectAttempts = 5;
+  private baseUrl = 'http://localhost:3001';
+
+  // Initialize socket connection
+  connect(token?: string) {
+    if (this.socket?.connected) {
+      return this.socket;
+    }
+
+    try {
+      this.socket = io(`${this.baseUrl}/admin/purchase-requests`, {
+        auth: {
+          token: token || this.getAuthToken(),
+        },
+        transports: ['websocket', 'polling'],
+        timeout: 20000,
+        retries: 3,
+      });
+
+      this.setupEventHandlers();
+      return this.socket;
+    } catch (error) {
+      console.error('Failed to connect to socket server:', error);
+      return null;
+    }
+  }
+
+  // Disconnect socket
+  disconnect() {
+    if (this.socket) {
+      this.socket.disconnect();
+      this.socket = null;
+      this.reconnectAttempts = 0;
+    }
+  }
+
+  // Get authentication token
+  private getAuthToken(): string | null {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('accessToken');
+    }
+    return null;
+  }
+
+  // Setup event handlers
+  private setupEventHandlers() {
+    if (!this.socket) return;
+
+    this.socket.on('connect', () => {
+      console.log('✅ Socket connected:', this.socket?.id);
+      this.reconnectAttempts = 0;
+    });
+
+    this.socket.on('disconnect', (reason) => {
+      console.log('❌ Socket disconnected:', reason);
+    });
+
+    this.socket.on('connect_error', (error) => {
+      console.error('🔥 Socket connection error:', error);
+      this.handleReconnect();
+    });
+
+    this.socket.on('auth_error', (error) => {
+      console.error('🔐 Socket authentication error:', error);
+      // Redirect to login or refresh token
+      this.handleAuthError();
+    });
+  }
+
+  // Handle reconnection attempts
+  private handleReconnect() {
+    if (this.reconnectAttempts < this.maxReconnectAttempts) {
+      this.reconnectAttempts++;
+      const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000);
+      
+      console.log(`🔄 Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
+      
+      setTimeout(() => {
+        const token = this.getAuthToken();
+        if (token) {
+          this.connect(token);
+        }
+      }, delay);
+    } else {
+      console.error('❌ Max reconnection attempts reached');
+    }
+  }
+
+  // Handle authentication errors
+  private handleAuthError() {
+    this.disconnect();
+    // Clear auth data and redirect to login
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('user');
+      window.location.href = '/login';
+    }
+  }
+
+  // Purchase Requests Events
+  onPurchaseRequestCreated(callback: (request: PurchaseRequest) => void) {
+    this.socket?.on('purchase_request:created', callback);
+  }
+
+  onPurchaseRequestUpdated(callback: (request: PurchaseRequest) => void) {
+    this.socket?.on('purchase_request:updated', callback);
+  }
+
+  onPurchaseRequestStatusChanged(callback: (data: any) => void) {
+    this.socket?.on('purchase-request-status-changed', callback);
+  }
+
+  onPurchaseRequestRejected(callback: (data: any) => void) {
+    this.socket?.on('purchase-request-rejected', callback);
+  }
+
+  onPurchaseRequestApproved(callback: (data: any) => void) {
+    this.socket?.on('purchase-request-approved', callback);
+  }
+
+  onPurchaseRequestDeleted(callback: (data: { id: string }) => void) {
+    this.socket?.on('purchase_request:deleted', callback);
+  }
+
+  // Remove event listeners
+  offPurchaseRequestCreated(callback?: (request: PurchaseRequest) => void) {
+    this.socket?.off('purchase_request:created', callback);
+  }
+
+  offPurchaseRequestUpdated(callback?: (request: PurchaseRequest) => void) {
+    this.socket?.off('purchase_request:updated', callback);
+  }
+
+  offPurchaseRequestStatusChanged(callback?: (data: any) => void) {
+    this.socket?.off('purchase-request-status-changed', callback);
+  }
+
+  offPurchaseRequestRejected(callback?: (data: any) => void) {
+    this.socket?.off('purchase-request-rejected', callback);
+  }
+
+  offPurchaseRequestApproved(callback?: (data: any) => void) {
+    this.socket?.off('purchase-request-approved', callback);
+  }
+
+  offPurchaseRequestDeleted(callback?: (data: { id: string }) => void) {
+    this.socket?.off('purchase_request:deleted', callback);
+  }
+
+  // Join specific rooms (if needed)
+  joinPurchaseRequestsRoom() {
+    this.socket?.emit('join', 'purchase_requests');
+  }
+
+  leavePurchaseRequestsRoom() {
+    this.socket?.emit('leave', 'purchase_requests');
+  }
+
+  // Join specific request room for detailed updates
+  joinPurchaseRequestRoom(requestId: string) {
+    this.socket?.emit('join', `purchase_request:${requestId}`);
+  }
+
+  leavePurchaseRequestRoom(requestId: string) {
+    this.socket?.emit('leave', `purchase_request:${requestId}`);
+  }
+
+  // Emit events (if needed for admin actions)
+  emitPurchaseRequestViewed(requestId: string) {
+    this.socket?.emit('purchase_request:viewed', { requestId });
+  }
+
+  // Get socket instance
+  getSocket(): Socket | null {
+    return this.socket;
+  }
+
+  // Check connection status
+  isConnected(): boolean {
+    return this.socket?.connected || false;
+  }
+}
+
+// Create singleton instance
+const socketService = new SocketService();
+
+export default socketService;
+
+// Enable Socket.IO debugging
+localStorage.debug = 'socket.io-client:socket'; 

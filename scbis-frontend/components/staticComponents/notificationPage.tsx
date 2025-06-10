@@ -1,84 +1,36 @@
 "use client";
 
-import { useState } from "react";
 import { CheckCheck, Trash2 } from "lucide-react";
-
-interface Notification {
-  id: number;
-  title: string;
-  date: string;
-  time: string;
-  type: "General" | "Policy Updates" | "Claim Updates";
-  unread: boolean;
-  details?: string;
-}
+import { useNotificationStore } from "@/store/notificationStore/notifications";
 
 export default function NotificationsPage() {
-  const [notifications, setNotifications] = useState<Notification[]>([
-    {
-      id: 1,
-      title: "Scheduled system maintenance",
-      date: "March 8, 2025",
-      time: "9:00PM",
-      type: "General",
-      unread: true,
-    },
-    {
-      id: 2,
-      title: "Your policy is about to Expire, Action Required.",
-      date: "March 8, 2025",
-      time: "9:00PM",
-      type: "Policy Updates",
-      unread: true,
-      details: "Policy #1234 (Comprehensive Cover) for your [Vehicle Model] is set to expire in 5 days. Renew now to avoid any coverage gaps.",
-    },
-    {
-      id: 3,
-      title: "Your policy request has been rejected.",
-      date: "March 8, 2025",
-      time: "9:00PM",
-      type: "Policy Updates",
-      unread: true,
-      details: "Reason: Incorrect vehicle details. Please resubmit.",
-    },
-    {
-      id: 4,
-      title: "Your claim is under review",
-      date: "March 8, 2025",
-      time: "9:00PM",
-      type: "Claim Updates",
-      unread: true,
-    },
-  ]);
-
-  const [filter, setFilter] = useState("All");
-
-  const markAsRead = (id: number) => {
-    setNotifications(notifications.map(n => (n.id === id ? { ...n, unread: false } : n)));
-  };
-
-  const markAllAsRead = () => {
-    setNotifications(notifications.map(n => ({ ...n, unread: false })));
-  };
-
-  const deleteNotification = (id: number) => {
-    setNotifications(notifications.filter(n => n.id !== id));
-  };
+  const {
+    notifications,
+    filter,
+    markAsRead,
+    markAllAsRead,
+    deleteNotification,
+    setFilter,
+    // clearAllNotifications,
+    // resetToDefault,
+  } = useNotificationStore();
 
   const filteredNotifications =
-    filter === "All" ? notifications : notifications.filter(n => n.type === filter);
+    filter === "All" ? notifications : notifications.filter((n) => n.type === filter);
 
   return (
     <div className="p-8 bg-white text-black max-w-4xl mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Notifications</h1>
-        <button
-          className="flex items-center gap-2 text-blue-500 hover:text-blue-700"
-          onClick={markAllAsRead}
-        >
-          <CheckCheck size={20} />
-          <span>Mark All as Read</span>
-        </button>
+        <div className="flex gap-4">
+          <button
+            className="flex items-center gap-2 text-blue-500 hover:text-blue-700"
+            onClick={markAllAsRead}
+          >
+            <CheckCheck size={20} />
+            <span>Mark All as Read</span>
+          </button>
+        </div>
       </div>
 
       <div className="flex w-full justify-between" style={{ boxShadow: '0px 10px 20px rgba(0, 123, 255, 0.4), 0px 4px 4px rgba(0, 0, 0, 0.1)' }}>
