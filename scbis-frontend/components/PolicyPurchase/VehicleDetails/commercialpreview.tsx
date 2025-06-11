@@ -2,21 +2,24 @@
 import { useRouter } from 'next/navigation';
 import { Edit, Check } from 'lucide-react';
 import { useState } from 'react';
-import { useVehiclePurposeStore } from '@/store/vehicleDetails/purpose';
 import { useCommercialVehicleCategoryStore } from '@/store/vehicleDetails/commercialVehicle';
 import { useCommercialVehicleTwoStore } from '@/store/vehicleDetails/commercialVehicle2';
 import { useGeneralVehicleStore } from '@/store/vehicleDetails/generalVehicle';
 import { useOwnershipUsageStore } from '@/store/vehicleDetails/ownershipAndUsage';
+import { useVehicleSelectionStore } from '@/store/vehicleSelection/vehicleSelectionStore';
+import { useVehicleDocumentsStore } from '@/store/vehicleDetails/vehicleDocuments';
+import { vehiclePersistenceService } from '@/utils/vehicleApi';
 
 export default function CommercialVehiclePreview() {
   const router = useRouter();
   
   // Get all data from stores
-  const { selectedType } = useVehiclePurposeStore();
   const { selectedCategories: commercialCategories1 } = useCommercialVehicleCategoryStore();
   const { selectedCategories: commercialCategories2 } = useCommercialVehicleTwoStore();
   const { formData: vehicleData } = useGeneralVehicleStore();
   const { formData: ownershipData } = useOwnershipUsageStore();
+  const { isExistingVehicle, selectedVehicleId } = useVehicleSelectionStore();
+  const { driversLicense, vehicleLibre } = useVehicleDocumentsStore();
 
   const [isEditing, setIsEditing] = useState({
     purpose: false,
@@ -25,29 +28,129 @@ export default function CommercialVehiclePreview() {
     vehicle: false,
     ownership: false
   });
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const toggleEdit = (section: keyof typeof isEditing) => {
     setIsEditing(prev => ({ ...prev, [section]: !prev[section] }));
   };
 
-  const handleSubmit = () => {
-    console.log('Submitting policy with all data:', {
-      insuranceType: selectedType,
-      commercialCategories1,
-      commercialCategories2,
-      vehicleDetails: vehicleData,
-      ownershipDetails: ownershipData
-    });
+  // Helper function to map commercial categories to vehicle category
+  const mapCommercialCategoriesToVehicleCategory = () => {
+    const allCategories = { ...commercialCategories1, ...commercialCategories2 };
+    const selectedKeys = Object.keys(allCategories).filter(key => allCategories[key]);
+    
+    // Determine primary category based on selections
+    if (selectedKeys.some(key => key.includes('taxi') || key.includes('bus'))) {
+      return 'Commercial Bus';
+    } else if (selectedKeys.some(key => key.includes('goods') || key.includes('cartage'))) {
+      return 'Commercial Truck';
+    } else if (selectedKeys.some(key => key.includes('pcv'))) {
+      return 'Commercial PCV';
+    } else if (selectedKeys.some(key => key.includes('gcv'))) {
+      return 'Commercial GCV';
+    }
+    
+    return 'Commercial Vehicle'; // Default
+  };
 
-    alert('Policy submitted successfully!');
-  
-    localStorage.removeItem('insurance-storage');
-    localStorage.removeItem('commercial-vehicle-storage');
-    localStorage.removeItem('commercial-vehicle-two-storage');
-    localStorage.removeItem('general-vehicle-storage');
-    localStorage.removeItem('ownership-usage-storage');
+  const handleSubmit = async () => {
+    console.log('🚀 Starting commercial vehicle submission process...');
+    
+    // Check if documents are uploaded
+    if (!driversLicense || !vehicleLibre) {
+      const missingDocs = [];
+      if (!driversLicense) missingDocs.push("Driver's License");
+      if (!vehicleLibre) missingDocs.push("Vehicle Libre");
+      
+      const shouldContinue = confirm(
+        `⚠️ Warning: You haven't uploaded the following required documents: ${missingDocs.join(', ')}.\n\nDo you want to continue without these documents? (Not recommended)`
+      );
+      
+      if (!shouldContinue) {
+        return;
+      }
+    }
 
-    router.push('/policy-purchase/purchase/policySelection');
+    setError('');
+    setIsLoading(true);
+
+    try {
+      // Step 1: Transform commercial data to match the expected format
+      const formData = {
+        selectedType: 'commercial',
+        carType: mapCommercialCategoriesToVehicleCategory(),
+        usageType: 'commercial',
+        vehicleData,
+        ownershipData,
+        documents: {
+          driversLicense: driversLicense || undefined,
+          vehicleLibre: vehicleLibre || undefined
+        },
+        // Include commercial categories
+        commercialCategories1,
+        commercialCategories2
+      };
+
+      console.log('🏗️ Transformed commercial data:', formData);
+
+      const vehiclePayload = vehiclePersistenceService.buildVehiclePayload(formData);
+      console.log('🏗️ Built commercial vehicle payload:', vehiclePayload);
+
+      // Step 2: Save or update vehicle data
+      let vehiclePersistenceResult;
+      
+      if (isExistingVehicle && selectedVehicleId) {
+        console.log('🔄 Updating existing commercial vehicle...');
+        vehiclePersistenceResult = await vehiclePersistenceService.saveVehicleData(
+          vehiclePayload,
+          true,
+          selectedVehicleId
+        );
+      } else {
+        console.log('🆕 Creating new commercial vehicle...');
+        vehiclePersistenceResult = await vehiclePersistenceService.saveVehicleData(
+          vehiclePayload,
+          false
+        );
+      }
+
+      console.log('✅ Commercial vehicle persistence completed:', vehiclePersistenceResult);
+
+      // Step 3: Continue with policy submission
+      const vehicleId = vehiclePersistenceResult.data._id || selectedVehicleId;
+      
+      if (!vehicleId) {
+        throw new Error('Vehicle ID not found after persistence operation');
+      }
+
+      console.log('📋 Using vehicle ID for policy submission:', vehicleId);
+
+      // Show success message
+      const successMessage = vehiclePersistenceResult.isUpdate 
+        ? 'Commercial vehicle updated successfully!' 
+        : 'New commercial vehicle created successfully!';
+      
+      alert(successMessage);
+      
+      // Clear form data
+      localStorage.removeItem('insurance-storage');
+      localStorage.removeItem('commercial-vehicle-storage');
+      localStorage.removeItem('commercial-vehicle-two-storage');
+      localStorage.removeItem('general-vehicle-storage');
+      localStorage.removeItem('ownership-usage-storage');
+      localStorage.removeItem('vehicle-selection-storage');
+      localStorage.removeItem('vehicle-documents-storage');
+      
+      console.log('🧹 Cleared form storage');
+      router.push('/policy-purchase/purchase/policySelection');
+
+    } catch (error) {
+      console.error('❌ Commercial vehicle submission failed:', error);
+      setError(`❌ Failed to save commercial vehicle data: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handlePrevious = () => {
@@ -229,7 +332,7 @@ export default function CommercialVehiclePreview() {
         </div>
 
         {/* Ownership and Usage Section */}
-        <div className="mb-8">
+        <div className="border-b pb-4 mb-8">
           <div className="flex justify-between items-center">
             <h2 className="text-lg font-bold text-blue-600">5. Ownership and Usage</h2>
             <button onClick={() => toggleEdit('ownership')} className="text-blue-500 hover:text-blue-700">
@@ -245,19 +348,67 @@ export default function CommercialVehiclePreview() {
           </div>
         </div>
 
+        {/* Documents Section */}
+        <div className="border-b pb-4 mb-8">
+          <div className="flex justify-between items-center">
+            <h2 className="text-lg font-bold text-blue-600">6. Required Documents</h2>
+            <button 
+              onClick={() => router.push('/policy-purchase/vehicle-information/uploadDocs')} 
+              className="text-blue-500 hover:text-blue-700 text-sm"
+            >
+              Upload Documents
+            </button>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 px-4">
+            <div>
+              <strong>Driver&apos;s License:</strong>
+              <p className={`flex items-center gap-2 ${driversLicense ? 'text-green-600' : 'text-red-600'}`}>
+                {driversLicense ? '✅ Uploaded' : '❌ Not uploaded'}
+                {driversLicense && (
+                  <button 
+                    onClick={() => window.open(driversLicense, '_blank')} 
+                    className="text-blue-500 hover:text-blue-700 text-sm underline"
+                  >
+                    View
+                  </button>
+                )}
+              </p>
+            </div>
+            <div>
+              <strong>Vehicle Libre:</strong>
+              <p className={`flex items-center gap-2 ${vehicleLibre ? 'text-green-600' : 'text-red-600'}`}>
+                {vehicleLibre ? '✅ Uploaded' : '❌ Not uploaded'}
+                {vehicleLibre && (
+                  <button 
+                    onClick={() => window.open(vehicleLibre, '_blank')} 
+                    className="text-blue-500 hover:text-blue-700 text-sm underline"
+                  >
+                    View
+                  </button>
+                )}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {error && <p className="text-red-500 mt-4 text-center">{error}</p>}
+
         {/* Navigation Buttons */}
         <div className="w-full max-w-5xl flex justify-between my-6 pr-4">
           <button 
             onClick={handlePrevious} 
             className="bg-[#3AA4FF] text-white p-2 px-6 rounded"
+            disabled={isLoading}
           >
             Previous
           </button>
           <button 
             onClick={handleSubmit} 
             className="bg-green-500 text-white p-2 px-6 rounded"
+            disabled={isLoading}
           >
-            Submit Application
+            {isLoading ? <span className='loading loading-dots loading-lg'></span> : "Submit Application"}
           </button>
         </div>
       </div>
