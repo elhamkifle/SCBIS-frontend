@@ -105,6 +105,10 @@ interface VehicleFormData {
     driverType: string;
     seatingCapacity: string;
   };
+  documents?: {
+    driversLicense?: string;
+    vehicleLibre?: string;
+  };
 }
 
 interface VehiclePersistenceResult {
@@ -192,7 +196,7 @@ export const vehiclePersistenceService = {
     console.log('🏗️ Building vehicle payload from form data...');
     console.log('📋 Input form data:', formData);
 
-    const { selectedType, carType, usageType, vehicleData, ownershipData } = formData;
+    const { selectedType, carType, usageType, vehicleData, ownershipData, documents } = formData;
 
     // Map frontend values to backend format
     const mapCarTypeToBackendCategory = (privateCarType: string): string => {
@@ -211,27 +215,40 @@ export const vehiclePersistenceService = {
       return ['Personal Use'];
     };
 
+    const vehicleDetails: Record<string, unknown> = {
+      usageType: mapUsageTypeToArray(usageType),
+      vehicleCategory: mapCarTypeToBackendCategory(carType),
+      generalDetails: {
+        make: vehicleData.make || '',
+        model: vehicleData.model || '',
+        manufacturingYear: vehicleData.mfgYear ? parseInt(vehicleData.mfgYear, 10) : undefined,
+        chassisNumber: vehicleData.chassisNo || '',
+        engineCapacity: vehicleData.engineCapacity ? parseInt(vehicleData.engineCapacity, 10) : 0,
+        plateNumber: vehicleData.plateNo || '',
+        bodyType: vehicleData.bodyType || '',
+        engineNumber: vehicleData.engineNo || ''
+      },
+      ownershipUsage: {
+        ownerType: ownershipData.ownerType || '',
+        purchasedValue: ownershipData.purchasedValue ? parseInt(ownershipData.purchasedValue, 10) : 0,
+        dutyFree: ownershipData.dutyFree === 'Yes',
+        driverType: ownershipData.driverType || '',
+        seatingCapacity: ownershipData.seatingCapacity ? parseInt(ownershipData.seatingCapacity, 10) : 0
+      }
+    };
+
+    // Add documents if they exist
+    if (documents && (documents.driversLicense || documents.vehicleLibre)) {
+      vehicleDetails.documents = {
+        ...(documents.driversLicense && { driversLicense: documents.driversLicense }),
+        ...(documents.vehicleLibre && { vehicleLibre: documents.vehicleLibre })
+      };
+      console.log('📄 Including documents in payload:', vehicleDetails.documents);
+    }
+
     const payload = {
       vehicleType: selectedType === 'private' ? 'Private' : 'Commercial',
-      [selectedType === 'private' ? 'privateVehicle' : 'commercialVehicle']: {
-        usageType: mapUsageTypeToArray(usageType),
-        vehicleCategory: mapCarTypeToBackendCategory(carType),
-        generalDetails: {
-          make: vehicleData.make || '',
-          model: vehicleData.model || '',
-          engineCapacity: vehicleData.engineCapacity ? parseInt(vehicleData.engineCapacity, 10) : 0,
-          plateNumber: vehicleData.plateNo || '',
-          bodyType: vehicleData.bodyType || '',
-          engineNumber: vehicleData.engineNo || ''
-        },
-        ownershipUsage: {
-          ownerType: ownershipData.ownerType || '',
-          purchasedValue: ownershipData.purchasedValue ? parseInt(ownershipData.purchasedValue, 10) : 0,
-          dutyFree: ownershipData.dutyFree === 'Yes',
-          driverType: ownershipData.driverType || '',
-          seatingCapacity: ownershipData.seatingCapacity ? parseInt(ownershipData.seatingCapacity, 10) : 0
-        }
-      }
+      [selectedType === 'private' ? 'privateVehicle' : 'commercialVehicle']: vehicleDetails
     };
 
     console.log('✅ Vehicle payload built:', payload);
