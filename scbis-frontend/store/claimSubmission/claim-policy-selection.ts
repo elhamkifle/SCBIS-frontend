@@ -4,6 +4,8 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 interface GeneralDetails {
   make: string;
   model: string;
+  manufacturingYear?: number;
+  chassisNumber?: string;
   engineCapacity?: number;
   plateNumber: string;
   bodyType?: string;

@@ -12,6 +12,8 @@ interface VehicleData {
     generalDetails: {
       make: string;
       model: string;
+      manufacturingYear?: number;
+      chassisNumber?: string;
       engineCapacity: number;
       plateNumber: string;
       bodyType: string;
@@ -23,6 +25,10 @@ interface VehicleData {
       dutyFree: boolean;
       driverType: string;
       seatingCapacity: number;
+    };
+    documents?: {
+      driversLicense?: string;
+      vehicleLibre?: string;
     };
   };
   commercialVehicle?: any; // Add if needed
