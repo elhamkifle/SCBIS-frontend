@@ -16,11 +16,11 @@ export default function ClaimDriverDetails() {
   const router = useRouter();
   const {
     isDriverSameAsInsured,
-    agreed,
+    // agreed,
     formData,
     setDriverSame,
     updateFormData,
-    clearAllData
+    // clearAllData
   } = useDriverDetailsStore();
 
   const [error, setError] = useState('');
@@ -47,18 +47,18 @@ export default function ClaimDriverDetails() {
         'grade',
         'expirationDate'
       ];
-    
+
       const isFormValid = requiredFields.every(field => {
         const value = formData[field as keyof typeof formData];
         return String(value).trim() !== '';
       });
-    
+
       if (!isFormValid) {
         setError('All fields are required when driver is not the insured customer.');
         return;
       }
     }
-    
+
 
     console.log('Form Data:', formData);
     router.push('/claim-submission/accident-details');
@@ -79,7 +79,7 @@ export default function ClaimDriverDetails() {
       <div className="flex flex-wrap sm:justify-start md:justify-start items-center gap-4 mt-6 mb-4">
         <div className="flex items-center">
           <div className="w-7 h-7 flex items-center justify-center bg-[#1F4878] text-white rounded-full">1</div>
-          <span className="ml-2 font-medium text-black text-xs sm:text-base">Driver's Details</span>
+          <span className="ml-2 font-medium text-black text-xs sm:text-base">Driver&rsquo;s Details</span>
         </div>
         <div className="w-7 sm:border-t-2 border-gray-400"></div>
         <div className="flex items-center">
@@ -102,20 +102,20 @@ export default function ClaimDriverDetails() {
         <p className="text-lg">1. Was the driver at the moment of accident the same as the insured customer?</p>
         <div className="mt-2 flex space-x-6">
           <label className="flex items-center space-x-2">
-            <input 
-              type="radio" 
-              name="driver" 
+            <input
+              type="radio"
+              name="driver"
               checked={isDriverSameAsInsured === true}
-              onChange={() => setDriverSame(true)} 
+              onChange={() => setDriverSame(true)}
             />
             <p>Yes</p>
           </label>
           <label className="flex items-center space-x-2">
-            <input 
-              type="radio" 
-              name="driver" 
+            <input
+              type="radio"
+              name="driver"
               checked={isDriverSameAsInsured === false}
-              onChange={() => setDriverSame(false)} 
+              onChange={() => setDriverSame(false)}
             />
             <p>No</p>
           </label>
@@ -124,10 +124,10 @@ export default function ClaimDriverDetails() {
 
       {isDriverSameAsInsured === false && (
         <div className="mt-2 p-4">
-          <p className="text-lg">Please State the Driver's</p>
+          <p className="text-lg">Please State the Driver&rsquo;s</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
             <div className="relative w-full">
-              <label className="absolute left-4 -top-2 text-black text-md bg-white px-1">First Name</label>
+              <label htmlFor="firstName"  aria-label="First Name" className="absolute left-4 -top-2 text-black text-md bg-white px-1">First Name</label>
               <input
                 type="text"
                 name="firstName"
@@ -138,7 +138,7 @@ export default function ClaimDriverDetails() {
               />
             </div>
             <div className="relative w-full">
-              <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Last Name</label>
+              <label aria-label="Last Name"  className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Last Name</label>
               <input
                 type="text"
                 name="lastName"
@@ -149,7 +149,7 @@ export default function ClaimDriverDetails() {
               />
             </div>
             <div className="relative w-full">
-              <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Age</label>
+              <label aria-label="age" className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Age</label>
               <input
                 type="text"
                 name="age"
@@ -164,7 +164,7 @@ export default function ClaimDriverDetails() {
           <h3 className="mt-6 text-blue-600 font-semibold">Address</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
             <div className="relative w-full">
-              <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">City</label>
+              <label aria-label="city" className="absolute left-4 -top-2 text-black bg-white text-sm px-1">City</label>
               <select
                 name="city"
                 value={formData.city}
@@ -179,7 +179,7 @@ export default function ClaimDriverDetails() {
               </select>
             </div>
             <div className="relative w-full">
-              <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Subcity</label>
+              <label aria-label="subCity" className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Subcity</label>
               <input
                 type="text"
                 name="subCity"
@@ -190,7 +190,7 @@ export default function ClaimDriverDetails() {
               />
             </div>
             <div className="relative w-full">
-              <label className="absolute left-4 -top-2 text-black text-md bg-white px-1">Kebele</label>
+              <label aria-label="kebele" className="absolute left-4 -top-2 text-black text-md bg-white px-1">Kebele</label>
               <input
                 type="text"
                 name="kebele"
@@ -203,7 +203,7 @@ export default function ClaimDriverDetails() {
           </div>
 
           <div className="relative max-w-xs md:mt-6 mt-2">
-            <label className="absolute left-4 -top-2 text-black text-md bg-white px-1">Phone Number</label>
+            <label aria-label="phoneNumber" className="absolute left-4 -top-2 text-black text-md bg-white px-1">Phone Number</label>
             <input
               type="text"
               name="phoneNumber"
@@ -214,10 +214,10 @@ export default function ClaimDriverDetails() {
             />
           </div>
 
-          <h3 className="mt-6 text-blue-600 font-semibold">Driver's License</h3>
+          <h3 className="mt-6 text-blue-600 font-semibold">Driver&rsquo;s License</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
             <div className="relative w-full">
-              <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">License No.</label>
+              <label aria-label="licenseNo" className="absolute left-4 -top-2 text-black bg-white text-sm px-1">License No.</label>
               <input
                 type="text"
                 name="licenseNo"
@@ -228,7 +228,7 @@ export default function ClaimDriverDetails() {
               />
             </div>
             <div className="relative w-full">
-              <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Grade</label>
+              <label aria-label="grade" className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Grade</label>
               <select
                 name="grade"
                 value={formData.grade}
@@ -243,7 +243,7 @@ export default function ClaimDriverDetails() {
               </select>
             </div>
             <div className="relative w-full">
-              <label className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Expiration Date</label>
+              <label aria-label="date" className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Expiration Date</label>
               <input
                 type="date"
                 name="expirationDate"
@@ -256,6 +256,13 @@ export default function ClaimDriverDetails() {
           </div>
         </div>
       )}
+
+      {error && (
+        <p className="text-red-500 text-sm mt-2">
+          {error}
+        </p>
+      )}
+
 
       {/* Navigation Buttons */}
       <div className="w-full max-w-5xl flex justify-between items-center mt-8">

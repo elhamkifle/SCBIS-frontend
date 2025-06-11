@@ -1,9 +1,10 @@
 'use client';
 
-import { Fragment, useState } from 'react';
+import { Fragment, useState, useEffect } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { useRouter } from 'next/navigation';
 import { useClaimPolicyStore } from '@/store/claimSubmission/claim-policy-selection';
+import axios from 'axios';
 
 export default function ClaimPolicySelection() {
     const router = useRouter();
@@ -11,13 +12,14 @@ export default function ClaimPolicySelection() {
         policies,
         selectedPolicy,
         selectPolicy,
+        addPolicies,
     } = useClaimPolicyStore();
-    
+
     const [open, setOpen] = useState(false);
     const [error, setError] = useState('');
 
-    const handleSelect = (policyTitle: string) => {
-        selectPolicy(policyTitle);
+    const handleSelect = (policyId: string) => {
+        selectPolicy(policyId);
         setError('');
     };
 
@@ -28,12 +30,38 @@ export default function ClaimPolicySelection() {
             setError('Please select an insurance coverage to continue.');
             return;
         }
-        console.log('Selected Policy:', selectedPolicy);
         router.push('/claim-submission/claim-disclaimer');
     };
 
-    // Get the full policy details of the selected policy
     const selectedPolicyDetails = policies.find(p => p.title === selectedPolicy);
+
+
+    const getAuthTokenFromCookie = (): string | null => {
+        const match = document.cookie.match(/(?:^|;\s*)auth_token=([^;]*)/);
+        return match ? decodeURIComponent(match[1]) : null;
+    };
+
+    useEffect(() => {
+        const fetchPolicies = async () => {
+            try {
+                const accessToken = getAuthTokenFromCookie();
+                const response = await axios.get(
+                    'https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/policy/user-policies',
+                    {
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`,
+                        },
+                    }
+                );
+                console.log('Fetched policies:', response.data);
+                addPolicies(response.data);
+            } catch (error) {
+                console.error('Error fetching policies:', error);
+            }
+        };
+
+        fetchPolicies();
+    }, [addPolicies]);
 
     return (
         <div className="flex flex-col items-center px-4 mb-10">
@@ -45,7 +73,7 @@ export default function ClaimPolicySelection() {
                     </button>
                 </div>
             </div>
-            
+
             <div className="w-full flex-col justify-between items-center mt-2 md:ml-12 md:mb-12">
                 <p className='text-[#3AA4FF] font-bold text-start text-[22px] mb-2'>
                     Select the Relevant Insurance Policy for this Claim
@@ -53,35 +81,58 @@ export default function ClaimPolicySelection() {
                 <p className='text-[18px]'>Please select the insurance policy by clicking the card.</p>
             </div>
 
-            {/* Centered Grid */}
             <div className="flex justify-center w-full">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-24">
-                    {policies.map((policy, index) => (
-                        <div
-                            key={index}
-                            className={`bg-white px-16 py-8 rounded-2xl shadow-lg flex flex-col justify-around space-y-4 text-center md:mb-[20px] cursor-pointer ${
-                                selectedPolicy === policy.title 
-                                    ? 'border-2 border-green-500' 
-                                    : 'border border-gray-300'
-                            }`}
-                            style={{ boxShadow: '0px 10px 20px rgba(0, 123, 255, 0.4), 0px 4px 8px rgba(0, 0, 0, 0.1)' }}
-                            onClick={() => handleSelect(policy.title)}
-                        >
-                            <h3 className="text-xl font-semibold">{policy.title}</h3>
-                            <p className="text-md">
-                                <span className='text-[#3AA4FF] font-bold'>Coverage End Date:</span> 
-                                {policy.coverageEndDate}
-                            </p>
-                            <p className="text-md">
-                                <span className='text-[#3AA4FF] font-bold'>Territory:</span> 
-                                {policy.territory}
-                            </p>
-                            <p className="text-md">
-                                <span className='text-[#3AA4FF] font-bold'>Duration:</span> 
-                                {policy.duration}
-                            </p>
-                        </div>
-                    ))}
+                    {policies.map((policy) => {
+                        const generalDetails =
+                            policy.privateVehicle?.generalDetails ||
+                            policy.commercialVehicle?.generalDetails;
+
+                        return (
+                            <div
+                                key={policy._id}
+                                className={`bg-white px-16 py-8 rounded-2xl shadow-lg flex flex-col justify-around space-y-4 text-center md:mb-[20px] cursor-pointer ${selectedPolicy === policy._id
+                                        ? 'border-2 border-green-500'
+                                        : 'border border-gray-300'
+                                    }`}
+                                style={{
+                                    boxShadow:
+                                        '0px 10px 20px rgba(0, 123, 255, 0.4), 0px 4px 8px rgba(0, 0, 0, 0.1)',
+                                }}
+                                onClick={() => handleSelect(policy._id)}
+                            >
+                                <p className="text-sm text-gray-400">Policy ID: {policy._id}</p>
+                                <h3 className="text-xl font-semibold">{policy.title}</h3>
+                                <p className="text-md">
+                                    <span className="text-[#3AA4FF] font-bold">Coverage End Date:</span>{' '}
+                                    {policy.coverageEndDate}
+                                </p>
+                                <p className="text-md">
+                                    <span className="text-[#3AA4FF] font-bold">Territory:</span>{' '}
+                                    {policy.territory}
+                                </p>
+
+                                {generalDetails && (
+                                    <>
+                                        <p className="text-md">
+                                            <span className="text-[#3AA4FF] font-bold">Make:</span>{' '}
+                                            {generalDetails.make}
+                                        </p>
+                                        <p className="text-md">
+                                            <span className="text-[#3AA4FF] font-bold">Model:</span>{' '}
+                                            {generalDetails.model}
+                                        </p>
+                                        <p className="text-md">
+                                            <span className="text-[#3AA4FF] font-bold">Plate Number:</span>{' '}
+                                            {generalDetails.plateNumber}
+                                        </p>
+                                    </>
+                                )}
+                            </div>
+                        );
+                    })}
+
+
                 </div>
             </div>
 
@@ -111,7 +162,6 @@ export default function ClaimPolicySelection() {
                 </Dialog>
             </Transition>
 
-            {/* Navigation Buttons */}
             <div className="w-full max-w-5xl flex justify-between items-center mt-8">
                 <button
                     type="button"

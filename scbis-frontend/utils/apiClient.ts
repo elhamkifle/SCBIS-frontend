@@ -36,7 +36,7 @@ apiClient.interceptors.response.use(
 
       try {
         // Attempt to refresh token
-        await refreshToken();
+        // await refreshToken();
         
         // Update authorization header with new token
         const user = useUserStore.getState().user;

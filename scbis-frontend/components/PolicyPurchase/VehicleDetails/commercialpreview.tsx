@@ -57,7 +57,7 @@ export default function CommercialVehiclePreview() {
   // Helper function to get category names
   const getSelectedCategories = (categories: Record<string, boolean>) => {
     return Object.entries(categories)
-      .filter(([_, selected]) => selected)
+      .filter(([selected]) => selected)
       .map(([key]) => {
         // Map the keys to human-readable names
         const nameMap: Record<string, string> = {
@@ -157,7 +157,7 @@ export default function CommercialVehiclePreview() {
             <h2 className="text-lg font-bold text-blue-600">1. Insurance Purpose</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 px-4">
-            <div><strong>Selected Insurance Type:</strong> Commercial</div>
+            <div><strong>Selected Insurance Type:</strong> <p> Commercial </p> </div>
           </div>
         </div>
 

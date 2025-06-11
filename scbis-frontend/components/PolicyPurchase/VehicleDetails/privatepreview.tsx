@@ -11,6 +11,7 @@ import { useVehicleSelectionStore } from '@/store/vehicleSelection/vehicleSelect
 import { vehiclePersistenceService } from '@/utils/vehicleApi';
 import { baseAPI } from '@/utils/axiosInstance';
 import { useUserStore } from '@/store/authStore/useUserStore';
+import { set } from 'zod';
 
 type VehicleDetails = {
   make: string;
@@ -19,11 +20,11 @@ type VehicleDetails = {
   [key: string]: any;
 };
 
-type OwnershipUsageData = {
-  isOwned: boolean;
-  isUsedForWork: boolean;
-  [key: string]: any;
-};
+// type OwnershipUsageData = {
+//   isOwned: boolean;
+//   isUsedForWork: boolean;
+//   [key: string]: any;
+// };
 
 export default function PolicyPreview() {
   const router = useRouter();
@@ -183,25 +184,25 @@ export default function PolicyPreview() {
     }
   };
 
-  const handlePrevious = () => {
-    router.push('/policy-purchase/vehicle-information/ownershipAndUsage');
-  };
+  // const handlePrevious = () => {
+  //   router.push('/policy-purchase/vehicle-information/ownershipAndUsage');
+  // };
 
-  const YesNoDisplay = ({ value }: { value: string | boolean }) => {
-    const displayValue = typeof value === 'boolean' ? (value ? 'yes' : 'no') : value;
-    return (
-      <span className={`px-2 py-1 rounded-full text-sm font-medium ${
-        displayValue === 'yes' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-      }`}>
-        {displayValue === 'yes' ? 'Yes' : 'No'}
-      </span>
-    );
-  };
+  // const YesNoDisplay = ({ value }: { value: string | boolean }) => {
+  //   const displayValue = typeof value === 'boolean' ? (value ? 'yes' : 'no') : value;
+  //   return (
+  //     <span className={`px-2 py-1 rounded-full text-sm font-medium ${
+  //       displayValue === 'yes' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+  //     }`}>
+  //       {displayValue === 'yes' ? 'Yes' : 'No'}
+  //     </span>
+  //   );
+  // };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     const checked = type === 'checkbox' ? (e.target as HTMLInputElement).checked : undefined;
-  
+
     setVehicleData({
       ...vehicleData,
       [name]: type === 'checkbox' ? checked : value
@@ -211,7 +212,7 @@ export default function PolicyPreview() {
   const handleOwnershipChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     const checked = type === 'checkbox' ? (e.target as HTMLInputElement).checked : undefined;
-  
+
     setOwnershipData({
       ...ownershipData,
       [name]: type === 'checkbox' ? checked : value
@@ -228,16 +229,16 @@ export default function PolicyPreview() {
       <div className="bg-white p-8 pt-2 mb-10 rounded-xl w-full max-w-5xl"
         style={{ boxShadow: '0px 10px 20px rgba(0, 123, 255, 0.4), 0px 4px 8px rgba(0, 0, 0, 0.1)' }}>
 
-      <div className="w-full max-w-5xl mb-10 flex justify-between items-center mt-8">
-        <h2 className="md:text-xl sm:text-lg font-bold">Preview </h2>
-      </div>
+        <div className="w-full max-w-5xl mb-10 flex justify-between items-center mt-8">
+          <h2 className="md:text-xl sm:text-lg font-bold">Preview </h2>
+        </div>
 
         {/* Purpose Section */}
         <div className="border-b pb-4 mb-4">
           <div className="flex justify-between items-center">
             <h2 className="text-lg font-bold text-blue-600">1. Insurance Purpose</h2>
           </div>
-          
+
           {isEditing.purpose ? (
             <div className="mt-4">
               <div className="relative">
@@ -254,7 +255,7 @@ export default function PolicyPreview() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 px-4">
-              <div><strong>Selected Insurance Type:</strong> {selectedType === 'private' ? 'Private' : 'Commercial'}</div>
+              <div><strong>Selected Insurance Type:</strong> <p> {selectedType === 'private' ? 'Private' : 'Commercial'}  </p> </div>
             </div>
           )}
         </div>
@@ -267,7 +268,7 @@ export default function PolicyPreview() {
               {isEditing.category ? <Check size={20} /> : <Edit size={20} />}
             </button>
           </div>
-          
+
           {isEditing.category ? (
             <div className="mt-4 space-y-4">
               <div className="relative">
@@ -283,7 +284,7 @@ export default function PolicyPreview() {
                   <option value="minivan">Vans & Mini-Buses</option>
                 </select>
               </div>
-              
+
               <div className="flex flex-col gap-2">
                 <label className="font-medium">Usage Type</label>
                 <div className="flex gap-4">
@@ -310,13 +311,13 @@ export default function PolicyPreview() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 px-4">
-              <div><strong>Vehicle Type:</strong> {
+              <div><strong>Vehicle Type:</strong> <p>  {
                 carType === 'passenger' ? 'Passenger Cars' :
-                carType === 'suvs' ? 'SUVs & Off-Road Vehicles' :
-                carType === 'pickup' ? 'Pickup Trucks & Utility Vehicles' :
-                'Vans & Mini-Buses'
-              }</div>
-              <div><strong>Usage Type:</strong> {usageType === 'personal' ? 'Private/Personal Use' : 'Private Business Use'}</div>
+                  carType === 'suvs' ? 'SUVs & Off-Road Vehicles' :
+                    carType === 'pickup' ? 'Pickup Trucks & Utility Vehicles' :
+                      'Vans & Mini-Buses'
+              } </p> </div>
+              <div><strong>Usage Type:</strong> <p>  {usageType === 'personal' ? 'Private/Personal Use' : 'Private Business Use'} </p> </div>
             </div>
           )}
         </div>
@@ -329,7 +330,7 @@ export default function PolicyPreview() {
               {isEditing.vehicle ? <Check size={20} /> : <Edit size={20} />}
             </button>
           </div>
-          
+
           {isEditing.vehicle ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <div className="relative">
@@ -346,7 +347,7 @@ export default function PolicyPreview() {
                   ))}
                 </select>
               </div>
-              
+
               <div className="relative">
                 <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Model</label>
                 <input
@@ -357,7 +358,7 @@ export default function PolicyPreview() {
                   className="w-full p-2 border border-black rounded"
                 />
               </div>
-              
+
               <div className="relative">
                 <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Manufacturing Year</label>
                 <select
@@ -372,7 +373,7 @@ export default function PolicyPreview() {
                   ))}
                 </select>
               </div>
-              
+
               <div className="relative">
                 <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Engine Capacity (CC)</label>
                 <input
@@ -383,7 +384,7 @@ export default function PolicyPreview() {
                   className="w-full p-2 border border-black rounded"
                 />
               </div>
-              
+
               <div className="relative">
                 <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Chassis No</label>
                 <input
@@ -394,7 +395,7 @@ export default function PolicyPreview() {
                   className="w-full p-2 border border-black rounded"
                 />
               </div>
-              
+
               <div className="relative">
                 <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Engine No</label>
                 <input
@@ -405,7 +406,7 @@ export default function PolicyPreview() {
                   className="w-full p-2 border border-black rounded"
                 />
               </div>
-              
+
               <div className="relative">
                 <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Plate No</label>
                 <input
@@ -416,7 +417,7 @@ export default function PolicyPreview() {
                   className="w-full p-2 border border-black rounded"
                 />
               </div>
-              
+
               <div className="relative">
                 <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Body Type</label>
                 <select
@@ -434,14 +435,14 @@ export default function PolicyPreview() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 px-4">
-              <div><strong>Make:</strong> {vehicleData.make}</div>
-              <div><strong>Model:</strong> {vehicleData.model}</div>
-              <div><strong>Manufacturing Year:</strong> {vehicleData.mfgYear}</div>
-              <div><strong>Engine Capacity (CC):</strong> {vehicleData.engineCapacity}</div>
-              <div><strong>Chassis No:</strong> {vehicleData.chassisNo}</div>
-              <div><strong>Engine No:</strong> {vehicleData.engineNo}</div>
-              <div><strong>Plate No:</strong> {vehicleData.plateNo}</div>
-              <div><strong>Body Type:</strong> {vehicleData.bodyType}</div>
+              <div><strong>Make:</strong> <p>  {vehicleData.make} </p></div>
+              <div><strong>Model:</strong> <p>  {vehicleData.model} </p></div>
+              <div><strong>Manufacturing Year:</strong> <p> {vehicleData.mfgYear} </p> </div>
+              <div><strong>Engine Capacity (CC):</strong> <p>  {vehicleData.engineCapacity} </p></div>
+              <div><strong>Chassis No:</strong> <p>  {vehicleData.chassisNo} </p></div>
+              <div><strong>Engine No:</strong> <p> {vehicleData.engineNo}  </p></div>
+              <div><strong>Plate No:</strong> <p>  {vehicleData.plateNo} </p> </div>
+              <div><strong>Body Type:</strong> <p>  {vehicleData.bodyType} </p></div>
             </div>
           )}
         </div>
@@ -454,7 +455,7 @@ export default function PolicyPreview() {
               {isEditing.ownership ? <Check size={20} /> : <Edit size={20} />}
             </button>
           </div>
-          
+
           {isEditing.ownership ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <div className="relative">
@@ -469,7 +470,7 @@ export default function PolicyPreview() {
                   <option value="Company">Company</option>
                 </select>
               </div>
-              
+
               <div className="relative">
                 <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Driver Type</label>
                 <select
@@ -482,7 +483,7 @@ export default function PolicyPreview() {
                   <option value="any">Any Driver </option>
                 </select>
               </div>
-              
+
               <div className="relative">
                 <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Seating Capacity</label>
                 <input
@@ -493,7 +494,7 @@ export default function PolicyPreview() {
                   className="w-full p-2 border border-black rounded"
                 />
               </div>
-              
+
               <div className="relative">
                 <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Purchased Value</label>
                 <input
@@ -504,7 +505,7 @@ export default function PolicyPreview() {
                   className="w-full p-2 border border-black rounded"
                 />
               </div>
-              
+
               <div className="relative">
                 <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Duty Free</label>
                 <select
@@ -520,22 +521,24 @@ export default function PolicyPreview() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 px-4">
-              <div><strong>Owner Type:</strong> {ownershipData.ownerType}</div>
-              <div><strong>Driver Type:</strong> {ownershipData.driverType}</div>
-              <div><strong>Seating Capacity:</strong> {ownershipData.seatingCapacity}</div>
-              <div><strong>Purchased Value:</strong> {ownershipData.purchasedValue}</div>
-              <div><strong>Duty Free:</strong> {ownershipData.dutyFree}</div>
+              <div><strong>Owner Type:</strong> <p>{ownershipData.ownerType}</p></div>
+              <div><strong>Driver Type:</strong> <p>{ownershipData.driverType}</p></div>
+              <div><strong>Seating Capacity:</strong> <p>{ownershipData.seatingCapacity}</p></div>
+              <div><strong>Purchased Value:</strong> <p>{ownershipData.purchasedValue}</p></div>
+              <div><strong>Duty Free:</strong> <p>{ownershipData.dutyFree}</p></div>
             </div>
           )}
         </div>
 
+        {error && <p className="text-red-500 mt-4 text-center">{error}</p>}
+
         {/* Navigation Buttons */}
         <div className="w-full max-w-5xl flex justify-end my-6 pr-4">
-          <button 
-            onClick={handleSubmit} 
+          <button
+            onClick={handleSubmit}
             className="bg-green-500 text-white p-2 px-6 rounded"
           >
-            {isLoading ? <span className='loading loading-dots loading-lg'></span> :"Submit Application"}
+            {isLoading ? <span className='loading loading-dots loading-lg'></span> : "Submit Application"}
           </button>
         </div>
       </div>

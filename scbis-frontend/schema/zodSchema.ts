@@ -5,7 +5,22 @@ export const AuthSchema = z.object({
     password: z.string().min(8,"Password must be at least 8 characters long"),
 })
 
-export type AuthSchemaType = {
-    email: string;
-    password: string;
-}
+export const ForgotPasswordSchema = z.object({
+    email: z.string().email("Invalid email address"),
+    Phone:z.string().min(10,"Phone number must be 10 digits long")
+})
+
+
+
+
+export const ResetPasswordSchema = z.object({
+    password: z.string().min(8,"Password must be at least 8 characters long"),
+    confirmPassword: z.string().min(8,"Password must be at least 8 characters long"),
+})
+
+
+
+
+export type AuthSchemaType = z.infer<typeof AuthSchema>;
+export type ResetPasswordSchemaType = z.infer<typeof ResetPasswordSchema>
+export type ForgotPasswordSchemaType = z.infer<typeof ForgotPasswordSchema>

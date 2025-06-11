@@ -3,6 +3,8 @@
 import DashboardStats from "@/components/dashboard/DashboardStats";
 import DashboardClaimsChart from "@/components/dashboard/DashboardClaimsChart";
 import RecentActivity from "@/components/dashboard/RecentActivity";
+import PolicyPieChart from "./PolicyPieChart";
+import SummaryStats from "./SummaryStats";
 
 export default function AdminDashboardPage() {
   return (
@@ -17,6 +19,14 @@ export default function AdminDashboardPage() {
         <DashboardClaimsChart />
         <RecentActivity />
       </div>
+      <SummaryStats
+              totalPolicies={10234}
+              totalRevenue={189230}
+              onCardClick={() => {}}
+            />
+
+            {/* Policy Distribution Chart */}
+    <PolicyPieChart />
     </div>
   );
 }

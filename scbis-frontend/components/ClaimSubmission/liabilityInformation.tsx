@@ -18,11 +18,11 @@ export default function LiabilityInformation() {
     setPoliceInvolved,
     setpoliceOfficerName,
     setPoliceStation,
-    clearAllData
+    // clearAllData
   } = useLiabilityInformationStore();
 
   const handlePrevious = () => router.push('/claim-submission/accident-details');
-    
+
   const handleNext = () => {
     router.push('/claim-submission/witness-information');
   };
@@ -42,7 +42,7 @@ export default function LiabilityInformation() {
       <div className="flex flex-wrap sm:justify-start md:justify-start items-center gap-4 mt-6 mb-4">
         <div className="flex items-center">
           <div className="w-7 h-7 flex items-center justify-center bg-green-500 text-white rounded-full">1</div>
-          <span className="ml-2 font-medium text-black text-xs sm:text-base">Driver's Details</span>
+          <span className="ml-2 font-medium text-black text-xs sm:text-base">Driver&rsquo;s Details</span>
         </div>
         <div className="w-7 sm:border-t-2 border-gray-400"></div>
         <div className="flex items-center">
@@ -69,13 +69,13 @@ export default function LiabilityInformation() {
         <div className="flex flex-wrap lg:flex-nowrap gap-4">
           {['Myself', 'The other person'].map((option) => (
             <label key={option} className="flex items-center">
-              <input 
-                type="radio" 
-                name="responsibleParty" 
-                value={option} 
-                onChange={() => setResponsibleParty(option)} 
-                checked={responsibleParty === option} 
-                className="mr-2" 
+              <input
+                type="radio"
+                name="responsibleParty"
+                value={option}
+                onChange={() => setResponsibleParty(option)}
+                checked={responsibleParty === option}
+                className="mr-2"
               />
               {option}
             </label>
@@ -89,13 +89,13 @@ export default function LiabilityInformation() {
         <div className="flex flex-wrap lg:flex-nowrap gap-4">
           {['I dont know', 'Yes , they are'].map((option) => (
             <label key={option} className="flex items-center">
-              <input 
-                type="radio" 
-                name="otherInsuredStatus" 
-                value={option} 
-                onChange={() => setOtherInsuredStatus(option)} 
-                checked={otherInsuredStatus === option} 
-                className="mr-2" 
+              <input
+                type="radio"
+                name="otherInsuredStatus"
+                value={option}
+                onChange={() => setOtherInsuredStatus(option)}
+                checked={otherInsuredStatus === option}
+                className="mr-2"
               />
               {option}
             </label>
@@ -105,12 +105,13 @@ export default function LiabilityInformation() {
           <div>
             <p className="font-semibold">If so please state</p>
             <div className="relative w-full mt-4">
-              <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Name of the Insurance Company</label>
+              <label htmlFor='otherInsuranceCompanyName' className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Name of the Insurance Company</label>
               <input
                 type="text"
+                id='otherInsuranceCompanyName'
                 value={OtherInsuranceCompanyName}
                 onChange={(e) => setOtherInsuranceCompanyName(e.target.value)}
-                className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400" 
+                className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
             </div>
           </div>
@@ -120,38 +121,53 @@ export default function LiabilityInformation() {
       {/* Police Involvement */}
       <div className="mt-4">
         <p className="font-semibold">Were particulars taken by police?</p>
-        <div className="flex flex-wrap lg:flex-nowrap gap-4">
-          {['Yes', 'No'].map((option) => (
-            <label key={option} className="flex items-center">
-              <input 
-                type="radio" 
-                name="policeInvolved" 
-                value={option} 
-                onChange={() => setPoliceInvolved(option)} 
-                checked={policeInvolved === option} 
-                className="mr-2" 
-              />
-              {option}
-            </label>
-          ))}
+        <div className="flex space-x-6"> 
+          <label className="flex items-center">
+            <input
+              type="radio"
+              value="Yes"
+              name="policeInvolved"
+              checked={policeInvolved === "Yes"}
+              onChange={(e) => setPoliceInvolved(e.target.value)}
+              className="mr-2"
+            />
+            Yes
+          </label>
+
+          <label className="flex items-center">
+            <input
+              type="radio"
+              value="No"
+              name="policeInvolved"
+              checked={policeInvolved === "No"}
+              onChange={(e) => setPoliceInvolved(e.target.value)}
+              className="mr-2"
+            />
+            No
+          </label>
         </div>
+
+
+
         {policeInvolved === 'Yes' && (
           <div className="mt-2">
             <p className="font-semibold">If so please state</p>
             <div className="flex flex-col md:flex-row gap-4 mt-2">
               <div className="relative w-full md:w-1/2">
-                <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Police Officer's Name</label>
+                <label htmlFor='policeOfficerName' className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Police Officer&rsquo;s Name</label>
                 <input
                   type="text"
+                  id='policeOfficerName'
                   value={policeOfficerName}
                   onChange={(e) => setpoliceOfficerName(e.target.value)}
                   className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
               </div>
               <div className="relative w-full md:w-1/2">
-                <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Police Station</label>
+                <label htmlFor='policeStation' className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Police Station</label>
                 <input
                   type="text"
+                  id='policeStation'
                   value={policeStation}
                   onChange={(e) => setPoliceStation(e.target.value)}
                   className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"

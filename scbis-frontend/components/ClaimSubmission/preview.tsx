@@ -16,10 +16,24 @@ import { useDamageDetailsStore } from '@/store/claimSubmission/damage-details';
 
 export default function ClaimPreview() {
   const router = useRouter();
+  const { selectedPolicy, policies } = useClaimPolicyStore.getState();
 
-  // Get all data from stores and their update functions
-  const { selectedVehicle, selectVehicle, vehicles } = useVehicleSelectionStore();
-  const { selectedPolicy, policies, selectPolicy } = useClaimPolicyStore();
+  const selectedPolicyObj = policies.find(p => p._id === selectedPolicy);
+
+  if (!selectedPolicyObj?._id) {
+    console.error('No policy selected or policy not found');
+    return;
+  }
+
+  const generalDetails =
+    selectedPolicyObj?.privateVehicle?.generalDetails ||
+    selectedPolicyObj?.commercialVehicle?.generalDetails;
+
+  const selectedVehicle = generalDetails
+    ? `${generalDetails.make} ${generalDetails.model}`
+    : '';
+
+
   const {
     isDriverSameAsInsured,
     formData: driver,
@@ -58,7 +72,7 @@ export default function ClaimPreview() {
     setVisibilityObstructions,
     setintersectionType,
     addVehicle,
-    removeVehicle,
+    // removeVehicle,
     updateVehicle
   } = useAccidentDetailsStore();
   const {
@@ -83,11 +97,11 @@ export default function ClaimPreview() {
     whyNoWitness,
     setAloneInVehicle,
     addVehicleOccupant,
-    removeVehicleOccupant,
+    // removeVehicleOccupant,
     updateVehicleOccupant,
     setindependentWitnessPresent,
     addIndependentWitness,
-    removeIndependentWitness,
+    // removeIndependentWitness,
     updateIndependentWitness,
     setwhyNoWitness
   } = useWitnessInformationStore();
@@ -96,10 +110,10 @@ export default function ClaimPreview() {
     insuredFullName,
     signatureDate,
     agreedToDeclaration,
-    setdriverFullName,
-    setinsuredFullName,
-    setsignatureDate,
-    setagreedToDeclaration
+    // setdriverFullName,
+    // setinsuredFullName,
+    // setsignatureDate,
+    // setagreedToDeclaration
   } = useDeclarationStore();
 
   const {
@@ -109,13 +123,13 @@ export default function ClaimPreview() {
     injuredPersons,
     vehicleDamageFiles,
     thirdPartyDamageFiles,
-    error,
+    // error,
     setvehicleDamageDesc,
     setthirdPartyDamageDesc,
     setinjuriesAny,
     setInjuredPersons,
-    setError,
-    clearAllData
+    // setError,
+    // clearAllData
   } = useDamageDetailsStore();
 
   const [isEditing, setIsEditing] = useState({
@@ -134,7 +148,7 @@ export default function ClaimPreview() {
 
   const handleSubmit = async () => {
     const claimData = {
-      policyId: "67fd5e03c2f1bd131f38a8ab",
+      policyId: selectedPolicyObj._id,
       isDriverSameAsInsured,
       driver: {
         ...driver
@@ -200,10 +214,19 @@ export default function ClaimPreview() {
 
     console.log(claimData);
 
-    const accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2N2ZkNTRlY2QzZGM1MzIxYTkwOWIyNDYiLCJyb2xlcyI6WyJ1c2VyIl0sImlhdCI6MTc0Njg5NDgzMSwiZXhwIjoxNzQ2ODk4NDMxfQ.oAQyZ5boJnsWWvFZm3aSehnD9JFaamufPIaoVmLU0CA"; // Provided accessToken
+    const getAuthTokenFromCookie = (): string | null => {
+      const match = document.cookie.match(/(?:^|;\s*)auth_token=([^;]*)/);
+      return match ? decodeURIComponent(match[1]) : null;
+    };
+
 
     try {
-      // Sending the claim data using Axios
+      const accessToken = getAuthTokenFromCookie();
+      if (!accessToken) {
+        console.warn('No auth token found in cookies.');
+        return;
+      }
+
       const response = await axios.post("https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/claims", claimData, {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -212,7 +235,7 @@ export default function ClaimPreview() {
       });
 
       console.log(response);
-  
+
       const storesToClear = [
         'accident-details-storage',
         'claim-policy-selection-storage',
@@ -224,11 +247,11 @@ export default function ClaimPreview() {
         'vehicle-selection-storage',
         'witness-information-storage'
       ];
-  
+
       storesToClear.forEach(storeName => {
         localStorage.removeItem(storeName);
       });
-  
+
       useAccidentDetailsStore.getState().clearAllData();
       useClaimPolicyStore.getState().clearAllData();
       useDriverDetailsStore.getState().clearAllData();
@@ -236,16 +259,23 @@ export default function ClaimPreview() {
       useVehicleSelectionStore.getState().clearAllData();
       useWitnessInformationStore.getState().clearAllData();
       useDeclarationStore.getState().clearAllData();
-  
+
       alert("Claim submitted successfully!")
-  
-    } catch (error:any) {
-      if (error.response) {
-        console.log('Error response:', error.response.data); // Response from the server
-      } else if (error.request) {
-        console.log('Error request:', error.request); // Request was sent, but no response was received
+      router.push("/dasboard")
+
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          console.log('Error response:', error.response.data);
+        } else if (error.request) {
+          console.log('Error request:', error.request);
+        } else {
+          console.log('Error message:', error.message);
+        }
+      } else if (error instanceof Error) {
+        console.log('General error:', error.message);
       } else {
-        console.log('Error message:', error.message); // Any other error
+        console.log('Unexpected error:', error);
       }
     }
 
@@ -286,8 +316,8 @@ export default function ClaimPreview() {
   };
 
   // Fix for select elements by ensuring values are never null
-  const safeDriverGrade = driver.grade || '';
-  const safeExpirationDate = driver.expirationDate || '';
+  // const safeDriverGrade = driver.grade || '';
+  // const safeExpirationDate = driver.expirationDate || '';
 
 
   return (
@@ -1019,7 +1049,7 @@ export default function ClaimPreview() {
               {injuriesAny && (
                 <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="relative">
-                    <label className="block text-sm font-medium mb-1">Injured Person's Name</label>
+                    <label className="block text-sm font-medium mb-1">Injured Person&rsquo;s Name</label>
                     <input
                       type="text"
                       value={injuredPersons.name}
@@ -1028,7 +1058,7 @@ export default function ClaimPreview() {
                     />
                   </div>
                   <div className="relative">
-                    <label className="block text-sm font-medium mb-1">Injured Person's Address</label>
+                    <label className="block text-sm font-medium mb-1">Injured Person&rsquo;s Address</label>
                     <input
                       type="text"
                       value={injuredPersons.address}

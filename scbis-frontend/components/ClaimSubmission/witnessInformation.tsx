@@ -20,7 +20,7 @@ export default function WitnessInformation() {
     updateIndependentWitness,
     removeIndependentWitness,
     setwhyNoWitness,
-    clearAllData
+    // clearAllData
   } = useWitnessInformationStore();
 
   const handlePrevious = () => router.push('/claim-submission/liability-information');
@@ -41,7 +41,7 @@ export default function WitnessInformation() {
       <div className="flex flex-wrap sm:justify-start md:justify-start items-center gap-4 mt-6 mb-4">
         <div className="flex items-center">
           <div className="w-7 h-7 flex items-center justify-center bg-green-500 text-white rounded-full">1</div>
-          <span className="ml-2 font-medium text-black text-xs sm:text-base">Driver's Details</span>
+          <span className="ml-2 font-medium text-black text-xs sm:text-base">Driver&rsquo;s Details</span>
         </div>
         <div className="w-7 sm:border-t-2 border-gray-400"></div>
         <div className="flex items-center">
@@ -60,33 +60,45 @@ export default function WitnessInformation() {
         </div>
       </div>
 
-      {/* Alone in Vehicle */}
       <div className="mt-4">
         <p className="font-semibold">Were you alone in your vehicle during the accident</p>
         <div className="flex gap-4">
-          {['Yes I was', 'No I wasn\'t alone'].map((option) => (
-            <label key={option} className="flex items-center">
-              <input 
-                type="radio" 
-                name="aloneInVehicle" 
-                value={option} 
-                onChange={() => setAloneInVehicle(option)} 
-                checked={aloneInVehicle === option} 
-                className="mr-2" 
-              />
-              {option}
-            </label>
-          ))}
+          {['Yes I was', "No I wasn't alone"].map((option, idx) => {
+            const radioId = `aloneInVehicle-${idx}`;
+            return (
+              <label key={option} htmlFor={radioId} className="flex items-center">
+                <input
+                  id={radioId}
+                  type="radio"
+                  name="aloneInVehicle"
+                  value={option}
+                  onChange={() => setAloneInVehicle(option)}
+                  checked={aloneInVehicle === option}
+                  className="mr-2"
+                />
+                {option}
+              </label>
+            );
+          })}
         </div>
 
-        {aloneInVehicle === 'No I wasn\'t alone' && (
+        {aloneInVehicle === "No I wasn't alone" && (
           <div className="mt-4">
             <p className="font-semibold">Give name and addresses of persons in your vehicle</p>
             {vehicleOccupants.map((occupant, index) => (
-              <div key={index} className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_auto] gap-4 mt-2 items-end">
+              <div
+                key={index}
+                className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_auto] gap-4 mt-2 items-end"
+              >
                 <div className="relative w-full">
-                  <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Full Name</label>
+                  <label
+                    htmlFor={`vehicleOccupant-name-${index}`}
+                    className="absolute left-4 -top-2 text-black bg-white text-sm px-1"
+                  >
+                    Full Name
+                  </label>
                   <input
+                    id={`vehicleOccupant-name-${index}`}
                     type="text"
                     value={occupant.name}
                     onChange={(e) => updateVehicleOccupant(index, 'name', e.target.value)}
@@ -95,8 +107,14 @@ export default function WitnessInformation() {
                 </div>
 
                 <div className="relative w-full">
-                  <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Address/Phone Number</label>
+                  <label
+                    htmlFor={`vehicleOccupant-contact-${index}`}
+                    className="absolute left-4 -top-2 text-black bg-white text-sm px-1"
+                  >
+                    Address/Phone Number
+                  </label>
                   <input
+                    id={`vehicleOccupant-contact-${index}`}
                     type="text"
                     value={occupant.contact}
                     onChange={(e) => updateVehicleOccupant(index, 'contact', e.target.value)}
@@ -134,29 +152,42 @@ export default function WitnessInformation() {
       <div className="mt-6">
         <p className="font-semibold">Were there any independent witnesses?</p>
         <div className="flex flex-wrap gap-4">
-          {['Yes', 'Yes. I dont have their names', 'No, there were no witnesses'].map((option) => (
-            <label key={option} className="flex items-center">
-              <input
-                type="radio"
-                name="independentWitnessPresent"
-                value={option}
-                onChange={() => setindependentWitnessPresent(option)}
-                checked={independentWitnessPresent === option}
-                className="mr-2"
-              />
-              {option}
-            </label>
-          ))}
+          {['Yes', "Yes. I dont have their names", 'No, there were no witnesses'].map((option, idx) => {
+            const radioId = `independentWitnessPresent-${idx}`;
+            return (
+              <label key={option} htmlFor={radioId} className="flex items-center">
+                <input
+                  id={radioId}
+                  type="radio"
+                  name="independentWitnessPresent"
+                  value={option}
+                  onChange={() => setindependentWitnessPresent(option)}
+                  checked={independentWitnessPresent === option}
+                  className="mr-2"
+                />
+                {option}
+              </label>
+            );
+          })}
         </div>
 
         {independentWitnessPresent === 'Yes' && (
           <div className="mt-4">
             <p className="font-semibold">Give name and addresses of witnesses.</p>
             {independentWitnesses.map((witness, index) => (
-              <div key={index} className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_auto] gap-4 mt-2 items-end">
+              <div
+                key={index}
+                className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_auto] gap-4 mt-2 items-end"
+              >
                 <div className="relative w-full">
-                  <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Full Name</label>
+                  <label
+                    htmlFor={`independentWitness-name-${index}`}
+                    className="absolute left-4 -top-2 text-black bg-white text-sm px-1"
+                  >
+                    Full Name
+                  </label>
                   <input
+                    id={`independentWitness-name-${index}`}
                     type="text"
                     value={witness.name}
                     onChange={(e) => updateIndependentWitness(index, 'name', e.target.value)}
@@ -165,8 +196,14 @@ export default function WitnessInformation() {
                 </div>
 
                 <div className="relative w-full">
-                  <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Address/Phone Number</label>
+                  <label
+                    htmlFor={`independentWitness-contact-${index}`}
+                    className="absolute left-4 -top-2 text-black bg-white text-sm px-1"
+                  >
+                    Address/Phone Number
+                  </label>
                   <input
+                    id={`independentWitness-contact-${index}`}
                     type="text"
                     value={witness.contact}
                     onChange={(e) => updateIndependentWitness(index, 'contact', e.target.value)}
@@ -203,6 +240,7 @@ export default function WitnessInformation() {
           <div className="mt-4">
             <p className="font-semibold">If No, why?</p>
             <textarea
+              id="whyNoWitness"
               placeholder="Reason"
               value={whyNoWitness}
               onChange={(e) => setwhyNoWitness(e.target.value)}
@@ -212,6 +250,7 @@ export default function WitnessInformation() {
           </div>
         )}
       </div>
+
 
       {/* Navigation Buttons */}
       <div className="w-full max-w-5xl flex justify-between items-center mt-8">

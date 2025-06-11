@@ -134,11 +134,11 @@ export default function DriverInformation() {
         {errors.employDriver && <p className="text-red-500">{errors.employDriver}</p>}
         {formData.employDriver === 'yes' && (
           <div className="mt-4">
-            <p>Please State the driver's information</p>
+            <p>Please State the driver&apos;s information</p>
             {formData.drivers.map((driver, index) => (
               <div key={index} className="flex flex-col lg:flex-row gap-4 mt-4">
                 <div className="flex-1">
-                <label className="block text-md font-medium text-black mb-2">Driver's License Grade/Level</label>
+                <label className="block text-md font-medium text-black mb-2">Driver&apos;s License Grade/Level</label>
                   <select 
                     name="driverLicenseGrade" 
                     className="border p-2 w-full" 
@@ -155,7 +155,7 @@ export default function DriverInformation() {
                   )}
                 </div>
                 <div className="flex-1">
-                  <label className="block text-md font-medium text-black mb-2">Driver's Name</label>
+                  <label className="block text-md font-medium text-black mb-2">Driver&apos;s Name</label>
                   <input
                     type="text"
                     name="driverName"
@@ -236,7 +236,7 @@ export default function DriverInformation() {
 
       {/* Question 4 */}
       <div className="mb-8">
-        <label className="font-semibold">4. Do you or any driver of the vehicle(s) have had less than six months' experience?</label>
+        <label className="font-semibold">4. Do you or any driver of the vehicle(s) have had less than six months&apos; experience?</label>
         <div className="flex gap-4 mt-4">
           <label>
             <input type="radio" name="lessThanSixMonthsExperience" value="yes" onChange={handleChange} checked={formData.lessThanSixMonthsExperience === 'yes'} /> Yes

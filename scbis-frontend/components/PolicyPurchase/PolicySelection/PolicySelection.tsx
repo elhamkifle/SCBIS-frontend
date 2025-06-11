@@ -129,7 +129,7 @@ export default function PolicySelection() {
         {covers.map((cover, index) => (
           <div
             key={index}
-            className={`bg-white p-6 rounded-2xl shadow-lg flex flex-col justify-between space-y-4 text-center md:mb-[20px] md:min-h-[400px] cursor-pointer ${
+            className={`bg-white p-6 text-black rounded-2xl shadow-lg flex flex-col justify-between space-y-4 text-center md:mb-[20px] md:min-h-[400px] cursor-pointer ${
               selectedPolicy === cover.title ? 'border-2 border-green-500' : 'border border-gray-300'
             }`}
             style={{ boxShadow: '0px 10px 20px rgba(0, 123, 255, 0.4), 0px 4px 8px rgba(0, 0, 0, 0.1)' }}
@@ -191,7 +191,9 @@ export default function PolicySelection() {
       </Transition>
 
       <div className="flex justify-between w-full max-w-6xl mt-8">
-        <button className="border border-black px-4 py-2 rounded-lg">Learn More</button>
+        <button className="border border-black px-4 py-2 rounded-lg text-black"
+        onClick={() => router.push('/policy-information')}
+        >Learn More</button>
         <button
           onClick={handleNext}
           className="bg-blue-500 text-white p-5 md:px-10 py-2 rounded"

@@ -3,8 +3,10 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import useLoginStore from "@/store/authStore/useLoginStore";
-import { AuthSchemaType, AuthSchema } from "@/schema/zodSchema";
+import { AuthSchemaType } from "@/schema/zodSchema";
 import { useUserStore } from "@/store/authStore/useUserStore";
+import Link from "next/link";
+
 
 export default function Login() {
     const setUser = useUserStore((state) => state.setUser);
@@ -27,16 +29,18 @@ export default function Login() {
         setIsLoading(true);
         setError(false);
 
-        const validation = AuthSchema.safeParse({ email, password });
-        if (!validation.success) {
-            const errors = validation.error.flatten();
-            setZodError({
-                email: errors.fieldErrors.email ? errors.fieldErrors.email[0] : '',
-                password: errors.fieldErrors.password ? errors.fieldErrors.password[0] : ''
-            });
-            setIsLoading(false);
-            return;
-        }
+        // const validation = AuthSchema.safeParse({ email, password });
+        // if (!validation.success) {
+        //     const errors = validation.error.flatten();
+        //     setZodError({
+        //         email: errors.fieldErrors.email ? errors.fieldErrors.email[0] : '',
+        //         password: errors.fieldErrors.password ? errors.fieldErrors.password[0] : ''
+        //     });
+
+        //     setIsLoading(false)
+            
+        //     return;
+        // }
 
         try {
             const serverResponse = await fetch(`https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/auth/login`, {
@@ -66,7 +70,7 @@ export default function Login() {
                     refreshToken: data.refreshToken
                 });
                 console.log(data.user)
-                router.push('/policy-purchase/personal-information/personalDetails');
+                router.push('/dashboard');
             } else {
                 setError(data.message || "Login failed. Please check your credentials.");
             }
@@ -91,37 +95,43 @@ export default function Login() {
 
             <div className="w-full border-none md:rounded-tl-[35px] md:rounded-bl-[35px] md:w-2/3 h-full flex justify-center items-center bg-gradient-to-b from-[#9ECCF3] to-[#3E99E7]">
                 <div className="w-full md:w-3/5 flex flex-col gap-8 p-3 md:p-8 " style={{background:'linear-gradient(to top,rgba(197, 191, 191, 0.65), rgba(215, 209, 209, 0.3))'}}>
-                    <p className="text-center text-[#302F2F] text-2xl font-bold font-inter">Login</p>
+                    <p className="text-center text-black  text-2xl font-bold ">Login</p>
                     
                     <div className="flex flex-col gap-3 md:gap-5">
-                        <label htmlFor="email" className="text-[#302F2F] text-xs font-medium font-inter">Email Address / Phone Number</label>
+                        <label htmlFor="email" className="text-black text-sm  italic font-bold font-inter">Email Address / Phone</label>
                         <input 
                             value={email}
                             onChange={(e) => setEmail(e.target.value)} 
-                            className="p-2 rounded" 
+                            className="p-2 rounded placeholder:text-black placeholder:font-semibold placeholder:italic placeholder:text-xs" 
                             type="text" 
                             id="email" 
                             name="email"
+                            placeholder="Type email address"
                         />
 
                         {zodError.email && <p className="text-red-500 font-bold text-sm">{zodError.email}</p>}
                         
-                        <label htmlFor="password" className="text-[#302F2F] text-xs font-medium font-inter">Password</label>
+                        <label htmlFor="password" className="text-black text-sm  italic  font-bold font-inter">Password</label>
                         <input 
                             value={password}
                             onChange={(e) => setPassword(e.target.value)} 
-                            className="p-2 rounded"  
+                            className="p-2 rounded placeholder:text-black placeholder:font-semibold placeholder:italic placeholder:text-xs"  
                             type="password" 
                             id="password" 
                             name="password"
+                            placeholder="Type password"
                         />
 
                         {zodError.password && <p className="text-red-500 font-bold text-sm">{zodError.password}</p>}
                     </div>
 
+                    <p className="text-xs md:text-sm  font-semibold text-end">
+                        <Link className="underline text-orange-600 hover:text-orange-700" href="/forgot-password">Forgot password?</Link>
+                    </p>
+
                     <button 
                         onClick={handleSubmit} 
-                        className="bg-[#1F2168] font-bold font-inter text-lg text-white p-3 rounded"
+                        className="bg-[#1F2168] hover:bg-[#1e2d66] font-bold font-inter text-lg text-white p-3 rounded"
                     >
                         {isLoading ? <span className="loading loading-dots loading-lg"></span> : 'Login'}
                     </button>
@@ -130,7 +140,7 @@ export default function Login() {
                         Don&apos;t have an account yet? 
                         <span 
                             onClick={signUp} 
-                            className="text-orange-600 cursor-pointer hover:text-blue-800 underline"
+                            className="text-orange-600 cursor-pointer hover:text-orange-700 underline"
                         >
                             Signup
                         </span> 
