@@ -31,7 +31,34 @@ interface VehicleData {
       seatingCapacity: number;
     };
   };
-  commercialVehicle?: any;
+  commercialVehicle?: {
+    usageType: string[];
+    vehicleCategory: string;
+    primaryVehicleType: string;
+    subCategory: string;
+    size: string;
+    selectedCategories: {
+      category1: Record<string, boolean>;
+      category2: Record<string, boolean>;
+    };
+    generalDetails: {
+      make: string;
+      model: string;
+      manufacturingYear?: number;
+      chassisNumber?: string;
+      engineCapacity: number;
+      plateNumber: string;
+      bodyType: string;
+      engineNumber: string;
+    };
+    ownershipUsage: {
+      ownerType: string;
+      purchasedValue: number;
+      dutyFree: boolean;
+      driverType: string;
+      seatingCapacity: number;
+    };
+  };
   createdAt: string;
   updatedAt: string;
 }
@@ -119,7 +146,19 @@ export default function VehicleList() {
       };
     }
     
-    // Handle commercial vehicle if needed
+    if (vehicle.commercialVehicle) {
+      const { generalDetails, usageType, vehicleCategory } = vehicle.commercialVehicle;
+      return {
+        title: `${generalDetails.make} ${generalDetails.model}`,
+        plateNumber: generalDetails.plateNumber,
+        type: `${vehicle.vehicleType} - ${vehicleCategory}`,
+        usage: usageType.join(', '),
+        bodyType: generalDetails.bodyType,
+        engineCapacity: `${generalDetails.engineCapacity}cc`,
+      };
+    }
+    
+    // Fallback for unknown vehicle structure
     return {
       title: 'Unknown Vehicle',
       plateNumber: 'N/A',
@@ -253,7 +292,7 @@ export default function VehicleList() {
             <div className="text-center py-12">
               <Car className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <h4 className="text-lg font-medium text-gray-600 mb-2">No vehicles found</h4>
-              <p className="text-gray-500 mb-6">You haven't added any vehicles yet.</p>
+              <p className="text-gray-500 mb-6">You haven&apos;t added any vehicles yet.</p>
               <button
                 onClick={handleCreateNewVehicle}
                 className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"

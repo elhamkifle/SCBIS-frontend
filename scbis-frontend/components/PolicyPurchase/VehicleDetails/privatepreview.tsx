@@ -212,20 +212,20 @@ export default function PolicyPreview() {
           {isEditing.purpose ? (
             <div className="mt-4">
               <div className="relative">
-                <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Insurance Type</label>
+                <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Vehicle Type</label>
                 <select
                   value={selectedType}
                   onChange={(e) => setSelectedType(e.target.value)}
                   className="w-full p-2 border border-black rounded"
                 >
-                  <option value="known">Known Driver</option>
-                  <option value="any">Any Driver </option>
+                  <option value="private">Private</option>
+                  <option value="commercial">Commercial</option>
                 </select>
               </div>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 px-4">
-              <div><strong>Selected Insurance Type:</strong> <p> {selectedType === 'private' ? 'Private' : 'Commercial'}  </p> </div>
+              <div><strong>Selected Vehicle Type:</strong> <p> {selectedType === 'private' ? 'Private' : 'Commercial'}  </p> </div>
             </div>
           )}
         </div>
