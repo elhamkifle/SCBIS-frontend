@@ -114,7 +114,7 @@ export default function UploadIDForm() {
                 if (vehicleLibreUrl) {
                     setVehicleLibre(vehicleLibreUrl);
                     console.log('✅ Vehicle libre uploaded:', vehicleLibreUrl);
-                } else {
+        } else {
                     throw new Error('Failed to upload vehicle libre');
                 }
             }
@@ -445,12 +445,12 @@ export default function UploadIDForm() {
                             ) : (
                                 <div 
                                     className="flex flex-col items-center justify-center bg-green-100 p-6 rounded-lg border-2 border-dashed border-green-300 hover:border-green-500 transition-colors cursor-pointer"
-                                    onDragOver={(e) => e.preventDefault()}
+                            onDragOver={(e) => e.preventDefault()}
                                     onDrop={handleVehicleLibreDrop}
                                     onClick={() => document.getElementById('vehicle-libre-upload')?.click()}
                                 >
                                     <p className='text-lg font-bold mb-2'>Drop Libre Here</p>
-                                    <p className='text-md font-bold mb-4'>Or</p>
+                            <p className='text-md font-bold mb-4'>Or</p>
                                     <input 
                                         type="file" 
                                         id="vehicle-libre-upload" 
