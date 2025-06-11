@@ -123,7 +123,7 @@ export default function PolicyDetails() {
               <div><div className="font-bold text-blue-700">City</div><div className="text-gray-700">{user?.city}</div></div>
               <div><div className="font-bold text-blue-700">Sub City/Zone</div><div className="text-gray-700">{user?.subcity}</div></div>
               <div><div className="font-bold text-blue-700">Wereda</div><div className="text-gray-700">{user?.wereda}</div></div>
-              <div><div className="font-bold text-blue-700">Kebele</div><div className="text-gray-700">{user.kebele}</div></div>
+              <div><div className="font-bold text-blue-700">Kebele</div><div className="text-gray-700">{user?.kebele}</div></div>
             </div>
           </div>
 

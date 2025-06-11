@@ -7,8 +7,6 @@ import { usePoliciesStore } from "@/store/dashboard/policies";
 import { useClaimsStore } from "@/store/dashboard/claims";
 import { useUserStore } from "@/store/authStore/useUserStore";
 
-
-
 const actionImages: Record<string, string> = {
   "New Policy Purchase": "/purchase.png",
   "Submit a Claim": "/Claim.png",
@@ -28,10 +26,10 @@ const actionLinks: Record<typeof actionLabels[number], string> = {
 };
 
 export default function Dashboard() {
-  const {
-    policies,
-    addPolicies,
-  } = usePoliciesStore();
+  const { policies, addPolicies } = usePoliciesStore();
+  const { claims, setClaims } = useClaimsStore();
+  const user = useUserStore((state) => state.user);
+  const profileName = user?.fullname.split(' ') || [];
 
   const getAuthTokenFromCookie = (): string | null => {
     const match = document.cookie.match(/(?:^|;\s*)auth_token=([^;]*)/);
@@ -60,7 +58,7 @@ export default function Dashboard() {
     fetchPolicies();
   }, [addPolicies]);
 
-    useEffect(() => {
+  useEffect(() => {
     const fetchClaims = async () => {
       try {
         const accessToken = getAuthTokenFromCookie();
@@ -73,40 +71,47 @@ export default function Dashboard() {
           }
         );
         console.log('Claims:', response.data);
+        setClaims(response.data);
       } catch (error) {
         console.error('Error fetching claims:', error);
       }
     };
 
     fetchClaims();
-  }, );
-
-  
-  const { claims } = useClaimsStore();
-  const user = useUserStore((state) => state.user);
-  const profileName = user?.fullname.split(' ') || [];
+  }, [setClaims]);
 
   const getStatusColor = (status: string) => {
-    switch (status) {
+    switch (status.toLowerCase()) {
       case "active":
+      case "approved":
+      case "submitted":
         return "text-green-600";
-      case "Renewal":
+      case "renewal":
       case "pending":
+      case "under review":
         return "text-yellow-500";
-      case "Approved":
-        return "text-green-600";
       case "rejected":
+        return "text-red-500";
+      case "Reject":
         return "text-red-500";
       default:
         return "text-gray-600";
     }
   };
 
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-KE", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
   return (
     <main className="bg-white min-h-screen text-gray-800">
       <div className="max-w-7xl mx-auto px-4 pt-8 pb-12">
         <h1 className="text-lg font-syne md:text-4xl font-bold text-blue-500 mb-10 text-center" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-          Hello {`${profileName[0]} ${profileName[1][0]}.`}
+          Hello {`${profileName[0]} ${profileName[1]?.[0] || ''}.`}
         </h1>
 
         <div className="flex flex-row flex-wrap justify-between items-center gap-8 mb-14">
@@ -148,7 +153,7 @@ export default function Dashboard() {
                     <p><span className="text-gray-500">Plate No.:</span> <span className="font-bold">{generalDetails?.plateNumber}</span></p>
                     <p><span className="text-gray-500">Duration:</span> <span className="font-bold">{policy.duration} days</span></p>
                     <p><span className="text-gray-500">Issued On:</span> <span className="font-bold">{formattedDate}</span></p>
-                    <p><span className="text-gray-500">Coverage End Date:</span> <span className="font-bold">{policy.coverageEndDate} </span></p>
+                    <p><span className="text-gray-500">Policy Duration:</span> <span className="font-bold">{policy.duration} days </span></p>
                   </div>
                   <Link href={`/policydetails/${policy._id}`}>
                     <button className="mt-5 w-full text-base text-blue-600 border border-blue-600 rounded py-2 hover:bg-blue-50 font-semibold">
@@ -158,32 +163,38 @@ export default function Dashboard() {
                 </div>
               );
             })}
-
           </div>
         </section>
 
         <section>
           <h2 className="text-xl font-semibold text-blue-500 mb-6" style={{ fontFamily: 'Montserrat, sans-serif' }}>Claims in progress</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10 justify-items-center">
-            {claims.map((claim) => (
-              <div key={claim.id} className="bg-white border rounded-xl shadow-lg shadow-blue-100 w-full max-w-[400px] p-8">
-                <div className="flex justify-between items-center mb-3">
-                  <img src={claim.imageUrl} alt="Vehicle" className="w-6 h-6" />
-                  <span className={`text-xs font-semibold ${getStatusColor(claim.status)}`}>{claim.status}</span>
+            {claims.map((claim) => {
+              const formattedDate = formatDate(claim.dateSubmitted || claim.createdAt);
+              
+              return (
+                <div key={claim._id} className="bg-white border rounded-xl shadow-lg shadow-blue-100 w-full max-w-[400px] p-8">
+                  <div className="flex justify-between items-center mb-3">
+                    <img src="/Claim.png" alt="Claim" className="w-6 h-6" />
+                    <span className={`text-xs font-semibold ${getStatusColor(claim.status)}`}>
+                      {claim.status}
+                    </span>
+                  </div>
+                  <div className="text-base leading-7">
+                    <p><span className="text-gray-500">Policy ID:</span> <span className="font-bold">{claim.policyId}</span></p>
+                    <p><span className="text-gray-500">Claim Submitted:</span> <span className="font-bold">{formattedDate}</span></p>
+                    <p><span className="text-gray-500">Coverage Amount:</span> <span className="font-bold">{claim.coverageAmount?.toLocaleString()} ETB</span></p>
+                    <p><span className="text-gray-500">Garage:</span> <span className="font-bold">{claim.garage}</span></p>
+                    <p><span className="text-gray-500">Fix Type:</span> <span className="font-bold">{claim.fixType}</span></p>
+                  </div>
+                  <Link href={`/claim-details/${claim._id}`}>
+                    <button className="mt-5 w-full text-base text-blue-600 border border-blue-600 rounded py-2 hover:bg-blue-50 font-semibold">
+                      View Details
+                    </button>
+                  </Link>
                 </div>
-                <div className="text-base leading-7">
-                  <p><span className="text-gray-500">Plate No.:</span> <span className="font-bold">{claim.plateNumber}</span></p>
-                  <p><span className="text-gray-500">Claim Reported On:</span> <span className="font-bold">{claim.claimReportedOn}</span></p>
-                  <p><span className="text-gray-500">Policy Id:</span> <span className="font-bold">{claim.policyId}</span></p>
-                  <p><span className="text-gray-500">Coverage Type:</span> <span className="font-bold">{claim.coverageType}</span></p>
-                </div>
-                <Link href="/claim-details">
-                  <button className="mt-5 w-full text-base text-blue-600 border border-blue-600 rounded py-2 hover:bg-blue-50 font-semibold">
-                    View Details
-                  </button>
-                </Link>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
       </div>
