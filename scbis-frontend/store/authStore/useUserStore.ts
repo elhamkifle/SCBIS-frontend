@@ -33,6 +33,7 @@ export type userType = {
     lastActive?: string,
     updatedAt?: string,
     __v?: number,
+    idDocumentUrls?: string[],
 }
 
 type userStoreType = {
