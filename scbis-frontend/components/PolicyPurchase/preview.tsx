@@ -203,6 +203,31 @@ export default function PolicyPreview() {
           fullName: formData.fullName,
           signatureDate: formData.signatureDate,
           acceptTerms: formData.acceptTerms
+        },
+        vehicleInformation: {
+          coverRequired: formData.coverRequired,
+          make: formData.make,
+          value: formData.value,
+          vehicleInGoodRepair: formData.vehicleInGoodRepair,
+          vehicleLeftOvernight: formData.vehicleLeftOvernight,
+          soleProperty: formData.soleProperty,
+          ownerName: formData.ownerName,
+          ownerAddress: formData.ownerAddress,
+          privateUse: formData.privateUse,
+          otherUses: formData.otherUses,
+          convicted: formData.convicted,
+          convictionDetails: formData.convictionDetails,
+          insuredBefore: formData.insuredBefore,
+          insurerName: formData.insurerName,
+          companyHistory: formData.companyHistory,
+          hadAccidents: formData.hadAccidents,
+          accidentDetails: formData.accidentDetails,
+          claimsInjury: formData.claimsInjury,
+          claimsInjuryDetails: formData.claimsInjuryDetails,
+          claimsProperty: formData.claimsProperty,
+          claimsPropertyDetails: formData.claimsPropertyDetails,
+          personalAccident: formData.personalAccident,
+          passengersInsured: formData.passengersInsured
         }
       };
       console.log('🔄 Policy selection payload:', policySelectionPayload);
