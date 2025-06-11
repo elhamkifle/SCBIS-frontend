@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUploadIDStore } from '@/store/customerInformationStore/uploadID';
 import { usePersonalDetailStore } from '@/store/customerInformationStore/personalDetails';
-// import { useAddressStore } from '@/store/customerInformationStore/addressStore'; 
+import { useAddressStore } from '@/store/customerInformationStore/addressStore'; 
 
 export default function UploadIDForm() {
     const router = useRouter();
@@ -31,8 +31,8 @@ export default function UploadIDForm() {
             
             logAllFormData();
             
-            // Navigate to preview or next step
-            router.push('/preview');
+            // Navigate to customer information preview page
+            router.push('/policy-purchase/personal-information/preview');
         } catch (error) {
             console.error('Error uploading files:', error);
             setError('❌ Error uploading files. Please try again.');
