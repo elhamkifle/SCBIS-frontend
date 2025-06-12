@@ -3,7 +3,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 
 interface ClaimDetailsState {
     id: string;
-    stage: "review" | "admin-approved" | "waiting-approval" | "in-person" | "under-review" | "winner-announced";
+    stage: "submitted" | "proformaSubmissionPending" | "adminApproved" | "policeReportUnderReview" | "proformaUnderReview" | "closed" | "winnerAnnounced";
     adminImageUrl?: string;
     policeReportUrl?: string;
     proformaUrls?: string[];
@@ -15,7 +15,7 @@ interface ClaimDetailsState {
 
 const initialClaim: ClaimDetailsState = {
     id: "",
-    stage: "review",
+    stage: "submitted",
     adminImageUrl: "",
     policeReportUrl: "",
     proformaUrls: [],
@@ -32,12 +32,7 @@ export const useClaimDetailsStore = create<ClaimDetailsState>()(
             setClaim: (claim) => set((state) => ({ ...state, ...claim })),
             nextStage: () => set((state) => {
                 const order: ClaimDetailsState["stage"][] = [
-                    "review",
-                    "admin-approved",
-                    "waiting-approval",
-                    "in-person",
-                    "under-review",
-                    "winner-announced",
+                    "submitted", "proformaSubmissionPending", "adminApproved", "policeReportUnderReview", "proformaUnderReview", "closed", "winnerAnnounced"
                 ];
                 const idx = order.indexOf(state.stage);
                 if (idx < order.length - 1) {
