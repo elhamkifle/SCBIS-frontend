@@ -126,10 +126,7 @@ export const useAccidentDetailsStore = create<AccidentDetailsState>()(
       setwereYouInVehicle: (wereYouInVehicle) => set({wereYouInVehicle}),
       setVisibilityObstructions: (visibilityObstructions) => set({ visibilityObstructions }),
       setintersectionType: (intersectionType) => set({ intersectionType }),
-      addSketchFile: (url) =>
-        set((state) => ({
-          sketchFiles: [...state.sketchFiles, url]
-        })),
+      addSketchFile: (url) => set({ sketchFiles: [url] }),
       setError: (error) => set({ error }),
       clearAllData: () => 
         set({ 

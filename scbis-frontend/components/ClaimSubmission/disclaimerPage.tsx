@@ -77,11 +77,11 @@ export default function ClaimDisclaimer() {
         <h3 className="text-lg font-semibold text-blue-600">Personal Information of the Insured</h3>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-2 border-b border-b-[#3E99E7] py-6">
           <p><strong>Full Name:</strong> {insuredInfo.fullName}</p>
-          <p><strong>Email:</strong> {insuredInfo.email}</p>
+          <p><strong> Email:</strong> {insuredInfo.email}</p>
           <p><strong>City:</strong> {insuredInfo.country}</p>
         </div>
 
-        <h3 className="text-lg font-semibold text-blue-600 py-6">
+        {/* <h3 className="text-lg font-semibold text-blue-600 py-6">
           Insured Vehicle Detail: {generalDetails?.make || '-'}
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-2">
@@ -89,7 +89,7 @@ export default function ClaimDisclaimer() {
           <p><strong>Model:</strong> {generalDetails?.model || '-'}</p>
           <p><strong>Plate No.:</strong> {generalDetails?.plateNumber || '-'}</p>
           <p><strong>CC:</strong> {generalDetails?.engineCapacity || '-'}</p>
-        </div>
+        </div> */}
       </div>
 
       <div className="mt-6 flex items-center">

@@ -49,10 +49,7 @@ export const useDamageDetailsStore = create<DamageDetailsState>()(
           injuredPersons: { ...state.injuredPersons, ...person },
         })),
 
-      addVehicleDamageFile: (url) =>
-        set((state) => ({
-          vehicleDamageFiles: [...state.vehicleDamageFiles, url],
-        })),
+      addVehicleDamageFile: (url) => set({ vehicleDamageFiles: [url] }),
       removeVehicleDamageFile: (index) =>
         set((state) => {
           const updated = [...state.vehicleDamageFiles];
@@ -60,10 +57,7 @@ export const useDamageDetailsStore = create<DamageDetailsState>()(
           return { vehicleDamageFiles: updated };
         }),
 
-      addThirdPartyDamageFile: (url) =>
-        set((state) => ({
-          thirdPartyDamageFiles: [...state.thirdPartyDamageFiles, url],
-        })),
+      addThirdPartyDamageFile: (url) => set({ thirdPartyDamageFiles: [url] }),
       removeThirdPartyDamageFile: (index) =>
         set((state) => {
           const updated = [...state.thirdPartyDamageFiles];

@@ -101,16 +101,13 @@ export default function ClaimPolicySelection() {
                                 }}
                                 onClick={() => handleSelect(policy._id)}
                             >
-                                <p className="text-sm text-gray-400">Policy ID: {policy._id}</p>
-                                <h3 className="text-xl font-semibold">{policy.title}</h3>
+                                <p className="text-md text-black">Policy ID: {policy.policyId}</p>
+                                <h3 className="text-xl font-semibold">{policy.policyType}</h3>
                                 <p className="text-md">
-                                    <span className="text-[#3AA4FF] font-bold">Coverage End Date:</span>{' '}
-                                    {policy.coverageEndDate}
+                                    <span className="text-[#3AA4FF] font-bold">Coverage Area:</span>{' '}
+                                    {policy.coverageArea}
                                 </p>
-                                <p className="text-md">
-                                    <span className="text-[#3AA4FF] font-bold">Territory:</span>{' '}
-                                    {policy.territory}
-                                </p>
+
 
                                 {generalDetails && (
                                     <>
@@ -147,9 +144,8 @@ export default function ClaimPolicySelection() {
                                 {selectedPolicyDetails?.title}
                             </Dialog.Title>
                             <div className="mt-4">
-                                <p>Coverage End Date: {selectedPolicyDetails?.coverageEndDate}</p>
-                                <p>Territory: {selectedPolicyDetails?.territory}</p>
-                                <p>Duration: {selectedPolicyDetails?.duration}</p>
+                                <p>Policy: {selectedPolicyDetails?.policyType}</p>
+                                <p>Coverage Area: {selectedPolicyDetails?.coverageArea}</p>
                             </div>
                             <button
                                 onClick={() => setOpen(false)}

@@ -23,8 +23,7 @@ export default function AccidentDetails() {
     wereYouInVehicle,
     visibilityObstructions,
     intersectionType,
-    // sketchFiles,
-    // sketchFiles,
+    sketchFiles,
     error,
     addVehicle,
     removeVehicle,
@@ -43,7 +42,7 @@ export default function AccidentDetails() {
     setwereYouInVehicle,
     setVisibilityObstructions,
     setintersectionType,
-    // addSketchFile,
+    addSketchFile,
     setError,
     // clearAllData
   } = useAccidentDetailsStore();
@@ -147,9 +146,14 @@ export default function AccidentDetails() {
           'https://api.cloudinary.com/v1_1/dmzvqehan/upload',
           formData
         );
+        let url = ""
 
         if (res.status === 200) {
-          uploadedUrls.push(res.data.secure_url);
+          url = res.data.secure_url
+          console.log(url) 
+          const { addSketchFile } = useAccidentDetailsStore.getState();
+          addSketchFile(url);
+          console.log(sketchFiles)
         } else {
           throw new Error('Upload failed');
         }
@@ -158,6 +162,7 @@ export default function AccidentDetails() {
       // Save uploaded URLs in Zustand
       const { addSketchFile } = useAccidentDetailsStore.getState();
       uploadedUrls.forEach((url) => addSketchFile(url));
+      console.log(sketchFiles)
 
       router.push('/claim-submission/liability-information');
     } catch (error) {

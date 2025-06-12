@@ -8,6 +8,8 @@ import axios from 'axios';
 export default function DamageDetails() {
   const router = useRouter();
   const {
+    vehicleDamageFiles,
+    thirdPartyDamageFiles,
     vehicleDamageDesc,
     thirdPartyDamageDesc,
     injuriesAny,
@@ -69,6 +71,8 @@ export default function DamageDetails() {
       const url = await uploadToCloudinary(file);
       if (url) {
         addVehicleDamageFile(url);
+        console.log(url)
+        console.log("VehicleDamageFiles: " +vehicleDamageFiles)
       }
     }
 
@@ -77,6 +81,7 @@ export default function DamageDetails() {
       const url = await uploadToCloudinary(file);
       if (url) {
         addThirdPartyDamageFile(url);
+        console.log(thirdPartyDamageFiles)
       }
     }
 
@@ -143,7 +148,7 @@ export default function DamageDetails() {
       </div>
 
       <div>
-        <label className="font-semibold block mb-2">Details of damage to your vehicle (Photos Or Brief description)</label>
+        <label className="font-semibold block mb-2">Details of damage to your vehicle (A Photo Or A Brief description)</label>
         <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 items-start">
           {renderDropArea(vehicleFiles, setVehicleFiles, 'vehicleUpload')}
           <div className="w-full lg:w-1/2">
@@ -158,7 +163,7 @@ export default function DamageDetails() {
       </div>
 
       <div>
-        <label className="font-semibold block mb-2">Details of damage to Third Party&rsquo;s property & Vehicle(s)</label>
+        <label className="font-semibold block mb-2">Details of damage to Third Party&rsquo;s property & Vehicle </label>
         <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 items-start">
           {renderDropArea(thirdPartyFiles, setThirdPartyFiles, 'thirdPartyUpload')}
           <div className="w-full lg:w-1/2">

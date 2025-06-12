@@ -39,9 +39,10 @@ interface CommercialVehicle {
 interface Policy {
   _id: string;
   title: string;
-  coverageEndDate: string;
-  territory: string;
-  duration: string;
+  policyId: string;
+  policyType: string;
+  coverageArea: string;
+  createdAt: string;
   privateVehicle?: PrivateVehicle;
   commercialVehicle?: CommercialVehicle;
 }

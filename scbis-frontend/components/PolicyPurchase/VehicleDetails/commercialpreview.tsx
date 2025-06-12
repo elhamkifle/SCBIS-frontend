@@ -10,7 +10,7 @@ import { useOwnershipUsageStore } from '@/store/vehicleDetails/ownershipAndUsage
 
 export default function CommercialVehiclePreview() {
   const router = useRouter();
-  
+
   // Get all data from stores
   const { selectedType } = useVehiclePurposeStore();
   const { selectedCategories: commercialCategories1 } = useCommercialVehicleCategoryStore();
@@ -40,7 +40,7 @@ export default function CommercialVehiclePreview() {
     });
 
     alert('Policy submitted successfully!');
-  
+
     localStorage.removeItem('insurance-storage');
     localStorage.removeItem('commercial-vehicle-storage');
     localStorage.removeItem('commercial-vehicle-two-storage');
@@ -83,7 +83,7 @@ export default function CommercialVehiclePreview() {
           'cartage_small': 'Cartage - Small',
           'cartage_medium': 'Cartage - Medium',
           'cartage_large': 'Cartage - Large',
-          
+
           // Commercial Vehicle Category 2
           'own_goods_tanker_trailers': 'Own Goods - Tanker Trailers',
           'own_goods_small_liquid': 'Own Goods - Small Liquid',
@@ -166,7 +166,7 @@ export default function CommercialVehiclePreview() {
           <div className="flex justify-between items-center">
             <h2 className="text-lg font-bold text-blue-600">2. Commercial Vehicle Categories (Part 1)</h2>
           </div>
-          
+
           {isEditing.category1 ? (
             <div className="mt-4 text-red-500">
               <p>Please go back to the category selection pages to make changes</p>
@@ -191,7 +191,7 @@ export default function CommercialVehiclePreview() {
               {isEditing.category2 ? <Check size={20} /> : <Edit size={20} />}
             </button>
           </div>
-          
+
           {isEditing.category2 ? (
             <div className="mt-4 text-red-500">
               <p>Please go back to the category selection pages to make changes</p>
@@ -217,15 +217,16 @@ export default function CommercialVehiclePreview() {
             </button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 px-4">
-            <div><strong>Make:</strong> {vehicleData.make}</div>
-            <div><strong>Model:</strong> {vehicleData.model}</div>
-            <div><strong>Manufacturing Year:</strong> {vehicleData.mfgYear}</div>
-            <div><strong>Engine Capacity (CC):</strong> {vehicleData.engineCapacity}</div>
-            <div><strong>Chassis No:</strong> {vehicleData.chassisNo}</div>
-            <div><strong>Engine No:</strong> {vehicleData.engineNo}</div>
-            <div><strong>Plate No:</strong> {vehicleData.plateNo}</div>
-            <div><strong>Body Type:</strong> {vehicleData.bodyType}</div>
+            <div><p><strong>Make:</strong> {vehicleData.make}</p></div>
+            <div><p><strong>Model:</strong> {vehicleData.model}</p></div>
+            <div><p><strong>Manufacturing Year:</strong> {vehicleData.mfgYear}</p></div>
+            <div><p><strong>Engine Capacity (CC):</strong> {vehicleData.engineCapacity}</p></div>
+            <div><p><strong>Chassis No:</strong> {vehicleData.chassisNo}</p></div>
+            <div><p><strong>Engine No:</strong> {vehicleData.engineNo}</p></div>
+            <div><p><strong>Plate No:</strong> {vehicleData.plateNo}</p></div>
+            <div><p><strong>Body Type:</strong> {vehicleData.bodyType}</p></div>
           </div>
+
         </div>
 
         {/* Ownership and Usage Section */}
@@ -237,24 +238,25 @@ export default function CommercialVehiclePreview() {
             </button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 px-4">
-            <div><strong>Owner Type:</strong> {ownershipData.ownerType}</div>
-            <div><strong>Driver Type:</strong> {ownershipData.driverType}</div>
-            <div><strong>Seating Capacity:</strong> {ownershipData.seatingCapacity}</div>
-            <div><strong>Purchased Value:</strong> {ownershipData.purchasedValue}</div>
-            <div><strong>Duty Free:</strong> {ownershipData.dutyFree}</div>
+            <div><p><strong>Owner Type:</strong> {ownershipData.ownerType}</p></div>
+            <div><p><strong>Driver Type:</strong> {ownershipData.driverType}</p></div>
+            <div><p><strong>Seating Capacity:</strong> {ownershipData.seatingCapacity}</p></div>
+            <div><p><strong>Purchased Value:</strong> {ownershipData.purchasedValue}</p></div>
+            <div><p><strong>Duty Free:</strong> {ownershipData.dutyFree}</p></div>
           </div>
         </div>
 
+
         {/* Navigation Buttons */}
         <div className="w-full max-w-5xl flex justify-between my-6 pr-4">
-          <button 
-            onClick={handlePrevious} 
+          <button
+            onClick={handlePrevious}
             className="bg-[#3AA4FF] text-white p-2 px-6 rounded"
           >
             Previous
           </button>
-          <button 
-            onClick={handleSubmit} 
+          <button
+            onClick={handleSubmit}
             className="bg-green-500 text-white p-2 px-6 rounded"
           >
             Submit Application

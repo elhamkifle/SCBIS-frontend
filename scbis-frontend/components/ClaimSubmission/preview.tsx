@@ -209,7 +209,14 @@ export default function ClaimPreview() {
         thirdPartyDamageDesc,
         injuriesAny,
         injuredPersons: [injuredPersons],
-      }
+      },
+
+      sketchFiles,
+      vehicleDamageFiles,
+      vehicleDamageDesc,
+      thirdPartyDamageFiles,
+      thirdPartyDamageDesc,
+
     }
 
     console.log(claimData);
@@ -261,7 +268,7 @@ export default function ClaimPreview() {
       useDeclarationStore.getState().clearAllData();
 
       alert("Claim submitted successfully!")
-      router.push("/dasboard")
+      router.push("/dashboard")
 
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
@@ -338,12 +345,7 @@ export default function ClaimPreview() {
         </div>
       </div>
 
-      {/* Vehicle Selection Section */}
-      <div className="border-b pb-4 mb-4 grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-        <div className="flex justify-between items-center">
-          <h2 className="text-lg font-bold text-blue-600">Selected Vehicle: <span className='text-black'> {selectedVehicle} </span></h2>
-        </div>
-      </div>
+
 
       {/* Driver Details Section */}
       <div className="border-b pb-4 mb-4">
@@ -830,34 +832,37 @@ export default function ClaimPreview() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 px-4">
-            <div><strong>Date of Accident:</strong> {dateOfAccident}</div>
-            <div><strong>Time of Accident:</strong> {timeOfAccident}</div>
-            <div><strong>Speed:</strong> {speed}</div>
+            <div><p><strong>Date of Accident:</strong> {dateOfAccident}</p></div>
+            <div><p><strong>Time of Accident:</strong> {timeOfAccident}</p></div>
+            <div><p><strong>Speed:</strong> {speed}</p></div>
 
-            <div><strong>City:</strong> {location.city}</div>
-            <div><strong>SubCity:</strong> {location.subCity}</div>
-            <div><strong>Kebele:</strong> {location.kebele}</div>
-            <div><strong>Sefer:</strong> {location.sefer}</div>
+            <div><p><strong>City:</strong> {location.city}</p></div>
+            <div><p><strong>SubCity:</strong> {location.subCity}</p></div>
+            <div><p><strong>Kebele:</strong> {location.kebele}</p></div>
+            <div><p><strong>Sefer:</strong> {location.sefer}</p></div>
 
-            <div><strong>Position on Road:</strong> {positionOnRoad}</div>
-            <div><strong>Road Surface:</strong> {roadSurface}</div>
-            <div><strong>Traffic Condition:</strong> {trafficCondition}</div>
-            <div><strong>Time of Day:</strong> {timeOfDay}</div>
-            <div><strong>In vehicle:</strong> <YesNoDisplay value={wereYouInVehicle} /></div>
+            <div><p><strong>Position on Road:</strong> {positionOnRoad}</p></div>
+            <div><p><strong>Road Surface:</strong> {roadSurface}</p></div>
+            <div><p><strong>Traffic Condition:</strong> {trafficCondition}</p></div>
+            <div><p><strong>Time of Day:</strong> {timeOfDay}</p></div>
+            <div><p><strong>In vehicle:</strong> <YesNoDisplay value={wereYouInVehicle} /></p></div>
+
             {timeOfDay === 'Night Time' && (
-              <div><strong>Headlights On:</strong> <YesNoDisplay value={headlightsOn} /></div>
+              <div><p><strong>Headlights On:</strong> <YesNoDisplay value={headlightsOn} /></p></div>
             )}
-            <div><strong>Horn Sounded:</strong> {hornSounded}</div>
-            <div><strong>Visibility Obstructions:</strong> {visibilityObstructions}</div>
-            <div><strong>Accident Location:</strong> {intersectionType}</div>
+
+            <div><p><strong>Horn Sounded:</strong> {hornSounded}</p></div>
+            <div><p><strong>Visibility Obstructions:</strong> {visibilityObstructions}</p></div>
+            <div><p><strong>Accident Location:</strong> {intersectionType}</p></div>
+
             <div className="col-span-2">
-              <strong>Description:</strong>
+              <p><strong>Description:</strong></p>
               <p className="whitespace-pre-line">{additionalDescription}</p>
             </div>
 
             {otherVehicles.length > 0 && (
               <div className="col-span-2">
-                <strong>Other Vehicles Involved:</strong>
+                <p><strong>Other Vehicles Involved:</strong></p>
                 {otherVehicles.map((vehicle, index) => (
                   <div key={index} className="mt-2 p-2 border rounded">
                     <p><strong>Driver:</strong> {vehicle.driverName}</p>
@@ -868,6 +873,7 @@ export default function ClaimPreview() {
               </div>
             )}
           </div>
+
         )}
       </div>
 
@@ -976,15 +982,17 @@ export default function ClaimPreview() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 px-4">
-            <div><strong>Responsible Party:</strong> {responsibleParty}</div>
             <div>
-              <strong>Other Vehicle Insured:</strong> {otherInsuredStatus}
+              <p><strong>Responsible Party:</strong> {responsibleParty}</p>
+            </div>
+            <div>
+              <p><strong>Other Vehicle Insured:</strong> {otherInsuredStatus}</p>
               {otherInsuredStatus === 'Yes , they are' && (
                 <p><strong>Insurance Company:</strong> {OtherInsuranceCompanyName}</p>
               )}
             </div>
             <div>
-              <strong>Police Involved:</strong> {policeInvolved}
+              <p><strong>Police Involved:</strong> {policeInvolved}</p>
               {policeInvolved === 'Yes' && (
                 <>
                   <p><strong>Officer Name:</strong> {policeOfficerName}</p>
@@ -993,6 +1001,7 @@ export default function ClaimPreview() {
               )}
             </div>
           </div>
+
         )}
       </div>
 
@@ -1081,7 +1090,7 @@ export default function ClaimPreview() {
               <p className="mt-1 whitespace-pre-wrap">{thirdPartyDamageDesc || 'Not provided'}</p>
             </div>
             <div>
-              <strong>Injuries:</strong> {injuriesAny ? 'Yes' : 'No'}
+              <strong>Injuries:</strong> <span className='text-black'> {injuriesAny ? 'Yes' : 'No'} </span>
               {injuriesAny && (
                 <>
                   <p className="mt-1"><strong>Injured Person:</strong> {injuredPersons.name}</p>
@@ -1227,7 +1236,7 @@ export default function ClaimPreview() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 px-4">
             <div>
-              <strong>Alone in Vehicle:</strong> {aloneInVehicle}
+              <strong>Alone in Vehicle:</strong>  <span className='text-black'> {aloneInVehicle}</span>
             </div>
 
             {aloneInVehicle === 'No I wasn\'t alone' && vehicleOccupants.length > 0 && (
@@ -1243,7 +1252,7 @@ export default function ClaimPreview() {
             )}
 
             <div className="col-span-2">
-              <strong>Independent Witnesses:</strong> {independentWitnessPresent}
+              <strong>Independent Witnesses:</strong> <span className='text-black'> {independentWitnessPresent}</span>
 
               {independentWitnessPresent === 'Yes' && independentWitnesses.length > 0 && (
                 <div className="mt-2">
