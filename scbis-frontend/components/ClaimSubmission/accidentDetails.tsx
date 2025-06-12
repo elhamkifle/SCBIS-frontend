@@ -24,6 +24,7 @@ export default function AccidentDetails() {
     visibilityObstructions,
     intersectionType,
     sketchFiles,
+    sketchFiles,
     error,
     addVehicle,
     removeVehicle,
@@ -158,6 +159,11 @@ export default function AccidentDetails() {
           throw new Error('Upload failed');
         }
       }
+
+      // Save uploaded URLs in Zustand
+      const { addSketchFile } = useAccidentDetailsStore.getState();
+      uploadedUrls.forEach((url) => addSketchFile(url));
+      console.log(sketchFiles)
 
       router.push('/claim-submission/liability-information');
     } catch (error) {

@@ -10,6 +10,8 @@ export default function DamageDetails() {
   const {
     vehicleDamageFiles,
     thirdPartyDamageFiles,
+    vehicleDamageFiles,
+    thirdPartyDamageFiles,
     vehicleDamageDesc,
     thirdPartyDamageDesc,
     injuriesAny,
@@ -66,22 +68,24 @@ export default function DamageDetails() {
     setError('');
     setLoading(true);
 
-    try {
-      // Upload vehicle file if exists
-      if (vehicleFile) {
-        const vehicleUrl = await uploadToCloudinary(vehicleFile);
-        if (vehicleUrl) {
-          addVehicleDamageFile(vehicleUrl);
-        }
+    // Upload vehicle files
+    for (const file of vehicleFiles) {
+      const url = await uploadToCloudinary(file);
+      if (url) {
+        addVehicleDamageFile(url);
+        console.log(url)
+        console.log("VehicleDamageFiles: " +vehicleDamageFiles)
       }
+    }
 
-      // Upload third-party file if exists
-      if (thirdPartyFile) {
-        const thirdPartyUrl = await uploadToCloudinary(thirdPartyFile);
-        if (thirdPartyUrl) {
-          addThirdPartyDamageFile(thirdPartyUrl);
-        }
+    // Upload third-party files
+    for (const file of thirdPartyFiles) {
+      const url = await uploadToCloudinary(file);
+      if (url) {
+        addThirdPartyDamageFile(url);
+        console.log(thirdPartyDamageFiles)
       }
+    }
 
       router.push('/claim-submission/declaration');
     } catch (err) {
