@@ -15,25 +15,34 @@ export default function GeneralVehicleDetailForm() {
         console.log('🔍 Checking for pre-selected vehicle data in general details page...');
         console.log('📋 Vehicle selection state:', { isExistingVehicle, vehicleData });
         
-        if (isExistingVehicle && vehicleData?.privateVehicle?.generalDetails) {
+        if (isExistingVehicle && vehicleData) {
             console.log('✅ Pre-filling general details form with existing vehicle data');
             
-            const { generalDetails } = vehicleData.privateVehicle;
+            let generalDetails;
             
-            // Map the API data to form fields
-            const preFilledData = {
-                make: generalDetails.make || '',
-                model: generalDetails.model || '',
-                mfgYear: '', // This might need to be derived or added to API
-                engineCapacity: generalDetails.engineCapacity?.toString() || '',
-                chassisNo: '', // This might need to be added to API
-                engineNo: generalDetails.engineNumber || '',
-                plateNo: generalDetails.plateNumber || '',
-                bodyType: generalDetails.bodyType || '',
-            };
+            // Handle both private and commercial vehicles
+            if (vehicleData.privateVehicle?.generalDetails) {
+                generalDetails = vehicleData.privateVehicle.generalDetails;
+            } else if (vehicleData.commercialVehicle?.generalDetails) {
+                generalDetails = vehicleData.commercialVehicle.generalDetails;
+            }
             
-            setFormData(preFilledData);
-            console.log('✅ General details pre-filled:', preFilledData);
+            if (generalDetails) {
+                // Map the API data to form fields
+                const preFilledData = {
+                    make: generalDetails.make || '',
+                    model: generalDetails.model || '',
+                    mfgYear: generalDetails.manufacturingYear?.toString() || '',
+                    engineCapacity: generalDetails.engineCapacity?.toString() || '',
+                    chassisNo: generalDetails.chassisNumber || '',
+                    engineNo: generalDetails.engineNumber || '',
+                    plateNo: generalDetails.plateNumber || '',
+                    bodyType: generalDetails.bodyType || '',
+                };
+                
+                setFormData(preFilledData);
+                console.log('✅ General details pre-filled:', preFilledData);
+            }
         } else {
             console.log('🆕 New vehicle creation - form will remain empty');
             // Clear form for new vehicle

@@ -105,6 +105,13 @@ interface VehicleFormData {
     driverType: string;
     seatingCapacity: string;
   };
+  documents?: {
+    driversLicense?: string;
+    vehicleLibre?: string;
+  };
+  // Add commercial categories for commercial vehicles
+  commercialCategories1?: Record<string, boolean>;
+  commercialCategories2?: Record<string, boolean>;
 }
 
 interface VehiclePersistenceResult {
@@ -192,50 +199,178 @@ export const vehiclePersistenceService = {
     console.log('🏗️ Building vehicle payload from form data...');
     console.log('📋 Input form data:', formData);
 
-    const { selectedType, carType, usageType, vehicleData, ownershipData } = formData;
+    const { selectedType, carType, usageType, vehicleData, ownershipData, documents, commercialCategories1, commercialCategories2 } = formData;
 
     // Map frontend values to backend format
-    const mapCarTypeToBackendCategory = (privateCarType: string): string => {
-      const mapping: Record<string, string> = {
+    const mapCarTypeToBackendCategory = (carTypeOrCategory: string): string => {
+      // Handle private vehicle categories
+      const privateMapping: Record<string, string> = {
         'passenger': 'Passenger Car',
         'suvs': 'SUV',
         'pickup': 'Pickup Truck',
         'minivan': 'Van',
       };
-      return mapping[privateCarType] || 'Passenger Car';
+      
+      // Handle commercial vehicle categories (already in proper format)
+      const commercialMapping: Record<string, string> = {
+        'Commercial Bus': 'Commercial Bus',
+        'Commercial Truck': 'Commercial Truck',
+        'Commercial PCV': 'Commercial PCV',
+        'Commercial GCV': 'Commercial GCV',
+        'Commercial Vehicle': 'Commercial Vehicle',
+      };
+      
+      // Try private mapping first, then commercial, then default
+      return privateMapping[carTypeOrCategory] || 
+             commercialMapping[carTypeOrCategory] || 
+             carTypeOrCategory || 
+             'Passenger Car';
     };
 
-    const mapUsageTypeToArray = (privateUsageType: string): string[] => {
-      if (privateUsageType === 'personal' || privateUsageType === 'Personal Use') return ['Personal Use'];
-      if (privateUsageType === 'business' || privateUsageType === 'Business') return ['Business'];
+    const mapUsageTypeToArray = (usageTypeValue: string): string[] => {
+      if (usageTypeValue === 'personal' || usageTypeValue === 'Personal Use') return ['Personal Use'];
+      if (usageTypeValue === 'business' || usageTypeValue === 'Business') return ['Business'];
+      if (usageTypeValue === 'commercial' || usageTypeValue === 'Commercial Use') return ['Commercial Use'];
       return ['Personal Use'];
     };
 
-    const payload = {
-      vehicleType: selectedType === 'private' ? 'Private' : 'Commercial',
-      [selectedType === 'private' ? 'privateVehicle' : 'commercialVehicle']: {
+    // Helper function to determine commercial vehicle metadata
+    const analyzeCommercialCategories = (categories1: Record<string, boolean> = {}, categories2: Record<string, boolean> = {}) => {
+      const allCategories = { ...categories1, ...categories2 };
+      const selectedKeys = Object.keys(allCategories).filter(key => allCategories[key]);
+      
+      let primaryVehicleType = 'Passenger Carrying';
+      let size = 'Medium';
+      let subCategory = 'General Commercial';
+      
+      // Determine primary type
+      if (selectedKeys.some(key => key.includes('liquid'))) {
+        primaryVehicleType = 'Liquid Cargo Carrying';
+      } else if (selectedKeys.some(key => key.includes('goods') || key.includes('cartage') || key.includes('gcv'))) {
+        primaryVehicleType = 'Goods Carrying';
+      } else if (selectedKeys.some(key => key.includes('taxi') || key.includes('bus') || key.includes('pcv'))) {
+        primaryVehicleType = 'Passenger Carrying';
+      }
+      
+      // Determine size
+      if (selectedKeys.some(key => key.includes('small'))) {
+        size = 'Small';
+      } else if (selectedKeys.some(key => key.includes('large'))) {
+        size = 'Large';
+      } else if (selectedKeys.some(key => key.includes('medium'))) {
+        size = 'Medium';
+      }
+      
+      // Determine subcategory
+      if (selectedKeys.some(key => key.includes('taxi'))) {
+        subCategory = 'Taxi Services';
+      } else if (selectedKeys.some(key => key.includes('bus'))) {
+        subCategory = 'Bus Services';
+      } else if (selectedKeys.some(key => key.includes('own_goods'))) {
+        subCategory = 'Own Goods Transport';
+      } else if (selectedKeys.some(key => key.includes('cartage'))) {
+        subCategory = 'Cartage Services';
+      } else if (selectedKeys.some(key => key.includes('pcv'))) {
+        subCategory = 'Public Carrying Vehicle';
+      } else if (selectedKeys.some(key => key.includes('gcv'))) {
+        subCategory = 'Goods Carrying Vehicle';
+      }
+      
+      return { primaryVehicleType, size, subCategory };
+    };
+
+    if (selectedType === 'private') {
+      const vehicleDetails: Record<string, unknown> = {
         usageType: mapUsageTypeToArray(usageType),
         vehicleCategory: mapCarTypeToBackendCategory(carType),
         generalDetails: {
           make: vehicleData.make || '',
           model: vehicleData.model || '',
-          engineCapacity: vehicleData.engineCapacity ? parseInt(vehicleData.engineCapacity, 10) : 0,
+          manufacturingYear: vehicleData.mfgYear ? parseInt(vehicleData.mfgYear, 10) : null,
+          chassisNumber: vehicleData.chassisNo || '',
+          engineCapacity: vehicleData.engineCapacity ? parseInt(vehicleData.engineCapacity, 10) : null,
           plateNumber: vehicleData.plateNo || '',
           bodyType: vehicleData.bodyType || '',
           engineNumber: vehicleData.engineNo || ''
         },
         ownershipUsage: {
           ownerType: ownershipData.ownerType || '',
-          purchasedValue: ownershipData.purchasedValue ? parseInt(ownershipData.purchasedValue, 10) : 0,
+          purchasedValue: ownershipData.purchasedValue ? parseInt(ownershipData.purchasedValue, 10) : null,
           dutyFree: ownershipData.dutyFree === 'Yes',
           driverType: ownershipData.driverType || '',
-          seatingCapacity: ownershipData.seatingCapacity ? parseInt(ownershipData.seatingCapacity, 10) : 0
+          seatingCapacity: ownershipData.seatingCapacity ? parseInt(ownershipData.seatingCapacity, 10) : null
         }
-      }
-    };
+      };
 
-    console.log('✅ Vehicle payload built:', payload);
-    return payload;
+      // Add documents if they exist
+      if (documents && (documents.driversLicense || documents.vehicleLibre)) {
+        vehicleDetails.documents = {
+          ...(documents.driversLicense && { driversLicense: documents.driversLicense }),
+          ...(documents.vehicleLibre && { vehicleLibre: documents.vehicleLibre })
+        };
+      }
+
+      const payload = {
+        vehicleType: 'Private',
+        privateVehicle: vehicleDetails
+      };
+
+      console.log('✅ Private vehicle payload built:', payload);
+      return payload;
+    } else {
+      // Commercial vehicle payload
+      const commercialMeta = analyzeCommercialCategories(commercialCategories1, commercialCategories2);
+      
+      const vehicleDetails: Record<string, unknown> = {
+        // Store detailed categories
+        selectedCategories: {
+          category1: commercialCategories1 || {},
+          category2: commercialCategories2 || {}
+        },
+        
+        // Simplified categorization for backend processing
+        primaryVehicleType: commercialMeta.primaryVehicleType,
+        subCategory: commercialMeta.subCategory,
+        size: commercialMeta.size,
+        
+        usageType: mapUsageTypeToArray(usageType),
+        vehicleCategory: mapCarTypeToBackendCategory(carType),
+        
+        generalDetails: {
+          make: vehicleData.make || '',
+          model: vehicleData.model || '',
+          manufacturingYear: vehicleData.mfgYear ? parseInt(vehicleData.mfgYear, 10) : null,
+          chassisNumber: vehicleData.chassisNo || '',
+          engineCapacity: vehicleData.engineCapacity ? parseInt(vehicleData.engineCapacity, 10) : null,
+          plateNumber: vehicleData.plateNo || '',
+          bodyType: vehicleData.bodyType || '',
+          engineNumber: vehicleData.engineNo || ''
+        },
+        ownershipUsage: {
+          ownerType: ownershipData.ownerType || '',
+          purchasedValue: ownershipData.purchasedValue ? parseInt(ownershipData.purchasedValue, 10) : null,
+          dutyFree: ownershipData.dutyFree === 'Yes',
+          driverType: ownershipData.driverType || '',
+          seatingCapacity: ownershipData.seatingCapacity ? parseInt(ownershipData.seatingCapacity, 10) : null
+        }
+      };
+
+      // Add documents if they exist
+      if (documents && (documents.driversLicense || documents.vehicleLibre)) {
+        vehicleDetails.documents = {
+          ...(documents.driversLicense && { driversLicense: documents.driversLicense }),
+          ...(documents.vehicleLibre && { vehicleLibre: documents.vehicleLibre })
+        };
+      }
+
+      const payload = {
+        vehicleType: 'Commercial',
+        commercialVehicle: vehicleDetails
+      };
+
+      console.log('✅ Commercial vehicle payload built:', payload);
+      return payload;
+    }
   }
 };
 

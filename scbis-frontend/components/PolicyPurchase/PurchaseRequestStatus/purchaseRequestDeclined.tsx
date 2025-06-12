@@ -102,7 +102,7 @@ export default function PurchaseRequestDeclined() {
     const path = vehicle.vehicleType === 'Private' ? 'privateVehicle' : 'commercialVehicle';
     
     await axios.put(
-      `https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/policy/update-vehicle/${vehicle._id}`,
+      `https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/policy/vehicle-details/${vehicle._id}`,
       {
         [`${path}.documents.${docType}`]: url
       },
@@ -117,8 +117,8 @@ export default function PurchaseRequestDeclined() {
     if (!accessToken) throw new Error('No access token found');
 
     await axios.put(
-      `https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/policy/update-policy/${policy._id}`,
-      { status: "pending" },
+      `https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/policy/update-policy-status/${policy._id}`,
+      { status: { value: "pending" } },
       { headers: { Authorization: `Bearer ${accessToken}` } }
     );
   };

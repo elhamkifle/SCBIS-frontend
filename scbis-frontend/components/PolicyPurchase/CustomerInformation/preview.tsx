@@ -6,6 +6,7 @@ import { useAddressStore } from '@/store/customerInformationStore/addressStore';
 import { useRouter } from 'next/navigation';
 import { useUserStore } from '@/store/authStore/useUserStore';
 import { fetchUserData, updateUserData } from '@/utils/userUtils';
+import { useUploadIDStore } from '@/store/customerInformationStore/uploadID';
 // import { baseAPI } from '@/utils/axiosInstance';
 // import { set } from 'zod';
 // import { span } from 'framer-motion/client';
@@ -15,8 +16,9 @@ export default function Preview() {
   // const setUser = useUserStore((state) => state.setUser);
 
   const router = useRouter();
-  const { formData: personalData, resetForm } = usePersonalDetailStore();
-  const { address: addressData, resetAddress } = useAddressStore();
+  const { formData: personalDetails, updateFormData, resetForm } = usePersonalDetailStore();
+  const { address: addressData, updateAddress, resetAddress } = useAddressStore();
+  const { uploadedUrls } = useUploadIDStore();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -69,8 +71,8 @@ export default function Preview() {
     // Get any existing user data we might want to include
     const userData = user ? {
       // Map user fields to form fields when form data is empty
-      email: personalData.email || user.email || '',
-      phone: personalData.phone || user.phoneNumber || '',
+      email: personalDetails.email || user.email || '',
+      phone: personalDetails.phone || user.phoneNumber || '',
       // Extract any additional fields
       ...(user.city && { city: addressData.city || user.city || '' }),
       ...(user.country && { country: addressData.country || user.country || '' }),
@@ -84,9 +86,9 @@ export default function Preview() {
       ...prev,
       ...userData,
       ...addressData,
-      ...personalData
+      ...personalDetails
     }));
-  }, [personalData, addressData, user]);
+  }, [personalDetails, addressData, user]);
 
   const [isEditing, setIsEditing] = useState({
     personalInfo: false,
@@ -114,6 +116,8 @@ export default function Preview() {
   // Handle form submission
   const handleSubmit = async () => {
     console.log('Form Submitted:', formData);
+    console.log('Uploaded ID URLs from store:', uploadedUrls);
+    console.log('Uploaded ID URLs from localStorage:', JSON.parse(localStorage.getItem('uploaded-id-urls') || '[]'));
     setLoading(true);
     setError(null);
 
@@ -147,22 +151,31 @@ export default function Preview() {
         zone: formData.zone,
         wereda: formData.wereda,
         kebele: formData.kebele,
-        houseNo: formData.houseNo
+        houseNo: formData.houseNo,
+
+        // ID Document URLs (uploaded to Cloudinary)
+        idDocumentUrls: uploadedUrls.length > 0 ? uploadedUrls : JSON.parse(localStorage.getItem('uploaded-id-urls') || '[]')
       };
+
+      console.log('📋 Complete submission data (including ID URLs):', submissionData);
 
       // Use the updateUserData utility instead of direct API call
       await updateUserData(submissionData);
-
-      alert('Application Submitted!');
-      router.push('/policy-purchase/vehicle-information/vehicle-list');
+      
+      console.log('✅ Personal information submitted successfully!');
+      console.log('➡️ Navigating to vehicle list page...');
+      alert('Application Submitted! Your Personal Information is under review');
+      router.push('/dashboard');
       
       // Clear personal details and address from localStorage
       localStorage.removeItem('personal-details-storage');
       localStorage.removeItem('address-details-storage');
+      localStorage.removeItem('uploaded-id-urls');
 
       // Reset the Zustand stores
       resetForm();  // Reset personal data store
       resetAddress();  // Reset address data store
+      useUploadIDStore.getState().reset();  // Reset upload ID store
 
     } catch (err: unknown) {
       console.error('Form submission error:', err);

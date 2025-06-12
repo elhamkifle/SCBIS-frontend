@@ -106,14 +106,25 @@ const Verification = () => {
             setIsSubmitting(false)
             return
         }
+        console.log(verificationNum, "here is the verification number", phone, email);
 
-        const serverResponse = await fetch('https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/otp/verify',{
-            method:'POST',
-            body:JSON.stringify({ otp:verificationNum,email,phoneNumber:phone }),
-            headers:{
-                'Content-Type':'application/json'
+        const formattedPhone = phone.startsWith('+') ? phone : `+${phone}`;
+        console.log(formattedPhone, "here is the formatted phone number")
+        const serverResponse = await fetch('https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/otp/verify', {
+            method: 'POST',
+            body: JSON.stringify({ 
+                otp: verificationNum, 
+                phoneNumber: formattedPhone 
+            }),
+            headers: {
+                'Content-Type': 'application/json'
             }
-        })
+        });
+
+        if (!serverResponse.ok) {
+            const errorText = await serverResponse.text();
+            console.error('Server response:', errorText);
+        }
 
 
 

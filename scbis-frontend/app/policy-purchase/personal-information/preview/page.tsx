@@ -1,13 +1,13 @@
 import Sidebar from "@/components/staticComponents/sidebar";
 import Header from "@/components/staticComponents/header";
 import { Footer } from "@/components/staticComponents/footer";
-import VehicleList from "@/components/PolicyPurchase/VehicleInformation/VehicleList";
+import Preview from "@/components/PolicyPurchase/CustomerInformation/preview";
 
-export default function VehicleListPage() {
+export default function CustomerInformationPreviewPage() {
     return (
-        <div className="flex min-h-screen ">
+        <div className="flex min-h-screen">
             {/* Sidebar for Large Screens */}
-            <div className="hidden lg:flex sticky top-0 bottom-0 h-screen overflow-y-auto">
+            <div className="hidden lg:flex">
                 <Sidebar />
             </div>
 
@@ -26,7 +26,7 @@ export default function VehicleListPage() {
                 {/* Main Content */}
                 <main className="flex-1 mt-6">
                     <div className="max-w-6xl mx-auto px-4">
-                        <VehicleList />
+                        <Preview />
                     </div>
                 </main>
 

@@ -8,18 +8,8 @@ import { usePrivateVehicleCategoryStore } from '@/store/vehicleDetails/privateVe
 import { useGeneralVehicleStore } from '@/store/vehicleDetails/generalVehicle';
 import { useOwnershipUsageStore } from '@/store/vehicleDetails/ownershipAndUsage';
 import { useVehicleSelectionStore } from '@/store/vehicleSelection/vehicleSelectionStore';
+import { useVehicleDocumentsStore } from '@/store/vehicleDetails/vehicleDocuments';
 import { vehiclePersistenceService } from '@/utils/vehicleApi';
-import { baseAPI } from '@/utils/axiosInstance';
-import { useUserStore } from '@/store/authStore/useUserStore';
-import { baseAPI } from '@/utils/axiosInstance';
-// import { set } from 'zod';
-
-// type VehicleDetails = {
-//   make: string;
-//   model: string;
-//   mfgYear: string;
-//   [key: string]: any;
-// };
 
 // type OwnershipUsageData = {
 //   isOwned: boolean;
@@ -29,12 +19,12 @@ import { baseAPI } from '@/utils/axiosInstance';
 
 export default function PolicyPreview() {
   const router = useRouter();
-  const user = useUserStore((state) => state.user);
   const { selectedType, setSelectedType } = useVehiclePurposeStore();
   const { carType, usageType, setCarType, setUsageType } = usePrivateVehicleCategoryStore();
   const { formData: vehicleData, setFormData: setVehicleData } = useGeneralVehicleStore();
   const { formData: ownershipData, setFormData: setOwnershipData } = useOwnershipUsageStore();
   const { isExistingVehicle, selectedVehicleId, vehicleData: selectedVehicleData } = useVehicleSelectionStore();
+  const { driversLicense, vehicleLibre } = useVehicleDocumentsStore();
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -56,6 +46,26 @@ export default function PolicyPreview() {
       selectedVehicleId,
       hasSelectedVehicleData: !!selectedVehicleData
     });
+    console.log('🔍 Vehicle selection store state:', {
+      isExistingVehicle,
+      selectedVehicleId,
+      vehicleData: selectedVehicleData
+    });
+
+    // Check if documents are uploaded
+    if (!driversLicense || !vehicleLibre) {
+      const missingDocs = [];
+      if (!driversLicense) missingDocs.push("Driver's License");
+      if (!vehicleLibre) missingDocs.push("Vehicle Libre");
+      
+      const shouldContinue = confirm(
+        `⚠️ Warning: You haven't uploaded the following required documents: ${missingDocs.join(', ')}.\n\nDo you want to continue without these documents? (Not recommended)`
+      );
+      
+      if (!shouldContinue) {
+        return;
+      }
+    }
 
     setError('');
     setIsLoading(true);
@@ -67,7 +77,11 @@ export default function PolicyPreview() {
         carType,
         usageType,
         vehicleData,
-        ownershipData
+        ownershipData,
+        documents: {
+          driversLicense: driversLicense || undefined,
+          vehicleLibre: vehicleLibre || undefined
+        }
       };
 
       const vehiclePayload = vehiclePersistenceService.buildVehiclePayload(formData);
@@ -93,89 +107,35 @@ export default function PolicyPreview() {
 
       console.log('✅ Vehicle persistence completed:', vehiclePersistenceResult);
 
-      // Step 3: Continue with policy submission (existing logic)
-      const vehicleKey = selectedType === 'private' ? 'privateVehicle' : 'commercialVehicle';
-
-      let category: string;
-      let usage: string[];
-
-      if (selectedType === 'private') {
-        const mapCarTypeToBackendCategory = (privateCarType: string): string => {
-          switch (privateCarType) {
-            case 'passenger': return 'Passenger Car';
-            case 'suvs': return 'SUV'; 
-            case 'pickup': return 'Pickup Truck';
-            case 'minivan': return 'Van/Minibus';
-            default: return 'Passenger Car';
-          }
-        };
-        const mapPrivateUsageTypeToArray = (privateUsageType: string): string[] => {
-          if (privateUsageType === 'personal') return ['Personal Use'];
-          if (privateUsageType === 'business') return ['Private Business Use'];
-          return ['Personal Use'];
-        };
-        category = mapCarTypeToBackendCategory(carType);
-        usage = mapPrivateUsageTypeToArray(usageType);
-      } else { // Commercial
-        category = "Passenger Car"; 
-        usage = ["Personal Use"];  
+      // Step 3: Continue with policy submission using the vehicle ID from persistence result
+      const vehicleId = vehiclePersistenceResult.data._id || selectedVehicleId;
+      
+      if (!vehicleId) {
+        throw new Error('Vehicle ID not found after persistence operation');
       }
 
-      const policyPayload =  {
-        vehicleType: selectedType === 'private' ? "Private" : "Commercial",
-        privateVehicle: {
-          vehicleCategory: category,
-          usageType: usage,
-          generalDetails: {
-            make: vehicleData.make,
-            model: vehicleData.model,
-            engineCapacity: vehicleData.engineCapacity ? parseInt(vehicleData.engineCapacity, 10) : undefined,
-            plateNumber: vehicleData.plateNo,
-            bodyType: vehicleData.bodyType,
-            engineNumber: vehicleData.engineNo
-          },
-          ownershipUsage: {
-            ownerType: ownershipData.ownerType,
-            purchasedValue: ownershipData.purchasedValue ? parseInt(ownershipData.purchasedValue, 10) : undefined,
-            dutyFree: ownershipData.dutyFree === "Yes" ? true : false,
-            driverType: ownershipData.driverType,
-            seatingCapacity: ownershipData.seatingCapacity ? parseInt(ownershipData.seatingCapacity, 10) : undefined
-          },
-        },
-      };
+      console.log('📋 Using vehicle ID for policy submission:', vehicleId);
 
-      console.log('📋 Policy payload being sent to backend:', policyPayload);
-
-      const serverResponse = await baseAPI.post('/policy/vehicle-details', policyPayload, {
-        headers: {
-          Authorization: `Bearer ${user?.accessToken}`
-        }
-      });
-
-      if (serverResponse.status === 201) {
-        console.log('✅ Policy submitted successfully:', serverResponse.data);
-        
-        // Show success message with context
-        const successMessage = vehiclePersistenceResult.isUpdate 
-          ? 'Vehicle updated and policy submitted successfully!' 
-          : 'New vehicle created and policy submitted successfully!';
-        
-        alert(successMessage);
-        
-        // Clear form data
-        localStorage.removeItem('insurance-storage');
-        localStorage.removeItem('private-vehicle-storage');
-        localStorage.removeItem('general-vehicle-storage');
-        localStorage.removeItem('ownership-usage-storage');
-        localStorage.removeItem('vehicle-selection-storage');
-        
-        console.log('🧹 Cleared form storage');
-        router.push('/policy-purchase/purchase/policySelection');
-
-      } else {
-        console.error('❌ Error submitting policy:', serverResponse.data);
-        setError('❌ Some error occurred during policy submission. Please try again.');
-      }
+      // Navigate to policy selection page with the vehicle ID
+      console.log('✅ Vehicle saved/updated successfully!');
+      
+      // Show success message with context
+      const successMessage = vehiclePersistenceResult.isUpdate 
+        ? 'Vehicle updated successfully!' 
+        : 'New vehicle created successfully!';
+      
+      alert(successMessage);
+      
+      // Clear form data
+      localStorage.removeItem('insurance-storage');
+      localStorage.removeItem('private-vehicle-storage');
+      localStorage.removeItem('general-vehicle-storage');
+      localStorage.removeItem('ownership-usage-storage');
+      localStorage.removeItem('vehicle-selection-storage');
+      localStorage.removeItem('vehicle-documents-storage');
+      
+      console.log('🧹 Cleared form storage');
+      router.push('/policy-purchase/purchase/policySelection');
 
     } catch (error) {
       console.error('❌ Vehicle submission failed:', error);
@@ -243,20 +203,20 @@ export default function PolicyPreview() {
           {isEditing.purpose ? (
             <div className="mt-4">
               <div className="relative">
-                <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Insurance Type</label>
+                <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Vehicle Type</label>
                 <select
                   value={selectedType}
                   onChange={(e) => setSelectedType(e.target.value)}
                   className="w-full p-2 border border-black rounded"
                 >
-                  <option value="known">Known Driver</option>
-                  <option value="any">Any Driver </option>
+                  <option value="private">Private</option>
+                  <option value="commercial">Commercial</option>
                 </select>
               </div>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 px-4">
-              <div><strong>Selected Insurance Type:</strong> <p> {selectedType === 'private' ? 'Private' : 'Commercial'}  </p> </div>
+              <div><strong>Selected Vehicle Type:</strong> <p> {selectedType === 'private' ? 'Private' : 'Commercial'}  </p> </div>
             </div>
           )}
         </div>
@@ -529,6 +489,50 @@ export default function PolicyPreview() {
               <div><strong>Duty Free:</strong> <p>{ownershipData.dutyFree}</p></div>
             </div>
           )}
+        </div>
+
+        {/* Documents Section */}
+        <div className="border-b pb-4 mb-8">
+          <div className="flex justify-between items-center">
+            <h2 className="text-lg font-bold text-blue-600">5. Required Documents</h2>
+            <button 
+              onClick={() => router.push('/policy-purchase/vehicle-information/uploadDocs')} 
+              className="text-blue-500 hover:text-blue-700 text-sm"
+            >
+              Upload Documents
+            </button>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 px-4">
+            <div>
+              <strong>Driver&apos;s License:</strong>
+              <p className={`flex items-center gap-2 ${driversLicense ? 'text-green-600' : 'text-red-600'}`}>
+                {driversLicense ? '✅ Uploaded' : '❌ Not uploaded'}
+                {driversLicense && (
+                  <button 
+                    onClick={() => window.open(driversLicense, '_blank')} 
+                    className="text-blue-500 hover:text-blue-700 text-sm underline"
+                  >
+                    View
+                  </button>
+                )}
+              </p>
+            </div>
+            <div>
+              <strong>Vehicle Libre:</strong>
+              <p className={`flex items-center gap-2 ${vehicleLibre ? 'text-green-600' : 'text-red-600'}`}>
+                {vehicleLibre ? '✅ Uploaded' : '❌ Not uploaded'}
+                {vehicleLibre && (
+                  <button 
+                    onClick={() => window.open(vehicleLibre, '_blank')} 
+                    className="text-blue-500 hover:text-blue-700 text-sm underline"
+                  >
+                    View
+                  </button>
+                )}
+              </p>
+            </div>
+          </div>
         </div>
 
         {error && <p className="text-red-500 mt-4 text-center">{error}</p>}
