@@ -226,18 +226,18 @@ export default function Dashboard() {
               ))}
             </div>
 
-            <section className="mb-14">
-              <h2 className="text-xl font-semibold text-blue-500 mb-6" style={{ fontFamily: 'Montserrat, sans-serif' }}>Active Policies</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10 justify-items-center">
-                {policies.map((policy) => {
-                  const generalDetails =
-                    policy.privateVehicle?.generalDetails ||
-                    policy.commercialVehicle?.generalDetails;
-                  const formattedDate = new Date(policy.createdAt).toLocaleDateString("en-KE", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  });
+        <section className="mb-14">
+          <h2 className="text-xl font-semibold text-blue-500 mb-6" style={{ fontFamily: 'Montserrat, sans-serif' }}>Your Policies</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10 justify-items-center">
+            {policies.map((policy) => {
+              const generalDetails =
+                policy.privateVehicle?.generalDetails ||
+                policy.commercialVehicle?.generalDetails;
+              const formattedDate = new Date(policy.createdAt).toLocaleDateString("en-KE", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              });
 
               const imageUrl = policy.vehicleType === "Private" ? "/Private.png" : "/Commercial.png";
               const handleViewDetails = () => {
