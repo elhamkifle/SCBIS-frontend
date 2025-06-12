@@ -130,7 +130,7 @@ export default function Dashboard() {
         </div>
 
         <section className="mb-14">
-          <h2 className="text-xl font-semibold text-blue-500 mb-6" style={{ fontFamily: 'Montserrat, sans-serif' }}>Active Policies</h2>
+          <h2 className="text-xl font-semibold text-blue-500 mb-6" style={{ fontFamily: 'Montserrat, sans-serif' }}>Your Policies</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10 justify-items-center">
             {policies.map((policy) => {
               const generalDetails =
@@ -179,7 +179,7 @@ export default function Dashboard() {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold text-blue-500 mb-6" style={{ fontFamily: 'Montserrat, sans-serif' }}>Claims in progress</h2>
+          <h2 className="text-xl font-semibold text-blue-500 mb-6" style={{ fontFamily: 'Montserrat, sans-serif' }}>Your claims </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10 justify-items-center">
             {claims.map((claim) => {
               const formattedDate = formatDate(claim.dateSubmitted || claim.createdAt);

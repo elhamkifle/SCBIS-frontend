@@ -117,7 +117,7 @@ export default function PurchaseRequestDeclined() {
     if (!accessToken) throw new Error('No access token found');
 
     await axios.put(
-      `https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/policy/update-policy/${policy._id}`,
+      `https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/policy/update-policy-status/${policy._id}`,
       { status: "pending" },
       { headers: { Authorization: `Bearer ${accessToken}` } }
     );
