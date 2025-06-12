@@ -261,7 +261,7 @@ export default function ClaimPreview() {
       useDeclarationStore.getState().clearAllData();
 
       alert("Claim submitted successfully!")
-      router.push("/dasboard")
+      router.push("/dashboard")
 
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {

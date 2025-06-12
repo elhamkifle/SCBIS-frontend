@@ -117,7 +117,7 @@ export default function VehicleList() {
       setSelectedVehicle(vehicle._id, detailedVehicle);
       
       console.log('✅ Vehicle selected successfully, navigating to purpose page...');
-      router.push('/policy-purchase/vehicle-information/purpose');
+      router.push('/policy-purchase/purchase/policySelection');
     } catch (err) {
       console.error('❌ Error selecting vehicle:', err);
       setError(err instanceof Error ? err.message : 'Failed to select vehicle');
