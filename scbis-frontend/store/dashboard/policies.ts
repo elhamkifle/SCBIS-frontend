@@ -1,79 +1,87 @@
 "use client";
 
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
+
+interface GeneralDetails {
+    make: string;
+    model: string;
+    engineCapacity?: number;
+    plateNumber: string;
+    bodyType?: string;
+    engineNumber?: string;
+}
+
+interface PrivateVehicle {
+    usageType: string[];
+    vehicleCategory: string;
+    generalDetails: GeneralDetails;
+    ownershipUsage?: {
+        ownerType?: string;
+        purchasedValue?: number;
+        dutyFree?: boolean;
+        driverType?: string;
+        seatingCapacity?: number;
+    };
+    _id: string;
+}
+
+interface CommercialVehicle {
+    usageType: string[];
+    vehicleCategory: string;
+    generalDetails: GeneralDetails;
+    ownershipUsage?: {
+        companyName?: string;
+        driverType?: string;
+        purchasedValue?: number;
+    };
+    _id: string;
+}
 
 interface Policy {
-    id: string;
-    plateNumber: string;
+    _id: string;
     policyType: string;
-    purpose: string;
-    passengers: string;
-    policyPeriod: {
-        start: string;
-        end: string;
+    coverageEndDate: string;
+    territory: string;
+    policyId: string;
+    duration: number;
+    policyPeriodFrom: string;
+    policyPeriodTo: string;
+    status: {
+        value: "Active" | "Renewal" | "Expired" | string;
+        _id: string;
     };
-    status: 'Active' | 'Renewal' | 'Expired';
-    imageUrl: string;
+    createdAt: string;
+    vehicleType: "Private" | "Commercial" | string;
+    imageUrl?: string;
+    privateVehicle?: PrivateVehicle;
+    commercialVehicle?: CommercialVehicle;
 }
+
 
 interface PoliciesState {
     policies: Policy[];
-    addPolicy: (policy: Policy) => void;
-    removePolicy: (id: string) => void;
-    updatePolicy: (id: string, policy: Partial<Policy>) => void;
+    selectedPolicy: string | null;
+    setSelectedPolicy: (policyId: string) => void;
+    addPolicies: (policies: Policy[]) => void;
+    setPolicies: (policies: Policy[]) => void;
     clearAllPolicies: () => void;
 }
-
-const initialPolicies: Policy[] = [
-    {
-        id: "1",
-        plateNumber: "A 12345",
-        policyType: "Comprehensive",
-        purpose: "Private",
-        passengers: "5 Seater",
-        policyPeriod: {
-            start: "01/01/24",
-            end: "01/01/25"
-        },
-        status: "Active",
-        imageUrl: "/Private.png"
-    },
-    {
-        id: "2",
-        plateNumber: "B 67890",
-        policyType: "Comprehensive",
-        purpose: "Commercial",
-        passengers: "3 Seater",
-        policyPeriod: {
-            start: "01/01/24",
-            end: "01/01/25"
-        },
-        status: "Renewal",
-        imageUrl: "/Commercial.png"
-    }
-];
 
 export const usePoliciesStore = create<PoliciesState>()(
     persist(
         (set) => ({
-            policies: initialPolicies,
-            addPolicy: (policy) => set((state) => ({
-                policies: [...state.policies, policy]
-            })),
-            removePolicy: (id) => set((state) => ({
-                policies: state.policies.filter(p => p.id !== id)
-            })),
-            updatePolicy: (id, policy) => set((state) => ({
-                policies: state.policies.map(p =>
-                    p.id === id ? { ...p, ...policy } : p
-                )
-            })),
-            clearAllPolicies: () => set({ policies: [] })
+            policies: [],
+            selectedPolicy: null,
+            setSelectedPolicy: (policyId) => set({ selectedPolicy: policyId }),
+            addPolicies: (newPolicies) =>
+                set(() => ({ policies: newPolicies })),
+            setPolicies: (policies) => set({ policies }),
+            clearAllPolicies: () => set({ policies: [] }),
         }),
         {
-            name: 'dashboard-policies-storage',
+            name: "dashboard-policies-storage",
             storage: createJSONStorage(() => localStorage),
         }
     )
-); 
+);

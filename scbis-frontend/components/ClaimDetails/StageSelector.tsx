@@ -1,6 +1,6 @@
 "use client";
 
-type ClaimStage = "review" | "admin-approved" | "waiting-approval" | "in-person" | "under-review" | "winner-announced";
+type ClaimStage = "submitted" | "adminApproved" | "policeReportUnderReview" | "proformaUnderReview" | "closed" | "winnerAnnounced"| "proformaSubmissionPending";
 
 interface StageSelectorProps {
     currentStage: ClaimStage;
@@ -9,12 +9,7 @@ interface StageSelectorProps {
 
 export function StageSelector({ currentStage, onStageChange }: StageSelectorProps) {
     const stages: ClaimStage[] = [
-        "review",
-        "admin-approved",
-        "waiting-approval",
-        "in-person",
-        "under-review",
-        "winner-announced"
+        "submitted", "adminApproved", "policeReportUnderReview", "proformaUnderReview", "closed", "winnerAnnounced", "proformaSubmissionPending"
     ];
 
     return (
@@ -25,11 +20,10 @@ export function StageSelector({ currentStage, onStageChange }: StageSelectorProp
                     <button
                         key={stage}
                         onClick={() => onStageChange(stage)}
-                        className={`px-3 py-1 text-sm rounded ${
-                            currentStage === stage
+                        className={`px-3 py-1 text-sm rounded ${currentStage === stage
                                 ? "bg-blue-600 text-black"
                                 : "bg-gray-600 hover:bg-blue-200"
-                        }`}
+                            }`}
                     >
                         {stage.replace(/-/g, " ")}
                     </button>

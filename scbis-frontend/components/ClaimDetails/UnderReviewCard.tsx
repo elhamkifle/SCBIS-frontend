@@ -1,6 +1,10 @@
 "use client";
 
 import { User, AlertTriangle, MapPin, FileText } from "lucide-react";
+import { useRouter } from "next/navigation";
+
+
+
 
 interface ClaimData {
     driver: any;
@@ -31,6 +35,8 @@ export function UnderReviewCard({
     buttonLabel,
     claimData,
 }: UnderReviewCardProps) {
+    const router = useRouter();
+    
     return (
         <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg border mb-8" style={{ boxShadow: '0px 10px 20px rgba(0, 123, 255, 0.12), 0px 4px 8px rgba(0, 0, 0, 0.06)' }}>
             <div className="text-center mb-8">
@@ -50,12 +56,12 @@ export function UnderReviewCard({
                             <h3 className="text-lg">Driver Information</h3>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                            <p><strong>Name:</strong> {claimData.driver.firstName} {claimData.driver.lastName}</p>
-                            <p><strong>Age:</strong> {claimData.driver.age}</p>
-                            <p><strong>License No:</strong> {claimData.driver.licenseNo}</p>
-                            <p><strong>License Grade:</strong> {claimData.driver.grade}</p>
-                            <p><strong>Expiration Date:</strong> {claimData.driver.expirationDate}</p>
-                            <p><strong>Phone:</strong> {claimData.driver.phoneNumber}</p>
+                            <p><strong>Name:</strong> {claimData.driver?.firstName || ''} {claimData.driver?.lastName || ''}</p>
+                            <p><strong>Age:</strong> {claimData.driver?.age || ''}</p>
+                            <p><strong>License No:</strong> {claimData.driver?.licenseNo || ''}</p>
+                            <p><strong>License Grade:</strong> {claimData.driver?.grade || ''}</p>
+                            <p><strong>Expiration Date:</strong> {claimData.driver?.expirationDate || ''}</p>
+                            <p><strong>Phone:</strong> {claimData.driver?.phoneNumber || ''}</p>
                         </div>
                     </div>
 
@@ -66,12 +72,12 @@ export function UnderReviewCard({
                             <h3 className="text-lg">Accident Details</h3>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                            <p><strong>Date:</strong> {claimData.accidentDetails.dateOfAccident}</p>
-                            <p><strong>Time:</strong> {claimData.accidentDetails.timeOfAccident}</p>
-                            <p><strong>Speed:</strong> {claimData.accidentDetails.speed} km/h</p>
-                            <p><strong>Road Surface:</strong> {claimData.accidentDetails.roadSurface}</p>
-                            <p><strong>Traffic Condition:</strong> {claimData.accidentDetails.trafficCondition}</p>
-                            <p><strong>Time of Day:</strong> {claimData.accidentDetails.timeOfDay}</p>
+                            <p><strong>Date:</strong> {claimData.accidentDetails?.dateOfAccident || ''}</p>
+                            <p><strong>Time:</strong> {claimData.accidentDetails?.timeOfAccident || ''}</p>
+                            <p><strong>Speed:</strong> {claimData.accidentDetails?.speed || ''} km/h</p>
+                            <p><strong>Road Surface:</strong> {claimData.accidentDetails?.roadSurface || ''}</p>
+                            <p><strong>Traffic Condition:</strong> {claimData.accidentDetails?.trafficCondition || ''}</p>
+                            <p><strong>Time of Day:</strong> {claimData.accidentDetails?.timeOfDay || ''}</p>
                         </div>
                     </div>
 
@@ -82,10 +88,10 @@ export function UnderReviewCard({
                             <h3 className="text-lg">Location Information</h3>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                            <p><strong>City:</strong> {claimData.accidentDetails.location.city}</p>
-                            <p><strong>Sub-City:</strong> {claimData.accidentDetails.location.subCity}</p>
-                            <p><strong>Kebele:</strong> {claimData.accidentDetails.location.kebele}</p>
-                            <p><strong>Sefer:</strong> {claimData.accidentDetails.location.sefer}</p>
+                            <p><strong>City:</strong> {claimData.accidentDetails?.location?.city || ''}</p>
+                            <p><strong>Sub-City:</strong> {claimData.accidentDetails?.location?.subCity || ''}</p>
+                            <p><strong>Kebele:</strong> {claimData.accidentDetails?.location?.kebele || ''}</p>
+                            <p><strong>Sefer:</strong> {claimData.accidentDetails?.location?.sefer || ''}</p>
                         </div>
                     </div>
 
@@ -96,13 +102,13 @@ export function UnderReviewCard({
                             <h3 className="text-lg">Liability Information</h3>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                            <p><strong>Responsible Party:</strong> {claimData.liability.responsibleParty}</p>
-                            <p><strong>Other Insurance:</strong> {claimData.liability.otherInsuranceCompanyName}</p>
-                            <p><strong>Police Involved:</strong> {claimData.liability.policeInvolved ? 'Yes' : 'No'}</p>
-                            {claimData.liability.policeInvolved && (
+                            <p><strong>Responsible Party:</strong> {claimData.liability?.responsibleParty || ''}</p>
+                            <p><strong>Other Insurance:</strong> {claimData.liability?.otherInsuranceCompanyName || ''}</p>
+                            <p><strong>Police Involved:</strong> {claimData.liability?.policeInvolved ? 'Yes' : 'No'}</p>
+                            {claimData.liability?.policeInvolved && (
                                 <>
-                                    <p><strong>Police Officer:</strong> {claimData.liability.policeOfficerName}</p>
-                                    <p><strong>Police Station:</strong> {claimData.liability.policeStation}</p>
+                                    <p><strong>Police Officer:</strong> {claimData.liability?.policeOfficerName || ''}</p>
+                                    <p><strong>Police Station:</strong> {claimData.liability?.policeStation || ''}</p>
                                 </>
                             )}
                         </div>
@@ -115,20 +121,20 @@ export function UnderReviewCard({
                             <h3 className="text-lg">Witness Information</h3>
                         </div>
                         <div className="grid grid-cols-1 gap-4 text-sm">
-                            <p><strong>Alone in Vehicle:</strong> {claimData.witness.aloneInVehicle ? 'Yes' : 'No'}</p>
-                            {claimData.witness.vehicleOccupants.length > 0 && (
+                            <p><strong>Alone in Vehicle:</strong> {claimData.witness?.aloneInVehicle ? 'Yes' : 'No'}</p>
+                            {claimData.witness?.vehicleOccupants?.length > 0 && (
                                 <div>
                                     <p className="font-semibold">Vehicle Occupants:</p>
                                     {claimData.witness.vehicleOccupants.map((occupant: any, index: number) => (
-                                        <p key={index} className="ml-4">• {occupant.name} - {occupant.contact}</p>
+                                        <p key={index} className="ml-4">• {occupant?.name || ''} - {occupant?.contact || ''}</p>
                                     ))}
                                 </div>
                             )}
-                            {claimData.witness.independentWitnesses.length > 0 && (
+                            {claimData.witness?.independentWitnesses?.length > 0 && (
                                 <div>
                                     <p className="font-semibold">Independent Witnesses:</p>
                                     {claimData.witness.independentWitnesses.map((witness: any, index: number) => (
-                                        <p key={index} className="ml-4">• {witness.name} - {witness.contact}</p>
+                                        <p key={index} className="ml-4">• {witness?.name || ''} - {witness?.contact || ''}</p>
                                     ))}
                                 </div>
                             )}
@@ -142,13 +148,13 @@ export function UnderReviewCard({
                             <h3 className="text-lg">Damage Information</h3>
                         </div>
                         <div className="grid grid-cols-1 gap-4 text-sm">
-                            <p><strong>Vehicle Damage:</strong> {claimData.damage.vehicleDamageDesc}</p>
-                            <p><strong>Third Party Damage:</strong> {claimData.damage.thirdPartyDamageDesc}</p>
-                            {claimData.damage.injuriesAny && (
+                            <p><strong>Vehicle Damage:</strong> {claimData.damage?.vehicleDamageDesc || ''}</p>
+                            <p><strong>Third Party Damage:</strong> {claimData.damage?.thirdPartyDamageDesc || ''}</p>
+                            {claimData.damage?.injuriesAny && claimData.damage?.injuredPersons?.length > 0 && (
                                 <div>
                                     <p className="font-semibold">Injured Persons:</p>
                                     {claimData.damage.injuredPersons.map((person: any, index: number) => (
-                                        <p key={index} className="ml-4">• {person.name} - {person.address}</p>
+                                        <p key={index} className="ml-4">• {person?.name || ''} - {person?.address || ''}</p>
                                     ))}
                                 </div>
                             )}
@@ -157,12 +163,13 @@ export function UnderReviewCard({
                 </div>
             )}
 
+
             <p className="text-md mt-8">
                 <span className="font-bold text-blue-700">N.B:</span> {note}
             </p>
             {onNext && (
-                <button className="mt-8 px-4 py-2 bg-blue-600 text-white rounded w-full" onClick={onNext}>
-                    {buttonLabel}
+                <button className="mt-8 px-4 py-2 bg-blue-600 text-white rounded w-full" onClick={() => router.push("/dashboard")}>
+                    Back to Dashboard 
                 </button>
             )}
         </div>

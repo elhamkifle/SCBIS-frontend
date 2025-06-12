@@ -111,7 +111,7 @@ export default function Hero() {
                             </button>
 
                             <button
-                                onClick={() => router.push("/claim-submission/vehicle-selection")}
+                                onClick={() => router.push("/claim-submission/claim-policy-selection")}
                                 className="bg-[#7AC943] text-white font-semibold px-6 py-3 rounded-lg hover:bg-[#1F4878] transition"
                             >
                                 Start a New Claim
