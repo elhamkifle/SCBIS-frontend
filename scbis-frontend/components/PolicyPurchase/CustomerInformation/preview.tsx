@@ -164,8 +164,8 @@ export default function Preview() {
 
       console.log('✅ Personal information submitted successfully!');
       console.log('➡️ Navigating to vehicle list page...');
-      alert('Application Submitted!');
-      router.push('/policy-purchase/vehicle-information/vehicle-list');
+      alert('Application Submitted! Your Personal Information is under review');
+      router.push('/dashboard');
       
       // Clear personal details and address from localStorage
       localStorage.removeItem('personal-details-storage');

@@ -275,7 +275,8 @@ Premium: $${policyResponse.premium}
 You will be redirected to the next step.`);
 
       // Navigate to next step (you can change this route as needed)
-      router.push('/claim-submission/vehicle-selection');
+      // router.push('/claim-submission/vehicle-selection');
+      router.push('/dashboard');
       
     } catch (error) {
       console.error('❌ Error submitting policy application:', error);
