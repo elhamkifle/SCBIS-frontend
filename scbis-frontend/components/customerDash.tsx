@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePoliciesStore } from "@/store/dashboard/policies";
 import { useClaimsStore } from "@/store/dashboard/claims";
 import { useUserStore } from "@/store/authStore/useUserStore";
+import { useRouter } from "next/navigation";
 
 const actionImages: Record<string, string> = {
   "New Policy Purchase": "/purchase.png",
@@ -30,6 +31,7 @@ export default function Dashboard() {
   const { claims, setClaims } = useClaimsStore();
   const user = useUserStore((state) => state.user);
   const profileName = user?.fullname.split(' ') || [];
+  const router = useRouter();
 
   const getAuthTokenFromCookie = (): string | null => {
     const match = document.cookie.match(/(?:^|;\s*)auth_token=([^;]*)/);
@@ -92,6 +94,8 @@ export default function Dashboard() {
         return "text-yellow-500";
       case "rejected":
         return "text-red-500";
+      case "documentreuploadrequest":
+        return "text-red-500";
       case "Reject":
         return "text-red-500";
       default:
@@ -139,6 +143,13 @@ export default function Dashboard() {
               });
 
               const imageUrl = policy.vehicleType === "Private" ? "/Private.png" : "/Commercial.png";
+              const handleViewDetails = () => {
+                if (policy.status?.value === "documentReuploadRequest") {
+                  router.push(`/purchaseRequestDeclined/${policy._id}`);
+                } else {
+                  router.push(`/policydetails/${policy._id}`);
+                }
+              };
 
               return (
                 <div key={policy._id} className="bg-white border rounded-xl shadow-lg shadow-blue-100 w-full max-w-[400px] p-8">
@@ -155,11 +166,12 @@ export default function Dashboard() {
                     <p><span className="text-gray-500">Issued On:</span> <span className="font-bold">{formattedDate}</span></p>
                     <p><span className="text-gray-500">Policy Duration:</span> <span className="font-bold">{policy.duration} days </span></p>
                   </div>
-                  <Link href={`/policydetails/${policy._id}`}>
-                    <button className="mt-5 w-full text-base text-blue-600 border border-blue-600 rounded py-2 hover:bg-blue-50 font-semibold">
-                      View Details
-                    </button>
-                  </Link>
+                  <button
+                    onClick={handleViewDetails}
+                    className="mt-5 w-full text-base text-blue-600 border border-blue-600 rounded py-2 hover:bg-blue-50 font-semibold"
+                  >
+                    View Details
+                  </button>
                 </div>
               );
             })}
@@ -171,7 +183,7 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10 justify-items-center">
             {claims.map((claim) => {
               const formattedDate = formatDate(claim.dateSubmitted || claim.createdAt);
-              
+
               return (
                 <div key={claim._id} className="bg-white border rounded-xl shadow-lg shadow-blue-100 w-full max-w-[400px] p-8">
                   <div className="flex justify-between items-center mb-3">

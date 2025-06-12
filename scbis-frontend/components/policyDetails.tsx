@@ -16,8 +16,10 @@ export default function PolicyDetails() {
     setSelectedPolicy,
   } = usePoliciesStore();
   const [selectedPolicy, setPolicy] = useState<any>(null);
-  const generalDetails = selectedPolicy?.privateVehicle?.generalDetails || selectedPolicy?.commercialVehicle?.generalDetails || {};
-  const vehicleType = selectedPolicy?.privateVehicle?.vehicleCategory || selectedPolicy?.commercialVehicle?.vehicleCategory || {};
+const generalDetails = selectedPolicy?.privateVehicle?.generalDetails || 
+                      selectedPolicy?.commercialVehicle?.generalDetails || {};
+const vehicleType = selectedPolicy?.privateVehicle?.vehicleCategory || 
+                   selectedPolicy?.commercialVehicle?.vehicleCategory || '';
   const user = useUserStore(state => state.user);
 
   const handlePrevious = () => router.push('/dashboard');

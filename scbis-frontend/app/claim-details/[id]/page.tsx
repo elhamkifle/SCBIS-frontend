@@ -14,35 +14,32 @@ import { useDamageDetailsStore } from "@/store/claimSubmission/damage-details";
 import { useClaimsStore } from "@/store/dashboard/claims";
 import { StageCard } from "@/components/ClaimDetails/StageCard";
 import { UnderReviewCard } from "@/components/ClaimDetails/UnderReviewCard";
-import { StageSelector } from "@/components/ClaimDetails/StageSelector";
+import { useRouter } from "next/navigation";
 
-type ClaimStage = "submitted" |"proformaSubmissionPending" | "adminApproved" | "policeReportUnderReview" | "proformaUnderReview" | "closed" | "winnerAnnounced";
+type ClaimStage = "submitted" | "proformaSubmissionPending" | "adminApproved" | "policeReportUnderReview" | "proformaUnderReview" | "closed" | "winnerAnnounced";
 
 export default function ClaimDetailsPage() {
     const params = useParams();
     const claimId = params?.id as string;
-    
+    const router = useRouter();
+
     const [backendClaim, setBackendClaim] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [uploading, setUploading] = useState(false);
 
     // Get claims from local storage via Zustand
     const { claims } = useClaimsStore();
     const localClaim = claims.find(claim => claim._id === claimId);
 
     const claim = useClaimDetailsStore();
-    const { formData: driver } = useDriverDetailsStore();
-    const accidentDetails = useAccidentDetailsStore();
-    const liability = useLiabilityInformationStore();
-    const witness = useWitnessInformationStore();
-    const damage = useDamageDetailsStore();
     const [policeReport, setPoliceReport] = useState<File | null>(null);
 
     useEffect(() => {
         const fetchClaimDetails = async () => {
             try {
                 setLoading(true);
-                
+
                 // If we have the claim in local storage, use that
                 if (localClaim) {
                     setBackendClaim(localClaim);
@@ -52,7 +49,7 @@ export default function ClaimDetailsPage() {
 
                 // Otherwise fetch from backend
                 const accessToken = document.cookie.match(/(?:^|;\s*)auth_token=([^;]*)/)?.[1];
-                
+
                 const response = await axios.get(
                     `https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/claims/${claimId}`,
                     {
@@ -73,13 +70,63 @@ export default function ClaimDetailsPage() {
 
         if (claimId) {
             fetchClaimDetails();
+            console.log(backendClaim)
         }
     }, [claimId, localClaim]);
 
-    const handlePoliceReportUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handlePoliceReportUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             setPoliceReport(e.target.files[0]);
-            claim.nextStage();
+        }
+    };
+
+    const uploadPoliceReport = async () => {
+        if (!policeReport) return;
+        
+        try {
+            setUploading(true);
+            
+            // Upload to Cloudinary
+            const formdata = new FormData();
+            formdata.append('file', policeReport);
+            formdata.append('upload_preset', 'docuploads');
+            
+            const uploadResult = await axios.post(
+                `https://api.cloudinary.com/v1_1/dmzvqehan/upload`,
+                formdata
+            );
+            
+            if (uploadResult.statusText === "OK") {
+                console.log(uploadResult.data.secure_url);
+                const policeReportUrl = uploadResult.data.secure_url;
+                
+                // Update the claim with the police report URL
+                const accessToken = document.cookie.match(/(?:^|;\s*)auth_token=([^;]*)/)?.[1];
+                
+                const updateResponse = await axios.patch(
+                    `https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/claims/${claimId}`,
+                    {
+                        policeReport: policeReportUrl,
+                        status: "policeReportUnderReview"
+                    },
+                    {
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`,
+                        },
+                    }
+                );
+                
+                if (updateResponse.status === 200) {
+                    // Update local state and move to next stage
+                    setBackendClaim(updateResponse.data);
+                    claim.nextStage();
+                }
+            }
+        } catch (err) {
+            console.error('Error uploading police report:', err);
+            setError('Failed to upload police report');
+        } finally {
+            setUploading(false);
         }
     };
 
@@ -89,31 +136,30 @@ export default function ClaimDetailsPage() {
 
     // Determine stage based on claim status and other properties
     const determineStage = (): ClaimStage => {
-        console.log("Claim Status from backend:", backendClaim.status);
-    if (!backendClaim) return "submitted";
-    console.log(backendClaim.status)
-    
-    switch (backendClaim.status) {
-        case "submitted":
-            return "submitted";
-        case "proformaSubmissionPending":
-            return "proformaSubmissionPending";
-        case "adminApproved":
-            return "adminApproved";
-        case "policeReportUnderReview":
-            return "policeReportUnderReview";
-        case "proformaUnderReview":
-            return "proformaUnderReview";
-        case "closed":
-            return "closed";
-        case "winnerAnnounced":
-            return "winnerAnnounced";
-        default:
-            return "submitted"; // Default case
-    }
-};
+        if (!backendClaim) return "submitted";
+        console.log(backendClaim.status)
 
-const currentStage: ClaimStage = claim.stage || determineStage();
+        switch (backendClaim.status) {
+            case "submitted":
+                return "submitted";
+            case "proformaSubmissionPending":
+                return "proformaSubmissionPending";
+            case "adminApproved":
+                return "adminApproved";
+            case "policeReportUnderReview":
+                return "policeReportUnderReview";
+            case "proformaUnderReview":
+                return "proformaUnderReview";
+            case "closed":
+                return "closed";
+            case "winnerAnnounced":
+                return "winnerAnnounced";
+            default:
+                return "submitted"; // Default case
+        }
+    };
+
+    const currentStage: ClaimStage = claim.stage || determineStage();
 
     if (loading) {
         return (
@@ -184,11 +230,11 @@ const currentStage: ClaimStage = claim.stage || determineStage();
                                             onNext={claim.nextStage}
                                             buttonLabel="Approve Claim (Demo)"
                                             claimData={{
-                                                driver,
-                                                accidentDetails,
-                                                liability,
-                                                witness,
-                                                damage
+                                                driver: backendClaim.driver,
+                                                accidentDetails: backendClaim.accidentDetails,
+                                                liability: backendClaim.liability,
+                                                witness: backendClaim.witness,
+                                                damage: backendClaim.damage,
                                             }}
                                         />
                                     );
@@ -202,7 +248,7 @@ const currentStage: ClaimStage = claim.stage || determineStage();
                                                         <div className="flex items-center justify-center bg-gray-50 p-4 rounded-lg mb-4">
                                                             <a href={backendClaim.policeReportRequestLetter} download className="block">
                                                                 <img
-                                                                    src="/placeholder-police-request.png"
+                                                                    src={backendClaim.policeReportRequestLetter}
                                                                     alt="Police Report Request Letter"
                                                                     className="w-64 h-64 object-contain"
                                                                 />
@@ -210,13 +256,55 @@ const currentStage: ClaimStage = claim.stage || determineStage();
                                                         </div>
                                                         <a
                                                             href={backendClaim.policeReportRequestLetter}
-                                                            download
+                                                            download="Police_Report_Request_Letter.pdf"
+                                                            rel="noopener noreferrer"
                                                             className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors inline-block text-center"
                                                         >
                                                             Download Request Letter
                                                         </a>
+
                                                     </div>
                                                 )}
+
+                                                <div className="border rounded-lg p-4">
+                                                    <h3 className="text-lg font-semibold mb-3">Upload Police Report</h3>
+                                                    <div className="space-y-4">
+                                                        <p className="text-gray-600 text-sm">Please upload the official police report you received from the police station.</p>
+                                                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                                                            <input
+                                                                type="file"
+                                                                onChange={handlePoliceReportUpload}
+                                                                className="hidden"
+                                                                id="police-report-upload"
+                                                                accept=".pdf,.jpg,.jpeg,.png"
+                                                            />
+                                                            <label
+                                                                htmlFor="police-report-upload"
+                                                                className="cursor-pointer inline-flex items-center justify-center px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                                            >
+                                                                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                                                                </svg>
+                                                                Choose File
+                                                            </label>
+                                                            <p className="mt-2 text-xs text-gray-500">PDF, JPG, or PNG up to 10MB</p>
+                                                        </div>
+                                                        {policeReport && (
+                                                            <div className="mt-4">
+                                                                <p className="text-sm text-gray-600 mb-2">Selected file: {policeReport.name}</p>
+                                                                <button
+                                                                    onClick={uploadPoliceReport}
+                                                                    disabled={uploading}
+                                                                    className={`w-full px-4 py-2 text-white rounded transition-colors ${
+                                                                        uploading ? 'bg-gray-400' : 'bg-green-600 hover:bg-green-700'
+                                                                    }`}
+                                                                >
+                                                                    {uploading ? 'Uploading...' : 'Submit Police Report'}
+                                                                </button>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
 
                                                 {backendClaim.policeReport ? (
                                                     <div className="bg-green-50 border border-green-200 rounded-lg p-4">
@@ -229,44 +317,7 @@ const currentStage: ClaimStage = claim.stage || determineStage();
                                                             Continue
                                                         </button>
                                                     </div>
-                                                ) : (
-                                                    <div className="border rounded-lg p-4">
-                                                        <h3 className="text-lg font-semibold mb-3">Upload Police Report</h3>
-                                                        <div className="space-y-4">
-                                                            <p className="text-gray-600 text-sm">Please upload the official police report you received from the police station.</p>
-                                                            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                                                                <input
-                                                                    type="file"
-                                                                    onChange={handlePoliceReportUpload}
-                                                                    className="hidden"
-                                                                    id="police-report-upload"
-                                                                    accept=".pdf,.jpg,.jpeg,.png"
-                                                                />
-                                                                <label
-                                                                    htmlFor="police-report-upload"
-                                                                    className="cursor-pointer inline-flex items-center justify-center px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50"
-                                                                >
-                                                                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-                                                                    </svg>
-                                                                    Choose File
-                                                                </label>
-                                                                <p className="mt-2 text-xs text-gray-500">PDF, JPG, or PNG up to 10MB</p>
-                                                            </div>
-                                                            {policeReport && (
-                                                                <div className="mt-4">
-                                                                    <p className="text-sm text-gray-600 mb-2">Selected file: {policeReport.name}</p>
-                                                                    <button
-                                                                        onClick={() => claim.nextStage()}
-                                                                        className="w-full px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
-                                                                    >
-                                                                        Submit Police Report
-                                                                    </button>
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                )}
+                                                ) : null}
                                             </div>
                                         </StageCard>
                                     );
@@ -278,8 +329,8 @@ const currentStage: ClaimStage = claim.stage || determineStage();
                                             statusColor="#DBBF1F"
                                             description="Your police report is under review. Please wait for further instructions."
                                             note="You will be notified once your report is approved."
-                                            onNext={claim.nextStage}
-                                            buttonLabel="Simulate Approval (Demo)"
+                                            onNext={() => router.push("/dashboard")}
+                                            buttonLabel="Back to Dashboard"
                                         />
                                     );
                                 case "proformaSubmissionPending":
@@ -288,8 +339,9 @@ const currentStage: ClaimStage = claim.stage || determineStage();
                                             <p className="mb-4">
                                                 Please come to the office and submit a proforma from your preferred garage and/or spare parts company.
                                             </p>
-                                            <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded w-full" onClick={claim.nextStage}>
-                                                I have submitted (Demo)
+                                            <p className="mb-4"> If you have already submitted please wait for upto 24 hours for your Proforma to be verified.</p>
+                                            <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded w-full" onClick={() => router.push("/dashboard")}>
+                                                Back To Dashboard
                                             </button>
                                         </StageCard>
                                     );
@@ -301,16 +353,22 @@ const currentStage: ClaimStage = claim.stage || determineStage();
                                             statusColor="#DBBF1F"
                                             description="Your proforma is being reviewed. Please wait for the results."
                                             note="You will be notified once a decision is made."
-                                            onNext={claim.nextStage}
-                                            buttonLabel="Announce Winner (Demo)"
+                                            onNext={() => router.push("/dashboard")}
+                                            buttonLabel="Back to Dashboard"
                                         />
                                     );
                                 case "winnerAnnounced":
                                     return (
-                                        <StageCard title="Winner Announced">
-                                            <p className="mb-4">The proforma that won the deal is:</p>
-                                            <a href={claim.winnerProformaUrl} download>
-                                                <button className="mt-4 px-4 py-2 bg-green-600 text-white rounded w-full">Download Winning Proforma</button>
+                                        <StageCard title="Your Claim has been accepted and finalized!">
+                                            <p className="mb-4">The garage picked for you is: {backendClaim.garage}</p>
+                                            <p className="mb-4">Pick your spare parts from: {backendClaim.sparePartsFrom}</p>
+                                            <p className="mb-2">Location: </p>
+                                            <p className="ml-8"> City: {backendClaim.sparePartsFromLocation?.city}</p>
+                                            <p className="ml-8"> City: {backendClaim.sparePartsFromLocation?.subCity}</p>
+                                            <p className="ml-8"> Kebele: {backendClaim.sparePartsFromLocation?.kebele}</p>
+
+                                            <a href="/dashboard">
+                                                <button className="mt-4 px-4 py-2 bg-green-600 text-white rounded w-full">Back to Dashboard</button>
                                             </a>
                                         </StageCard>
                                     );
@@ -324,8 +382,6 @@ const currentStage: ClaimStage = claim.stage || determineStage();
                 {/* Footer */}
                 <Footer />
             </div>
-            {/* Stage Selector for Testing */}
-            {/* <StageSelector currentStage={currentStage} onStageChange={handleStageChange} /> */}
         </div>
     );
 }
