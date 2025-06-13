@@ -87,16 +87,15 @@ export default function Dashboard() {
       case "active":
       case "approved":
       case "submitted":
+      case "premiumdecided":
         return "text-green-600";
       case "renewal":
       case "pending":
       case "under review":
         return "text-yellow-500";
       case "rejected":
-        return "text-red-500";
       case "documentreuploadrequest":
-        return "text-red-500";
-      case "Reject":
+      case "reject":
         return "text-red-500";
       default:
         return "text-gray-600";
@@ -146,6 +145,8 @@ export default function Dashboard() {
               const handleViewDetails = () => {
                 if (policy.status?.value === "documentReuploadRequest") {
                   router.push(`/purchaseRequestDeclined/${policy._id}`);
+                } else if (policy.status?.value === "premiumDecided") {
+                  router.push(`/purchaseRequestApproved/${policy._id}`);
                 } else {
                   router.push(`/policydetails/${policy._id}`);
                 }
