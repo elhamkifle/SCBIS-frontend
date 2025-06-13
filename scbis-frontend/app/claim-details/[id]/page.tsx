@@ -6,11 +6,6 @@ import Sidebar from "@/components/staticComponents/sidebar";
 import Header from "@/components/staticComponents/header";
 import { Footer } from "@/components/staticComponents/footer";
 import { useClaimDetailsStore } from "@/store/claimSubmission/claim-details";
-import { useDriverDetailsStore } from "@/store/claimSubmission/driver-details";
-import { useAccidentDetailsStore } from "@/store/claimSubmission/accident-details";
-import { useLiabilityInformationStore } from "@/store/claimSubmission/liability-information";
-import { useWitnessInformationStore } from "@/store/claimSubmission/witness-information";
-import { useDamageDetailsStore } from "@/store/claimSubmission/damage-details";
 import { useClaimsStore } from "@/store/dashboard/claims";
 import { StageCard } from "@/components/ClaimDetails/StageCard";
 import { UnderReviewCard } from "@/components/ClaimDetails/UnderReviewCard";
@@ -210,12 +205,6 @@ export default function ClaimDetailsPage() {
                 {/* Main Claim Content */}
                 <main className="flex-1 flex flex-col items-center justify-center py-8 px-2">
                     <div className="w-full max-w-3xl">
-                        <div className="mb-6 p-4 bg-white rounded-lg shadow">
-                            <h2 className="text-xl font-bold mb-2">Claim Overview</h2>
-                            <p><span className="font-semibold">Status:</span> {backendClaim.status}</p>
-                            <p><span className="font-semibold">Policy ID:</span> {backendClaim.policyId}</p>
-                            <p><span className="font-semibold">Submitted:</span> {new Date(backendClaim.createdAt).toLocaleDateString()}</p>
-                        </div>
 
                         {(() => {
                             switch (backendClaim.status) {
@@ -227,15 +216,7 @@ export default function ClaimDetailsPage() {
                                             statusColor="#DBBF1F"
                                             description="Claim is under review by admin."
                                             note="Your claim will be processed as soon as possible."
-                                            onNext={claim.nextStage}
                                             buttonLabel="Approve Claim (Demo)"
-                                            claimData={{
-                                                driver: backendClaim.driver,
-                                                accidentDetails: backendClaim.accidentDetails,
-                                                liability: backendClaim.liability,
-                                                witness: backendClaim.witness,
-                                                damage: backendClaim.damage,
-                                            }}
                                         />
                                     );
                                 case "adminApproved":
@@ -329,7 +310,6 @@ export default function ClaimDetailsPage() {
                                             statusColor="#DBBF1F"
                                             description="Your police report is under review. Please wait for further instructions."
                                             note="You will be notified once your report is approved."
-                                            onNext={() => router.push("/dashboard")}
                                             buttonLabel="Back to Dashboard"
                                         />
                                     );
@@ -353,7 +333,6 @@ export default function ClaimDetailsPage() {
                                             statusColor="#DBBF1F"
                                             description="Your proforma is being reviewed. Please wait for the results."
                                             note="You will be notified once a decision is made."
-                                            onNext={() => router.push("/dashboard")}
                                             buttonLabel="Back to Dashboard"
                                         />
                                     );
