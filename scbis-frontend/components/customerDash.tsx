@@ -121,6 +121,7 @@ export default function Dashboard() {
       case "approved":
       case "submitted":
       case "premiumdecided":
+      case "premiumdecided":
         return "text-green-600";
       case "renewal":
       case "pending":
@@ -248,26 +249,6 @@ export default function Dashboard() {
                 } else {
                   router.push(`/policydetails/${policy._id}`);
                 }
-              };
-
-              const isAboutToExpire = () => {
-                if (!policy.createdAt || !policy.duration) return false;
-                const expiryDate = new Date(policy.createdAt);
-                expiryDate.setDate(expiryDate.getDate() + policy.duration);
-                const today = new Date();
-                const daysUntilExpiry = Math.ceil((expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-                return daysUntilExpiry <= 7 && daysUntilExpiry > 0;
-              };
-
-              const isExpired = () => {
-                if (!policy.createdAt || !policy.duration) return false;
-                const expiryDate = new Date(policy.createdAt);
-                expiryDate.setDate(expiryDate.getDate() + policy.duration);
-                return new Date() > expiryDate;
-              };
-
-              const handleRenew = () => {
-                router.push(`/renew-policy/policy-selection?policyId=${policy._id}`);
               };
 
                   return (
