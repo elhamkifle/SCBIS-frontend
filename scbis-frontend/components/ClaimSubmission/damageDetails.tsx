@@ -22,11 +22,10 @@ export default function DamageDetails() {
     addVehicleDamageFile,
     addThirdPartyDamageFile,
     setError,
-    // clearAllData
   } = useDamageDetailsStore();
 
-  const [vehicleFiles, setVehicleFiles] = useState<File[]>([]);
-  const [thirdPartyFiles, setThirdPartyFiles] = useState<File[]>([]);
+  const [vehicleFile, setVehicleFile] = useState<File | null>(null);
+  const [thirdPartyFile, setThirdPartyFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
 
   const uploadToCloudinary = async (file: File) => {
@@ -41,6 +40,7 @@ export default function DamageDetails() {
       }
     } catch (err) {
       console.error('Cloudinary upload error:', err);
+      throw err; // Rethrow to handle in the calling function
     }
     return null;
   };
@@ -51,11 +51,11 @@ export default function DamageDetails() {
       return;
     }
 
-    if (!vehicleFiles.length && !vehicleDamageDesc.trim()) {
+    if (!vehicleFile && !vehicleDamageDesc.trim()) {
       return setError('❌ Please upload a photo or provide a description of the damage to your vehicle.');
     }
 
-    if (!thirdPartyFiles.length && !thirdPartyDamageDesc.trim()) {
+    if (!thirdPartyFile && !thirdPartyDamageDesc.trim()) {
       return setError('❌ Please upload a photo or provide a description of the third-party damage.');
     }
 
@@ -66,27 +66,30 @@ export default function DamageDetails() {
     setError('');
     setLoading(true);
 
-    // Upload vehicle files
-    for (const file of vehicleFiles) {
-      const url = await uploadToCloudinary(file);
-      if (url) {
-        addVehicleDamageFile(url);
-        console.log(url)
-        console.log("VehicleDamageFiles: " +vehicleDamageFiles)
+    try {
+      // Upload vehicle file if exists
+      if (vehicleFile) {
+        const vehicleUrl = await uploadToCloudinary(vehicleFile);
+        if (vehicleUrl) {
+          addVehicleDamageFile(vehicleUrl);
+        }
       }
-    }
 
-    // Upload third-party files
-    for (const file of thirdPartyFiles) {
-      const url = await uploadToCloudinary(file);
-      if (url) {
-        addThirdPartyDamageFile(url);
-        console.log(thirdPartyDamageFiles)
+      // Upload third-party file if exists
+      if (thirdPartyFile) {
+        const thirdPartyUrl = await uploadToCloudinary(thirdPartyFile);
+        if (thirdPartyUrl) {
+          addThirdPartyDamageFile(thirdPartyUrl);
+        }
       }
-    }
 
-    setLoading(false);
-    router.push('/claim-submission/declaration');
+      router.push('/claim-submission/declaration');
+    } catch (err) {
+      setError('Failed to upload files. Please try again.');
+      console.error('Upload error:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handlePrevious = () => {
@@ -94,45 +97,46 @@ export default function DamageDetails() {
   };
 
   const renderDropArea = (
-    files: File[],
-    setFiles: React.Dispatch<React.SetStateAction<File[]>>,
-    inputId: string
+    file: File | null,
+    setFile: React.Dispatch<React.SetStateAction<File | null>>,
+    inputId: string,
+    label: string
   ) => (
     <div
       className="md:w-1/2 w-full flex flex-col items-center justify-center bg-blue-100 p-6 py-14 rounded-lg"
       onDragOver={(e) => e.preventDefault()}
       onDrop={(e) => {
         e.preventDefault();
-        const file = e.dataTransfer.files[0];
-        if (file) setFiles([file]); // Only one file allowed
+        const droppedFile = e.dataTransfer.files[0];
+        if (droppedFile) setFile(droppedFile);
       }}
     >
-      <p className='text-xl font-bold mb-2'>Drop Files Here</p>
+      <p className='text-xl font-bold mb-2'>{label}</p>
       <p className='text-md font-bold mb-4'>Or</p>
       <input
         type="file"
         id={inputId}
         accept=".pdf,.jpg,.png"
         onChange={(e) => {
-          const file = e.target.files?.[0];
-          if (file) setFiles([file]); // Only one file allowed
+          const selectedFile = e.target.files?.[0];
+          if (selectedFile) setFile(selectedFile);
         }}
         className="hidden"
       />
       <label htmlFor={inputId} className="bg-green-500 text-white px-4 py-2 rounded cursor-pointer hover:bg-green-600">
         Browse Files
       </label>
-      {files.map((file, index) => (
-        <div key={index} className="mt-2 text-green-500 text-sm">
+      {file && (
+        <div className="mt-2 text-green-500 text-sm">
           ✅ File ready for upload: {file.name}
           <button
-            onClick={() => setFiles([])}
+            onClick={() => setFile(null)}
             className="ml-2 text-red-500 hover:text-red-700"
           >
             Delete
           </button>
         </div>
-      ))}
+      )}
     </div>
   );
 
@@ -150,13 +154,14 @@ export default function DamageDetails() {
       <div>
         <label className="font-semibold block mb-2">Details of damage to your vehicle (A Photo Or A Brief description)</label>
         <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 items-start">
-          {renderDropArea(vehicleFiles, setVehicleFiles, 'vehicleUpload')}
+          {renderDropArea(vehicleFile, setVehicleFile, 'vehicleUpload', 'Drop Vehicle Damage File Here')}
           <div className="w-full lg:w-1/2">
             <label className="font-semibold block mb-2">Details of damage to your vehicle</label>
             <textarea
               className="w-full border border-gray-300 rounded-md p-2"
               value={vehicleDamageDesc}
               onChange={(e) => setvehicleDamageDesc(e.target.value)}
+              placeholder="Enter description or it will be auto-filled with image URL"
             />
           </div>
         </div>
@@ -165,13 +170,14 @@ export default function DamageDetails() {
       <div>
         <label className="font-semibold block mb-2">Details of damage to Third Party&rsquo;s property & Vehicle </label>
         <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 items-start">
-          {renderDropArea(thirdPartyFiles, setThirdPartyFiles, 'thirdPartyUpload')}
+          {renderDropArea(thirdPartyFile, setThirdPartyFile, 'thirdPartyUpload', 'Drop Third Party Damage File Here')}
           <div className="w-full lg:w-1/2">
             <label className="font-semibold block mb-2">Details of damage to Third Party&rsquo;s property & Vehicle</label>
             <textarea
               className="w-full border border-gray-300 rounded-md p-2"
               value={thirdPartyDamageDesc}
               onChange={(e) => setthirdPartyDamageDesc(e.target.value)}
+              placeholder="Enter description or it will be auto-filled with image URL"
             />
           </div>
         </div>
@@ -210,7 +216,7 @@ export default function DamageDetails() {
                 <input
                   className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                   value={injuredPersons.name} id='injuredPersonName'
-                  onChange={(e) => setInjuredPersons({ name: e.target.value })}
+                  onChange={(e) => setInjuredPersons({ ...injuredPersons, name: e.target.value })}
                 />
               </div>
               <div className="relative w-full">
@@ -218,7 +224,7 @@ export default function DamageDetails() {
                 <input
                   className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                   value={injuredPersons.address} id='injuredPersonAddress'
-                  onChange={(e) => setInjuredPersons({ address: e.target.value })}
+                  onChange={(e) => setInjuredPersons({ ...injuredPersons, address: e.target.value })}
                 />
               </div>
             </div>
@@ -239,10 +245,11 @@ export default function DamageDetails() {
         </button>
         <button
           type="submit"
-          className="bg-blue-500 text-white p-10 py-2 rounded"
+          disabled={loading}
+          className={`bg-blue-500 text-white p-10 py-2 rounded ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
           onClick={handleNext}
         >
-          Next
+          {loading ? 'Uploading...' : 'Next'}
         </button>
       </div>
     </div>

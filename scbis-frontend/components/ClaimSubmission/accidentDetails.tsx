@@ -153,16 +153,11 @@ export default function AccidentDetails() {
           console.log(url) 
           const { addSketchFile } = useAccidentDetailsStore.getState();
           addSketchFile(url);
-          console.log(sketchFiles)
+          console.log('Saved to Zustand:', useAccidentDetailsStore.getState().sketchFiles);
         } else {
           throw new Error('Upload failed');
         }
       }
-
-      // Save uploaded URLs in Zustand
-      const { addSketchFile } = useAccidentDetailsStore.getState();
-      uploadedUrls.forEach((url) => addSketchFile(url));
-      console.log(sketchFiles)
 
       router.push('/claim-submission/liability-information');
     } catch (error) {

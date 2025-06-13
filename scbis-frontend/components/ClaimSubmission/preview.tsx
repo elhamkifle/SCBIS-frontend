@@ -500,17 +500,18 @@ export default function ClaimPreview() {
 
             {!isDriverSameAsInsured && (
               <>
-                <div><strong>First Name:</strong> {driver.firstName}</div>
-                <div><strong>Last Name:</strong> {driver.lastName}</div>
-                <div><strong>Age:</strong> {driver.age}</div>
-                <div><strong>City:</strong> {driver.city}</div>
-                <div><strong>Subcity:</strong> {driver.subCity}</div>
-                <div><strong>Kebele:</strong> {driver.kebele}</div>
-                <div><strong>Phone Number:</strong> {driver.phoneNumber}</div>
-                <div><strong>License No:</strong> {driver.licenseNo}</div>
-                <div><strong>Grade:</strong> {driver.grade}</div>
-                <div><strong>Expiration Date:</strong> {driver.expirationDate}</div>
+                <p><strong>First Name:</strong> {driver.firstName}</p>
+                <p><strong>Last Name:</strong> {driver.lastName}</p>
+                <p><strong>Age:</strong> {driver.age}</p>
+                <p><strong>City:</strong> {driver.city}</p>
+                <p><strong>Subcity:</strong> {driver.subCity}</p>
+                <p><strong>Kebele:</strong> {driver.kebele}</p>
+                <p><strong>Phone Number:</strong> {driver.phoneNumber}</p>
+                <p><strong>License No:</strong> {driver.licenseNo}</p>
+                <p><strong>Grade:</strong> {driver.grade}</p>
+                <p><strong>Expiration Date:</strong> {driver.expirationDate}</p>
               </>
+
             )}
           </div>
         )}
