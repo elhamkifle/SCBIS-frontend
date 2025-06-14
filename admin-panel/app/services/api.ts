@@ -213,7 +213,7 @@ export interface Claim {
   claimantName: string;
   dateSubmitted?: string; // Made optional since backend returns undefined
   policyNumber: string;
-  status: "draft" | "submitted" | "Under Review" | "Approved" | "Rejected" | "Needs More Info" | "Forwarded";
+  status: "draft" | "submitted" | "Under Review" | "Approved" | "Rejected" | "Needs More Info" | "Forwarded" | "policeReportUnderReview" | "proformaSubmissionPending" | "proformaUnderReview";
   vehicleInfo: string;
   accidentDate?: string | Date; // Made optional and allow Date object
   location: string | object; // Allow object since backend returns [Object]

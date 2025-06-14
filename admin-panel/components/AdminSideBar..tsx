@@ -83,7 +83,7 @@ export default function AdminSidebar() {
         <SidebarGroup
           title="Reports & Analytics"
           links={[
-            { label: "Generate Reports", href: "/admin/reports", icon: BarChart },
+            { label: "Generate Reports", href: "/reportAnalytics/generateReports", icon: BarChart },
             { label: "Underwriter Reports", href: "/admin/reports/underwriters", icon: FileText },
             { label: "Claims Dept Reports", href: "/admin/reports/claims", icon: FileText },
           ]}

@@ -54,7 +54,7 @@ function IncomingClaimsPage() {
 
       // Ensure claims is always an array
       const claimsData = response.claims || [];
-      
+
       setClaims(claimsData);
       setTotalPages(response.pagination?.totalPages || 1);
       setTotalClaims(response.pagination?.total || 0);
@@ -89,6 +89,7 @@ function IncomingClaimsPage() {
       case "submitted":
         return "bg-blue-100 text-blue-700";
       case "Under Review":
+      case "policeReportUnderReview":
         return "bg-yellow-100 text-yellow-800";
       case "Approved":
         return "bg-green-100 text-green-800";
@@ -98,10 +99,30 @@ function IncomingClaimsPage() {
         return "bg-orange-100 text-orange-700";
       case "Forwarded":
         return "bg-purple-100 text-purple-700";
+      case "proformaSubmissionPending":
+        return "bg-indigo-100 text-indigo-700";
+      case "proformaUnderReview":
+        return "bg-pink-100 text-pink-700";
       default:
         return "bg-gray-100 text-gray-700";
     }
   };
+
+  const getClaimRoute = (claim: Claim) => {
+    switch (claim.status) {
+      case "submitted":
+        return `/claims/submittedClaim/${claim.id}`;
+      case "policeReportUnderReview":
+        return `/claims/viewPoliceReport/${claim.id}`;
+      case "proformaSubmissionPending":
+        return `/claims/proformaSubmissionView/${claim.id}`;
+      case "proformaUnderReview":
+        return `/claims/proformaApprovalView/${claim.id}`;
+      default:
+        return `/claims/incomingClaims/${claim.id}`;
+    }
+  };
+
 
   // Helper function to format dates safely
   const formatDate = (date: string | Date | undefined) => {
@@ -165,8 +186,8 @@ function IncomingClaimsPage() {
     <div className="max-w-7xl mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Incoming Claims</h1>
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           onClick={handleRetry}
           disabled={loading}
           className="flex items-center gap-2"
@@ -290,7 +311,7 @@ function IncomingClaimsPage() {
                 <Button
                   variant="outline"
                   className="w-full mt-2 flex items-center gap-2 hover:bg-gray-50"
-                  onClick={() => window.location.href = `/claims/incomingClaims/${claim.id}`}
+                  onClick={() => window.location.href = getClaimRoute(claim)}
                 >
                   <Eye size={16} /> View Full Details
                 </Button>
@@ -310,7 +331,7 @@ function IncomingClaimsPage() {
           >
             Previous
           </Button>
-          
+
           <div className="flex items-center space-x-1">
             {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
               const pageNum = i + 1;
