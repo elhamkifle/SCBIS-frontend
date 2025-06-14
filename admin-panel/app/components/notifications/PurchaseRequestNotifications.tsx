@@ -6,7 +6,7 @@ import { usePurchaseRequestsSocket } from '../../services/socket';
 
 interface Notification {
   id: string;
-  type: 'NEW_REQUEST' | 'STATUS_CHANGE' | 'APPROVED' | 'REJECTED' | 'STATS_UPDATE';
+  type: 'NEW_REQUEST' | 'STATUS_CHANGE' | 'APPROVED' | 'REJECTED' | 'STATS_UPDATE' | 'REUPLOAD_REQUESTED';
   title: string;
   message: string;
   timestamp: Date;
@@ -118,6 +118,31 @@ export default function PurchaseRequestNotifications() {
     });
     unsubscribeFunctions.push(unsubscribeStatusChange);
 
+    // File reupload requested
+    const unsubscribeReuploadRequested = socket.on('purchase-request-reupload-requested', (data) => {
+      console.log('🔔 [Notifications] Reupload request event received:', data);
+      
+      if (!mounted) {
+        console.log('⚠️ [Notifications] Component not mounted, ignoring event');
+        return;
+      }
+      
+      const notification: Notification = {
+        id: `reupload-${data.data.id}-${Date.now()}`,
+        type: 'REUPLOAD_REQUESTED',
+        title: 'File Reupload Requested',
+        message: `Files requested for reupload on request ${data.data.id}: ${data.data.files}`,
+        timestamp: new Date(data.timestamp),
+        icon: <AlertCircle className="w-5 h-5" />,
+        bgColor: 'bg-orange-50',
+        borderColor: 'border-orange-200'
+      };
+      
+      console.log('📋 [Notifications] Adding notification:', notification);
+      setNotifications(prev => [notification, ...prev.slice(0, 9)]);
+    });
+    unsubscribeFunctions.push(unsubscribeReuploadRequested);
+
     return () => {
       mounted = false;
       unsubscribeFunctions.forEach(unsubscribe => unsubscribe());
@@ -179,6 +204,7 @@ export default function PurchaseRequestNotifications() {
                 notification.type === 'APPROVED' ? 'text-green-600' :
                 notification.type === 'REJECTED' ? 'text-red-600' :
                 notification.type === 'NEW_REQUEST' ? 'text-blue-600' :
+                notification.type === 'REUPLOAD_REQUESTED' ? 'text-orange-600' :
                 'text-yellow-600'
               }`}>
                 {notification.icon}

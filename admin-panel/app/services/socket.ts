@@ -71,6 +71,17 @@ export interface PurchaseRequestWebSocketEvents {
     };
     timestamp: Date;
   };
+
+  'purchase-request-reupload-requested': {
+    type: 'REUPLOAD_REQUESTED';
+    data: PurchaseRequestBasic & {
+      requestedBy: string;
+      files: string;
+      reason?: string;
+    };
+    timestamp: Date;
+    message: string;
+  };
 }
 
 class PurchaseRequestsSocketService {
@@ -90,12 +101,13 @@ class PurchaseRequestsSocketService {
         }
 
         // Connect to the purchase requests namespace
-        this.socket = io('https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/admin/purchase-requests', {
+        this.socket = io('http://localhost:3001', {
           auth: {
             token: `Bearer ${token}`
           },
-          transports: ['websocket', 'polling'],
+          transports: ['polling', 'websocket'],
           timeout: 10000,
+          forceNew: true,
         });
 
         this.socket.on('connect', () => {

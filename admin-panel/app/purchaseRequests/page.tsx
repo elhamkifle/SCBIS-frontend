@@ -90,6 +90,13 @@ function IncomingRequestsPage() {
           setStats(data.data);
         });
 
+        // Listen for reupload requests
+        const unsubscribeReuploadRequested = socket.on('purchase-request-reupload-requested', (data) => {
+          console.log('File reupload requested:', data);
+          // This is a global notification - no need to update the request list
+          // The notification will be handled by PurchaseRequestNotifications component
+        });
+
         // Return cleanup function
         return () => {
           unsubscribeNew();
@@ -97,6 +104,7 @@ function IncomingRequestsPage() {
           unsubscribeApproved();
           unsubscribeRejected();
           unsubscribeStats();
+          unsubscribeReuploadRequested();
           socket.disconnect();
         };
       } catch (error) {
@@ -182,6 +190,9 @@ function IncomingRequestsPage() {
                 <div>
                   <h2 className="font-medium text-lg">{req.user?.name || "Unknown User"}</h2>
                   <p className="text-sm text-gray-500">Policy: {req.policyType || "N/A"}</p>
+                  {req.policyId && (
+                    <p className="text-sm text-gray-600">Policy ID: {req.policyId}</p>
+                  )}
                   <p className="text-xs text-gray-400">
                     Submitted on: {req.submittedOn ? new Date(req.submittedOn).toLocaleDateString() : "N/A"}
                   </p>

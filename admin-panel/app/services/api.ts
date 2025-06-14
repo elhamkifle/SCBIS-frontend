@@ -1,5 +1,5 @@
 // API Service utility for handling backend requests
-const API_BASE_URL = "https://scbis-git-dev-hailes-projects-a12464a1.vercel.app";
+const API_BASE_URL = "http://localhost:3001";
 
 // Helper function to redirect to login
 const redirectToLogin = () => {
@@ -57,6 +57,7 @@ export interface UserDetails {
   lastActive: string;
   notes: string;
   status?: "Active" | "Blocked" | "Suspended";
+  idDocumentUrls?: string[];
   policies: {
     id: string;
     type: string;
@@ -116,46 +117,83 @@ export interface AuthResponse {
 
 export interface PurchaseRequest {
   id: string;
-  user: {
+  _id?: string;
+  policyId?: string;
+  userId?: string;
+  vehicleId?: string;
+  user?: {
     id: string;
-    name: string;
+    fullname: string;
     email?: string;
     phoneNumber?: string;
+    idDocumentUrls?: string[];
   };
   policyType: string;
-  submittedOn: string;
-  status: string;
+  submittedOn?: string;
+  createdAt?: string;
+  status: string | { value: string };
   duration?: number;
   coverageArea?: string;
   premium?: number;
-  createdAt?: string;
   documents?: {
     url?: string;
     name?: string;
     type?: string;
   }[];
   vehicle?: {
-    type: string;
-    details: {
-      usageType: string[];
-      vehicleCategory: string;
-      generalDetails: {
-        make: string;
-        model: string;
-        engineCapacity: number;
-        plateNumber: string;
-        bodyType: string;
-        engineNumber: string;
+    _id?: string;
+    userId?: string;
+    vehicleType?: string;
+    privateVehicle?: {
+      usageType?: string[];
+      vehicleCategory?: string;
+      generalDetails?: {
+        make?: string;
+        model?: string;
+        manufacturingYear?: number;
+        chassisNumber?: string;
+        engineCapacity?: number;
+        plateNumber?: string;
+        bodyType?: string;
+        engineNumber?: string;
       };
-      ownershipUsage: {
-        ownerType: string;
-        purchasedValue: number;
-        dutyFree: boolean;
-        driverType: string;
-        seatingCapacity: number;
+      ownershipUsage?: {
+        ownerType?: string;
+        purchasedValue?: number;
+        dutyFree?: boolean;
+        driverType?: string;
+        seatingCapacity?: number;
       };
-      _id: string;
+      documents?: {
+        driversLicense?: string;
+        vehicleLibre?: string;
+      };
     };
+    createdAt?: string;
+    updatedAt?: string;
+  };
+  vehicleInformation?: {
+    coverRequired?: string;
+    vehicleInGoodRepair?: string;
+    vehicleLeftOvernight?: string;
+    soleProperty?: string;
+    privateUse?: string;
+    convicted?: string;
+    insuredBefore?: string;
+    companyHistory?: string[];
+    hadAccidents?: string;
+    claimsInjury?: string;
+    claimsProperty?: string;
+    personalAccident?: string;
+    passengersInsured?: string;
+  };
+  driverInformation?: {
+    fullName?: string;
+    drivers?: Array<{
+      driverName?: string;
+      driverLicenseGrade?: string;
+      drivingExperience?: string;
+    }>;
   };
 }
 
@@ -207,6 +245,35 @@ interface ClaimsResponse {
     limit: number;
     totalPages: number;
   };
+}
+
+// Premium Settings interfaces
+export interface PremiumSettings {
+  baseRates: {
+    comprehensive: number;
+    ownDamage: number;
+    thirdParty: number;
+  };
+  multipliers: {
+    commercialVehicle: number;
+    underageDriver: number;
+    lessThanSixMonthsExperience: number;
+    accidentHistory: number;
+    claimHistory: number;
+  };
+  addOns: {
+    personalAccident: number;
+    passengerAccident: number;
+    radioCoveragePercent: number;
+  };
+  updatedBy?: string;
+  updatedAt?: string;
+}
+
+export interface PremiumSettingsResponse {
+  success: boolean;
+  data: PremiumSettings;
+  message?: string;
 }
 
 // Helper function to get auth token
@@ -455,6 +522,96 @@ export const purchaseRequestsApi = {
       body: JSON.stringify({ reason }),
     });
   },
+
+  // Request reupload for a purchase request
+  requestReupload: async (id: string, files: string[], reason?: string): Promise<{ message: string }> => {
+    return apiRequest<{ message: string }>(`/admin/purchase-requests/${id}/request-reupload`, {
+      method: 'POST',
+      body: JSON.stringify({ files, reason }),
+    });
+  },
+
+  // Calculate premium for a purchase request
+  calculatePremium: async (id: string): Promise<{
+    success: boolean;
+    data: {
+      policyId: string;
+      vehicleValue: number;
+      depreciatedValue: number;
+      vehicleAge: number;
+      coverageType: string;
+      baseRate: number;
+      basePremium: number;
+      finalMultiplier: number;
+      finalPremium: number;
+      duration: number;
+      breakdown: {
+        carValue: number;
+        carAge: number;
+        riskFactor: number;
+        depreciationAmount: number;
+        coverageType: string;
+        basePremium: number;
+        finalPremium: number;
+      };
+      appliedMultipliers: {
+        commercial: number;
+        underage: string | number;
+        experience: number;
+        accidents: number;
+        claims: number;
+      };
+    };
+  }> => {
+    return apiRequest(`/admin/purchase-requests/${id}/calculate-premium`, {
+      method: 'POST',
+    });
+  },
+
+  // Approve a purchase request with premium calculation
+  approveWithPremium: async (id: string, approvalData: {
+    calculatedPremium: number;
+    premiumBreakdown: {
+      carValue: number;
+      carAge: number;
+      riskFactor: number;
+      depreciationAmount: number;
+      coverageType: string;
+      basePremium: number;
+      finalPremium: number;
+    };
+    policyDuration?: number;
+    effectiveDate?: string;
+    notes?: string;
+  }): Promise<{
+    success: boolean;
+    message: string;
+    data: {
+      purchaseRequest: {
+        id: string;
+        status: string;
+        premium: number;
+        updatedAt: string;
+      };
+      policy: {
+        id: string;
+        policyNumber: string;
+        premium: number;
+        premiumBreakdown: object;
+        coverageType: string;
+        effectiveDate: string;
+        expiryDate: string;
+        approvedBy: string;
+        approvedAt: string;
+        notes?: string;
+      };
+    };
+  }> => {
+    return apiRequest(`/admin/purchase-requests/${id}/approve`, {
+      method: 'POST',
+      body: JSON.stringify(approvalData),
+    });
+  },
 };
 
 // Claims API
@@ -514,4 +671,20 @@ export const claimsApi = {
   },
 };
 
-export default { userApi, adminApi, authApi, purchaseRequestsApi, claimsApi }; 
+// Premium Settings API
+export const premiumSettingsApi = {
+  // Get current premium settings
+  getSettings: async (): Promise<PremiumSettingsResponse> => {
+    return apiRequest<PremiumSettingsResponse>('/admin/premium-settings');
+  },
+
+  // Update premium settings
+  updateSettings: async (settings: PremiumSettings): Promise<PremiumSettingsResponse> => {
+    return apiRequest<PremiumSettingsResponse>('/admin/premium-settings', {
+      method: 'PUT',
+      body: JSON.stringify(settings),
+    });
+  },
+};
+
+export default { userApi, adminApi, authApi, purchaseRequestsApi, claimsApi, premiumSettingsApi }; 
