@@ -41,7 +41,7 @@ export default function SignupStep2() {
     }
 
     try {
-      const serverResponse = await fetch(`https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/auth/register`, {
+      const serverResponse = await fetch(`http://localhost:3001/auth/register`, {
         method: 'POST',
         body: JSON.stringify({
           fullname: `${fName} ${lName}`,

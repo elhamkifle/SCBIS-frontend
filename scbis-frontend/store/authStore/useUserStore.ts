@@ -34,6 +34,10 @@ export type userType = {
     updatedAt?: string,
     __v?: number,
     idDocumentUrls?: string[],
+    userVerified?: boolean,
+    verificationStatus?: string,
+    verificationNotes?: string,
+    isEmailVerified?: boolean,
 }
 
 type userStoreType = {

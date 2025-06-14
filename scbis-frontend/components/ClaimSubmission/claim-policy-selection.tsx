@@ -46,7 +46,7 @@ export default function ClaimPolicySelection() {
             try {
                 const accessToken = getAuthTokenFromCookie();
                 const response = await axios.get(
-                    'https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/policy/user-policies',
+                    'http://localhost:3001/policy/user-policies',
                     {
                         headers: {
                             Authorization: `Bearer ${accessToken}`,

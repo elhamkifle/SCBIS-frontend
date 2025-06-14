@@ -70,7 +70,7 @@ const Verification = () => {
 
     const ResendCode = async()=>{
         setIsResending(true)
-        const serverResponse = await fetch('https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/auth/request-password-reset',{
+        const serverResponse = await fetch('https://localhost:3001/auth/request-password-reset',{
             method:'POST',
             body:JSON.stringify({ email,phoneNumber:phone }),
             headers:{
@@ -106,15 +106,15 @@ const Verification = () => {
             setIsSubmitting(false)
             return
         }
-        console.log(verificationNum, "here is the verification number", phone, email);
+        console.log(verificationNum, "here is the verification number",  email);
 
-        const formattedPhone = phone.startsWith('+') ? phone : `+${phone}`;
-        console.log(formattedPhone, "here is the formatted phone number")
-        const serverResponse = await fetch('https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/otp/verify', {
+        // const formattedPhone = phone.startsWith('+') ? phone : `+${phone}`;
+        // console.log(formattedPhone, "here is the formatted phone number")
+        const serverResponse = await fetch('http://localhost:3001/auth/verify-email', {
             method: 'POST',
             body: JSON.stringify({ 
-                otp: verificationNum, 
-                phoneNumber: formattedPhone 
+                identifier: email,
+                otp: verificationNum
             }),
             headers: {
                 'Content-Type': 'application/json'

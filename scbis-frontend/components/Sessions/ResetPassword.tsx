@@ -65,7 +65,7 @@ const ResetPassword = () => {
             return
         }
         
-        const serverResponse = await fetch('https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/auth/request-password-reset',{
+        const serverResponse = await fetch('http://localhost:3001/auth/reset-password',{
             method:'POST',
             body:JSON.stringify({ email, otp, password: formData.password }),
             headers:{
