@@ -1,6 +1,6 @@
 // Vehicle API utilities using fetch
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://scbis-git-dev-hailes-projects-a12464a1.vercel.app';
-// const API_BASE_URL = 'http://localhost:3001';
+// const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://scbis-git-dev-hailes-projects-a12464a1.vercel.app';
+const API_BASE_URL = 'http://localhost:3001';
 // Helper function to get auth token
 const getAuthToken = () => {
   if (typeof window !== 'undefined') {
