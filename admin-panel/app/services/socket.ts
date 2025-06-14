@@ -90,7 +90,7 @@ class PurchaseRequestsSocketService {
         }
 
         // Connect to the purchase requests namespace
-        this.socket = io('http://localhost:3001/admin/purchase-requests', {
+        this.socket = io('https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/admin/purchase-requests', {
           auth: {
             token: `Bearer ${token}`
           },

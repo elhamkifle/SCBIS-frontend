@@ -20,6 +20,13 @@ import { purchaseRequestsApi, PurchaseRequest } from "../../services/api";
 import { usePurchaseRequestsSocket } from "../../services/socket";
 import withAuth from "../../utils/withAuth";
 import PurchaseRequestNotifications from "../../components/notifications/PurchaseRequestNotifications";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params); // Unwrap the params Promise
@@ -27,10 +34,13 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [rejectOpen, setRejectOpen] = useState(false);
+  const [reuploadOpen, setReuploadOpen] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
+  const [selectedFile, setSelectedFile] = useState("");
   const [isRejecting, setIsRejecting] = useState(false);
+  const [isRequestingReupload, setIsRequestingReupload] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  
+
   // API integration states
   const [requestData, setRequestData] = useState<PurchaseRequest | null>(null);
   const [loading, setLoading] = useState(true);
@@ -67,7 +77,7 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
           if (data.data.id === id) {
             console.log('Status changed for current request:', data);
             setRequestData(prev => prev ? { ...prev, status: data.data.newStatus } : null);
-            
+
             toast({
               title: "Status Updated",
               description: `Request status changed to ${data.data.newStatus}`,
@@ -81,7 +91,7 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
           if (data.data.id === id) {
             console.log('Current request approved:', data);
             setRequestData(prev => prev ? { ...prev, status: 'approved' } : null);
-            
+
             toast({
               title: "Request Approved",
               description: `This request has been approved by ${data.data.approvedBy}`,
@@ -94,7 +104,7 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
           if (data.data.id === id) {
             console.log('Current request rejected:', data);
             setRequestData(prev => prev ? { ...prev, status: 'rejected' } : null);
-            
+
             toast({
               title: "Request Rejected",
               description: `This request has been rejected: ${data.data.reason}`,
@@ -119,11 +129,11 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
 
   const handleReject = async () => {
     if (!requestData) return;
-    
+
     setIsRejecting(true);
     try {
       await purchaseRequestsApi.reject(requestData.id, rejectionReason);
-      
+
       toast({
         title: "Request Rejected",
         description: `Request #${requestData.id} has been rejected. Reason: ${rejectionReason}`,
@@ -148,12 +158,43 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
     }
   };
 
+  const handleRequestReupload = async () => {
+    if (!requestData || !selectedFile) return;
+
+    setIsRequestingReupload(true);
+    try {
+      // Here you would call your API to request reupload
+      // For now, we'll just simulate it
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      toast({
+        title: "Reupload Requested",
+        description: selectedFile === "Both Vehicle Libre and License"
+          ? `Requested reupload of both Vehicle Libre and Driver's License for request #${requestData.id}`
+          : `Requested reupload of ${selectedFile} for request #${requestData.id}`,
+      });
+
+      setIsRequestingReupload(false);
+      setReuploadOpen(false);
+      setSelectedFile("");
+      setIsSuccess(true);
+    } catch (err) {
+      console.error("Failed to request reupload:", err);
+      toast({
+        title: "Error",
+        description: "Failed to request document reupload. Please try again.",
+        variant: "destructive",
+      });
+      setIsRequestingReupload(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="p-8 space-y-8 bg-gray-50 min-h-screen">
         <Skeleton className="h-8 w-1/3" />
         <Skeleton className="h-4 w-48" />
-        
+
         {Array.from({ length: 4 }).map((_, index) => (
           <Card key={index}>
             <CardContent className="p-6 space-y-4">
@@ -179,8 +220,8 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
             <div className="text-center text-red-600">
               <p className="text-lg font-semibold">Error Loading Request</p>
               <p className="mt-2">{error}</p>
-              <Button 
-                onClick={() => window.location.reload()} 
+              <Button
+                onClick={() => window.location.reload()}
                 className="mt-4"
                 variant="outline"
               >
@@ -225,13 +266,12 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
             <p><strong>Duration:</strong> {requestData.duration ? `${requestData.duration} Days` : "N/A"}</p>
             <p><strong>Coverage Area:</strong> {requestData.coverageArea || "N/A"}</p>
             <p><strong>Premium:</strong> {requestData.premium ? `${requestData.premium.toLocaleString()} Birr` : "N/A"}</p>
-            <p><strong>Status:</strong> 
-              <span className={`ml-2 px-2 py-1 rounded-full text-xs font-semibold ${
-                requestData.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+            <p><strong>Status:</strong>
+              <span className={`ml-2 px-2 py-1 rounded-full text-xs font-semibold ${requestData.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
                 requestData.status === 'approved' ? 'bg-green-100 text-green-700' :
-                requestData.status === 'canceled' ? 'bg-red-100 text-red-700' :
-                'bg-gray-100 text-gray-700'
-              }`}>
+                  requestData.status === 'canceled' ? 'bg-red-100 text-red-700' :
+                    'bg-gray-100 text-gray-700'
+                }`}>
                 {requestData.status?.charAt(0).toUpperCase() + requestData.status?.slice(1) || "Unknown"}
               </span>
             </p>
@@ -250,14 +290,14 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
             <p><strong>Phone Number:</strong> {requestData.user?.phoneNumber || "N/A"}</p>
             <p><strong>User ID:</strong> {requestData.user?.id || "N/A"}</p>
           </div>
-          
+
           <div className="mt-4">
             <h3 className="font-semibold mb-2">Identity Documents</h3>
             {requestData.documents && requestData.documents.length > 0 ? (
               <div className="grid grid-cols-2 gap-4">
                 {requestData.documents.map((doc, index) => (
-                  <div 
-                    key={index} 
+                  <div
+                    key={index}
                     className="border rounded-lg p-2 cursor-pointer hover:shadow-md transition-shadow"
                     onClick={() => setSelectedImage(doc.url || "/docs/placeholder.png")}
                   >
@@ -277,8 +317,8 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
               <div className="grid grid-cols-2 gap-4">
                 {/* Placeholder documents */}
                 {Array.from({ length: 2 }).map((_, index) => (
-                  <div 
-                    key={index} 
+                  <div
+                    key={index}
                     className="border rounded-lg p-2 cursor-pointer hover:shadow-md transition-shadow"
                     onClick={() => setSelectedImage("/docs/placeholder.png")}
                   >
@@ -323,8 +363,8 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
               <div className="grid grid-cols-2 gap-4">
                 {/* Placeholder vehicle documents */}
                 {Array.from({ length: 2 }).map((_, index) => (
-                  <div 
-                    key={index} 
+                  <div
+                    key={index}
                     className="border rounded-lg p-2 cursor-pointer hover:shadow-md transition-shadow"
                     onClick={() => setSelectedImage("/docs/placeholder.png")}
                   >
@@ -379,15 +419,22 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
           </div>
         </CardContent>
       </Card>
-      
+
       {/* Action Buttons */}
       <div className="flex flex-wrap gap-4 justify-end">
-        <Button 
-          variant="destructive" 
+        <Button
+          variant="destructive"
           onClick={() => setRejectOpen(true)}
           disabled={requestData.status !== 'pending'}
         >
           Reject Request
+        </Button>
+        <Button
+          className="bg-yellow-500 hover:bg-yellow-600 text-white"
+          onClick={() => setReuploadOpen(true)}
+          disabled={requestData.status !== 'pending'}
+        >
+          Request File Reuploads
         </Button>
         <Link href={`/purchaseRequests/${requestData.id}/premium-calculation`}>
           <Button disabled={requestData.status !== 'pending'}>
@@ -424,7 +471,7 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
               Please provide a reason for rejecting this request. This will be communicated to the user.
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4 py-4">
             <Textarea
               placeholder="Enter rejection reason (required)"
@@ -434,20 +481,61 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
               required
             />
           </div>
-          
+
           <DialogFooter>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => setRejectOpen(false)}
             >
               Cancel
             </Button>
-            <Button 
-              variant="destructive" 
+            <Button
+              variant="destructive"
               onClick={handleReject}
               disabled={!rejectionReason.trim() || isRejecting}
             >
               {isRejecting ? "Rejecting..." : "Confirm Rejection"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Reupload Request Modal */}
+      <Dialog open={reuploadOpen} onOpenChange={setReuploadOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Request Document Reuploads</DialogTitle>
+            <DialogDescription>
+              Please select which files need to be reuploaded by the user.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <Select onValueChange={(value) => setSelectedFile(value)}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Which file should be reuploaded?" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Vehicle Libre">Vehicle Libre</SelectItem>
+                <SelectItem value="Driver's License">Driver's License</SelectItem>
+                <SelectItem value="Both Vehicle Libre and License">Both Vehicle Libre and License</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setReuploadOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              className="bg-yellow-500 hover:bg-yellow-600 text-white"
+              onClick={handleRequestReupload}
+              disabled={!selectedFile || isRequestingReupload}
+            >
+              {isRequestingReupload ? "Requesting..." : "Request Document Reuploads"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -461,26 +549,26 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
           </DialogHeader>
           <div className="flex flex-col items-center justify-center space-y-4">
             <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center">
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                className="h-8 w-8 text-white" 
-                fill="none" 
-                viewBox="0 0 24 24" 
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-8 w-8 text-white"
+                fill="none"
+                viewBox="0 0 24 24"
                 stroke="currentColor"
               >
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  strokeWidth={2} 
-                  d="M5 13l4 4L19 7" 
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
                 />
               </svg>
             </div>
             <p className="text-center text-gray-600">
-              The insurance request has been successfully rejected.
+              The operation was completed successfully.
             </p>
-            <Button 
-              className="w-full" 
+            <Button
+              className="w-full"
               onClick={() => setIsSuccess(false)}
             >
               OK

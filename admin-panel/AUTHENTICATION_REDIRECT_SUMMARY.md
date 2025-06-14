@@ -172,7 +172,7 @@ const LoadingSpinner = () => (
 ## Configuration
 
 ### Base Settings
-- **API Base URL**: `http://localhost:3001`
+- **API Base URL**: `https://scbis-git-dev-hailes-projects-a12464a1.vercel.app`
 - **Default Redirect**: Home page (`/`)
 - **Token Storage**: localStorage + cookies
 - **Session Duration**: 7 days (configurable)
