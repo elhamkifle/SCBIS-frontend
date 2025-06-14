@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams } from 'next/navigation';
 import { usePoliciesStore } from '@/store/dashboard/policies';
+import { useRouter } from 'next/navigation';
 
 interface Policy {
   _id: string;
@@ -47,6 +48,7 @@ export default function PurchaseRequestApproved() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { policies } = usePoliciesStore();
+  const router = useRouter();
 
   const getAuthTokenFromCookie = (): string | null => {
     const match = document.cookie.match(/(?:^|;\s*)auth_token=([^;]*)/);
@@ -72,7 +74,7 @@ export default function PurchaseRequestApproved() {
         console.log(response.data)
 
         setPolicy(response.data);
-        
+
       } catch (err) {
         console.error('Error fetching policy:', err);
         setError('Failed to load policy details');
@@ -210,6 +212,10 @@ export default function PurchaseRequestApproved() {
           </button>
 
         </div>
+
+        <button className="mt-8 px-4 py-2 bg-blue-600 text-white rounded w-full" onClick={() => router.push("/dashboard")}>
+          Back To Dashboard
+        </button>
 
         {/* Notice */}
         <p className="text-md mt-8">
