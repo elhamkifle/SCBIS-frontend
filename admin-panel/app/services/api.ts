@@ -1,5 +1,5 @@
 // API Service utility for handling backend requests
-const API_BASE_URL = "http://localhost:3001";
+const API_BASE_URL = "https://scbis-git-dev-hailes-projects-a12464a1.vercel.app";
 
 // Helper function to redirect to login
 const redirectToLogin = () => {
