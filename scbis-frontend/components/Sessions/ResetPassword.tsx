@@ -67,7 +67,7 @@ const ResetPassword = () => {
         
         const serverResponse = await fetch('http://localhost:3001/auth/reset-password',{
             method:'POST',
-            body:JSON.stringify({ email, otp, newPassword: formData.password }),
+            body:JSON.stringify({ email, otp, password: formData.password }),
             headers:{
                 'Content-Type':'application/json'
             }
