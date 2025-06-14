@@ -46,7 +46,7 @@ export default function ClaimDetailsPage() {
                 const accessToken = document.cookie.match(/(?:^|;\s*)auth_token=([^;]*)/)?.[1];
 
                 const response = await axios.get(
-                    `https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/claims/${claimId}`,
+                    `http://localhost:3001/claims/${claimId}`,
                     {
                         headers: {
                             Authorization: `Bearer ${accessToken}`,
@@ -99,7 +99,7 @@ export default function ClaimDetailsPage() {
                 const accessToken = document.cookie.match(/(?:^|;\s*)auth_token=([^;]*)/)?.[1];
                 
                 const updateResponse = await axios.patch(
-                    `https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/claims/${claimId}`,
+                    `http://localhost:3001/claims/${claimId}`,
                     {
                         policeReport: policeReportUrl,
                         status: "policeReportUnderReview"

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Car, Plus, Loader2, AlertCircle } from 'lucide-react';
 import { vehicleApi } from '@/utils/vehicleApi';
 import { useVehicleSelectionStore } from '@/store/vehicleSelection/vehicleSelectionStore';
+import { useUserStore } from '@/store/authStore/useUserStore';
 
 interface VehicleData {
   _id: string;
@@ -65,6 +66,8 @@ interface VehicleData {
 
 export default function VehicleList() {
   const router = useRouter();
+  const user = useUserStore((state) => state.user);
+  
   const {
     vehicles,
     isLoading,
@@ -80,8 +83,15 @@ export default function VehicleList() {
 
   useEffect(() => {
     console.log('🚗 Vehicle List Page mounted');
-    fetchUserVehicles();
-  }, []);
+    
+    // Only fetch vehicles if user is verified
+    if (user?.userVerified === true) {
+      fetchUserVehicles();
+    } else {
+      console.log('🚫 User not verified - skipping vehicle fetch');
+      setLoading(false);
+    }
+  }, [user?.userVerified]);
 
   const fetchUserVehicles = async () => {
     console.log('🔄 Starting to fetch user vehicles...');

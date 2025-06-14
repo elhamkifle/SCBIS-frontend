@@ -3,13 +3,14 @@ import { useUserStore } from '@/store/authStore/useUserStore';
 
 /**
  * Fetch the current user's data from the backend and update the store
- * @returns The updated user data
+ * @returns The updated user data or null if user is not authenticated
  */
 export const fetchUserData = async () => {
   const user = useUserStore.getState().user;
   
   if (!user || !user._id) {
-    throw new Error('User not authenticated');
+    console.log('User not authenticated - skipping fetchUserData');
+    return null;
   }
   
   try {
@@ -38,7 +39,7 @@ export const fetchUserData = async () => {
  * @param userData Partial user data to update
  * @returns The updated user data
  */
-export const updateUserData = async (userData: any) => {
+export const updateUserData = async (userData: Record<string, unknown>) => {
   const user = useUserStore.getState().user;
   
   if (!user || !user._id) {

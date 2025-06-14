@@ -16,8 +16,8 @@ export default function Preview() {
   // const setUser = useUserStore((state) => state.setUser);
 
   const router = useRouter();
-  const { formData: personalDetails, updateFormData, resetForm } = usePersonalDetailStore();
-  const { address: addressData, updateAddress, resetAddress } = useAddressStore();
+  const { formData: personalDetails, resetForm } = usePersonalDetailStore();
+  const { address: addressData, resetAddress } = useAddressStore();
   const { uploadedUrls } = useUploadIDStore();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -118,6 +118,19 @@ export default function Preview() {
     console.log('Form Submitted:', formData);
     console.log('Uploaded ID URLs from store:', uploadedUrls);
     console.log('Uploaded ID URLs from localStorage:', JSON.parse(localStorage.getItem('uploaded-id-urls') || '[]'));
+    
+    // Check if user is already verified - if so, don't allow updates
+    if (user?.userVerified === true) {
+      alert('Your profile has already been verified. No updates are allowed.');
+      return;
+    }
+    
+    // Only allow updates if user is unverified (pending or rejected)
+    if (user?.verificationStatus !== 'PENDING' && user?.verificationStatus !== 'REJECTED') {
+      alert('Profile updates are only allowed for pending or rejected verification status.');
+      return;
+    }
+    
     setLoading(true);
     setError(null);
 

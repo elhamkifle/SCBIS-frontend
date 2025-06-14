@@ -102,7 +102,7 @@ describe('ClaimPolicySelection', () => {
     
     await waitFor(() => {
       expect(mockAxios.get).toHaveBeenCalledWith(
-        'https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/policy/user-policies',
+        'http://localhost:3001/policy/user-policies',
         {
           headers: {
             Authorization: 'Bearer mock-token'
