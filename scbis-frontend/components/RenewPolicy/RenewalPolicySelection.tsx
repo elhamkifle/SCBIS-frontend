@@ -13,7 +13,7 @@ export default function RenewalPolicySelectionPage() {
   useEffect(() => {
     const fetchPolicies = async () => {
       try {
-        const res = await axios.get('/api/policies'); // replace with your actual endpoint
+        const res = await axios.get('/api/policies'); 
         const filtered = res.data.filter(
           (policy: any) => policy.status === 'Active' || policy.status === 'Expired'
         );

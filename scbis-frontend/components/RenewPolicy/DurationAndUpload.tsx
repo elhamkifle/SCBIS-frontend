@@ -73,7 +73,7 @@ export default function RenewalDetailsPage() {
             <h1 className="text-2xl font-bold">Renew Policy</h1>
 
             <div>
-                <label className="block font-semibold">Select Duration (Months)</label>
+                <label className="block font-semibold">Select Policy Duration (Months)</label>
                 <select
                     className="border p-2 rounded w-full mt-1"
                     value={durationInMonths}

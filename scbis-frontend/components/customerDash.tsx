@@ -23,7 +23,7 @@ const actionLabels = [
 const actionLinks: Record<typeof actionLabels[number], string> = {
   "New Policy Purchase": "/policy-purchase/personal-information/personalDetails",
   "Submit a Claim": "/claim-submission/claim-policy-selection",
-  "Renew Policy": "/policy-purchase/personal-information/personalDetails",
+  "Renew Policy": "/renew-policy",
 };
 
 export default function Dashboard() {
@@ -152,6 +152,26 @@ export default function Dashboard() {
                 }
               };
 
+              const isAboutToExpire = () => {
+                if (!policy.createdAt || !policy.duration) return false;
+                const expiryDate = new Date(policy.createdAt);
+                expiryDate.setDate(expiryDate.getDate() + policy.duration);
+                const today = new Date();
+                const daysUntilExpiry = Math.ceil((expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+                return daysUntilExpiry <= 7 && daysUntilExpiry > 0;
+              };
+
+              const isExpired = () => {
+                if (!policy.createdAt || !policy.duration) return false;
+                const expiryDate = new Date(policy.createdAt);
+                expiryDate.setDate(expiryDate.getDate() + policy.duration);
+                return new Date() > expiryDate;
+              };
+
+              const handleRenew = () => {
+                router.push(`/renew-policy/policy-selection?policyId=${policy._id}`);
+              };
+
               return (
                 <div key={policy._id} className="bg-white border rounded-xl shadow-lg shadow-blue-100 w-full max-w-[400px] p-8">
                   <div className="flex justify-between items-center mb-3">
@@ -167,12 +187,22 @@ export default function Dashboard() {
                     <p><span className="text-gray-500">Issued On:</span> <span className="font-bold">{formattedDate}</span></p>
                     <p><span className="text-gray-500">Policy Duration:</span> <span className="font-bold">{policy.duration} days </span></p>
                   </div>
-                  <button
-                    onClick={handleViewDetails}
-                    className="mt-5 w-full text-base text-blue-600 border border-blue-600 rounded py-2 hover:bg-blue-50 font-semibold"
-                  >
-                    View Details
-                  </button>
+                  <div className="mt-5 space-y-2">
+                    {(isAboutToExpire() || isExpired()) && (
+                      <button
+                        onClick={handleRenew}
+                        className="w-full text-base text-white bg-blue-600 rounded py-2 hover:bg-blue-700 font-semibold"
+                      >
+                        Renew Policy
+                      </button>
+                    )}
+                    <button
+                      onClick={handleViewDetails}
+                      className="w-full text-base text-blue-600 border border-blue-600 rounded py-2 hover:bg-blue-50 font-semibold"
+                    >
+                      View Details
+                    </button>
+                  </div>
                 </div>
               );
             })}
