@@ -27,11 +27,19 @@ const redirectToLogin = () => {
 export interface User {
   id: string;
   name: string;
+  fullname?: string;
   email: string;
   phone: string;
+  phoneNumber?: string;
   policyCount: number;
   joined?: string;
+  registeredAt?: string;
   status?: "Active" | "Blocked" | "Suspended";
+  userVerified?: boolean;
+  verificationStatus?: "PENDING" | "VERIFIED" | "REJECTED";
+  verificationDate?: string;
+  verificationNotes?: string;
+  verifiedBy?: string;
 }
 
 export interface UserDetails {
@@ -40,10 +48,16 @@ export interface UserDetails {
   phoneNumber: string;
   email: string;
   roles: string[];
-  isPhoneVerified: boolean;
+  isEmailVerified: boolean;
+  userVerified?: boolean;
+  verificationStatus?: "PENDING" | "VERIFIED" | "REJECTED";
+  verificationDate?: string;
+  verificationNotes?: string;
+  verifiedBy?: string;
   title: string;
   tinNumber: string;
   country: string;
+  nationality?: string;
   regionOrState: string;
   city: string;
   subcity: string;
@@ -210,16 +224,100 @@ export interface PurchaseRequestsResponse {
 // Claims interface based on backend specification
 export interface Claim {
   id: string;
+  claimId?: string;
+  userId?: string;
+  policyId?: string;
   claimantName: string;
-  dateSubmitted?: string; // Made optional since backend returns undefined
+  dateSubmitted?: string | Date;
   policyNumber: string;
-  status: "draft" | "submitted" | "Under Review" | "Approved" | "Rejected" | "Needs More Info" | "Forwarded" | "policeReportUnderReview" | "proformaSubmissionPending" | "proformaUnderReview";
+  status: "Submitted" | "Under Review" | "Approved" | "Rejected" | "submitted" | "pending" | "rejected" | "adminApproved" | "policeReportUnderReview" | "proformaSubmissionPending" | "proformaUnderReview" | "winnerAnnounced";
   vehicleInfo: string;
-  accidentDate?: string | Date; // Made optional and allow Date object
-  location: string | object; // Allow object since backend returns [Object]
+  accidentDate?: string | Date;
+  location: string | object;
   driverName: string;
   damageImages: string[];
   declaration: boolean;
+  claimAmount?: number;
+  description?: string;
+  evidenceDocuments?: string[];
+  assessorNotes?: string;
+  approvedAmount?: number;
+  rejectionReason?: string;
+  submittedAt?: Date;
+  policeReport?: string;
+  proformaSubmitted?: boolean;
+  policeReportRequestLetter?: string;
+  statusReason?: string;
+  coverageAmount?: number;
+  garage?: string;
+  sparePartsFrom?: string;
+  sparePartsFromLocation?: {
+    city: string;
+    subCity: string;
+    kebele: string;
+  };
+  fixType?: string;
+  isDriverSameAsInsured?: boolean;
+  driver?: {
+    firstName: string;
+    lastName: string;
+    age: number;
+    city: string;
+    subCity: string;
+    kebele: string;
+    phoneNumber: string;
+    licenseNo: string;
+    grade: string;
+    expirationDate: Date;
+  };
+  dateOfAccident?: Date;
+  timeOfAccident?: string;
+  speed?: number;
+  locationDetails?: {
+    city: string;
+    subCity: string;
+    kebele: string;
+    sefer: string;
+  };
+  otherVehicles?: {
+    driverName: string;
+    driverAddress: string;
+    driverPhone: string;
+  }[];
+  positionOnRoad?: string;
+  roadSurface?: string;
+  trafficCondition?: string;
+  timeOfDay?: string;
+  hornSounded?: boolean;
+  wereYouInVehicle?: boolean;
+  headlightsOn?: boolean;
+  visibilityObstructions?: string;
+  intersectionType?: string;
+  additionalDescription?: string;
+  responsibleParty?: string;
+  otherInsuredStatus?: string;
+  otherInsuranceCompanyName?: string;
+  policeInvolved?: boolean;
+  policeOfficerName?: string;
+  policeStation?: string;
+  aloneInVehicle?: boolean;
+  vehicleOccupants?: { name: string; contact: string }[];
+  independentWitnessPresent?: boolean;
+  independentWitnesses?: { name: string; contact: string }[];
+  whyNoWitness?: string;
+  sketchFiles?: string;
+  vehicleDamageFiles?: string;
+  vehicleDamageDesc?: string;
+  thirdPartyDamageFiles?: string;
+  thirdPartyDamageDesc?: string;
+  injuries?: {
+    anyInjuries: boolean;
+    injuredPersons: { name: string; address: string }[];
+  };
+  driverFullName?: string;
+  insuredFullName?: string;
+  signatureDate?: Date;
+  agreedToDeclaration?: boolean;
   statusHistory?: {
     status: string;
     note: string;
@@ -342,6 +440,7 @@ export const userApi = {
   getUsers: async (params: {
     search?: string;
     status?: string;
+    verificationStatus?: string;
     page?: number;
     limit?: number;
   } = {}): Promise<PaginatedUsers> => {
@@ -349,6 +448,7 @@ export const userApi = {
     
     if (params.search) searchParams.append('search', params.search);
     if (params.status) searchParams.append('status', params.status);
+    if (params.verificationStatus) searchParams.append('verificationStatus', params.verificationStatus);
     if (params.page) searchParams.append('page', params.page.toString());
     if (params.limit) searchParams.append('limit', params.limit.toString());
 
@@ -361,6 +461,68 @@ export const userApi = {
   // Get detailed user information
   getUserDetails: async (id: string): Promise<UserDetails> => {
     return apiRequest<UserDetails>(`/admin/users/${id}`);
+  },
+
+  // Get users by verification status
+  getPendingVerifications: async (params: {
+    page?: number;
+    limit?: number;
+  } = {}): Promise<PaginatedUsers> => {
+    const searchParams = new URLSearchParams();
+    if (params.page) searchParams.append('page', params.page.toString());
+    if (params.limit) searchParams.append('limit', params.limit.toString());
+
+    const queryString = searchParams.toString();
+    const endpoint = `/admin/users/verification/pending${queryString ? `?${queryString}` : ''}`;
+    
+    return apiRequest<PaginatedUsers>(endpoint);
+  },
+
+  getVerifiedUsers: async (params: {
+    page?: number;
+    limit?: number;
+  } = {}): Promise<PaginatedUsers> => {
+    const searchParams = new URLSearchParams();
+    if (params.page) searchParams.append('page', params.page.toString());
+    if (params.limit) searchParams.append('limit', params.limit.toString());
+
+    const queryString = searchParams.toString();
+    const endpoint = `/admin/users/verification/verified${queryString ? `?${queryString}` : ''}`;
+    
+    return apiRequest<PaginatedUsers>(endpoint);
+  },
+
+  getRejectedUsers: async (params: {
+    page?: number;
+    limit?: number;
+  } = {}): Promise<PaginatedUsers> => {
+    const searchParams = new URLSearchParams();
+    if (params.page) searchParams.append('page', params.page.toString());
+    if (params.limit) searchParams.append('limit', params.limit.toString());
+
+    const queryString = searchParams.toString();
+    const endpoint = `/admin/users/verification/rejected${queryString ? `?${queryString}` : ''}`;
+    
+    return apiRequest<PaginatedUsers>(endpoint);
+  },
+
+  // Verify user
+  verifyUser: async (id: string, status: 'VERIFIED' | 'REJECTED', notes?: string): Promise<{ 
+    message: string;
+    user: {
+      id: string;
+      fullname: string;
+      email: string;
+      verificationStatus: string;
+      userVerified: boolean;
+      verificationDate: string;
+      verificationNotes?: string;
+    };
+  }> => {
+    return apiRequest(`/admin/users/${id}/verify`, {
+      method: 'PUT',
+      body: JSON.stringify({ status, notes }),
+    });
   },
 
   // Get user transactions
@@ -386,17 +548,41 @@ export const userApi = {
     return apiRequest<PaginatedTransactions>(endpoint);
   },
 
-  // Suspend user
-  suspendUser: async (id: string): Promise<{ message: string }> => {
-    return apiRequest<{ message: string }>(`/admin/users/${id}/suspend`, {
+  // Suspend user (now with notes)
+  suspendUser: async (id: string, notes?: string): Promise<{ 
+    message: string;
+    user: {
+      id: string;
+      fullname: string;
+      status: string;
+      userVerified: boolean;
+      verificationStatus: string;
+      verificationDate: string;
+      verificationNotes?: string;
+    };
+  }> => {
+    return apiRequest(`/admin/users/${id}/suspend`, {
       method: 'PUT',
+      body: JSON.stringify({ notes }),
     });
   },
 
-  // Activate user
-  activateUser: async (id: string): Promise<{ message: string }> => {
-    return apiRequest<{ message: string }>(`/admin/users/${id}/activate`, {
+  // Activate user (now with notes)
+  activateUser: async (id: string, notes?: string): Promise<{ 
+    message: string;
+    user: {
+      id: string;
+      fullname: string;
+      status: string;
+      userVerified: boolean;
+      verificationStatus: string;
+      verificationDate: string;
+      verificationNotes?: string;
+    };
+  }> => {
+    return apiRequest(`/admin/users/${id}/activate`, {
       method: 'PUT',
+      body: JSON.stringify({ notes }),
     });
   },
 
@@ -667,6 +853,103 @@ export const claimsApi = {
     return apiRequest<{ message: string }>(`/admin/claims/${id}/status`, {
       method: 'PUT',
       body: JSON.stringify({ status, note }),
+    });
+  },
+
+  // Approve submitted claim (status: submitted -> adminApproved)
+  approveSubmittedClaim: async (
+    id: string,
+    note?: string
+  ): Promise<{ message: string }> => {
+    return apiRequest<{ message: string }>(`/admin/claims/${id}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status: 'adminApproved', note }),
+    });
+  },
+
+  // Reject submitted claim (status: submitted -> rejected)
+  rejectSubmittedClaim: async (
+    id: string,
+    reason: string
+  ): Promise<{ message: string }> => {
+    return apiRequest<{ message: string }>(`/admin/claims/${id}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status: 'rejected', note: reason }),
+    });
+  },
+
+  // Approve police report (status: policeReportUnderReview -> proformaSubmissionPending)
+  approvePoliceReport: async (
+    id: string,
+    note?: string
+  ): Promise<{ message: string }> => {
+    return apiRequest<{ message: string }>(`/admin/claims/${id}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status: 'proformaSubmissionPending', note }),
+    });
+  },
+
+  // Reject police report (status: policeReportUnderReview -> rejected)
+  rejectPoliceReport: async (
+    id: string,
+    reason: string
+  ): Promise<{ message: string }> => {
+    return apiRequest<{ message: string }>(`/admin/claims/${id}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status: 'rejected', note: reason }),
+    });
+  },
+
+  // Confirm proforma submission (status: proformaSubmissionPending -> proformaUnderReview)
+  confirmProformaSubmission: async (
+    id: string,
+    note?: string
+  ): Promise<{ message: string }> => {
+    return apiRequest<{ message: string }>(`/admin/claims/${id}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status: 'proformaUnderReview', note }),
+    });
+  },
+
+  // Approve proforma with details (status: proformaUnderReview -> winnerAnnounced)
+  approveProforma: async (
+    id: string,
+    approvalData: {
+      coverageAmount: number;
+      garage: string;
+      sparePartsFrom?: string;
+      sparePartsFromLocation?: {
+        city: string;
+        subCity: string;
+        kebele: string;
+      };
+      fixType: string;
+      note?: string;
+    }
+  ): Promise<{ message: string }> => {
+    return apiRequest<{ message: string }>(`/admin/claims/${id}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ 
+        status: 'winnerAnnounced', 
+        note: approvalData.note,
+        // Include approval data in the request
+        coverageAmount: approvalData.coverageAmount,
+        garage: approvalData.garage,
+        sparePartsFrom: approvalData.sparePartsFrom,
+        sparePartsFromLocation: approvalData.sparePartsFromLocation,
+        fixType: approvalData.fixType
+      }),
+    });
+  },
+
+  // Reject proforma (status: proformaUnderReview -> rejected)
+  rejectProforma: async (
+    id: string,
+    reason: string
+  ): Promise<{ message: string }> => {
+    return apiRequest<{ message: string }>(`/admin/claims/${id}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status: 'rejected', note: reason }),
     });
   },
 };
