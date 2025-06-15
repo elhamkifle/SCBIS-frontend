@@ -4,17 +4,21 @@ import { useState } from "react";
 import { User, LogOut, Settings, HelpCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useUserStore } from "@/store/authStore/useUserStore";
+import { useBlockchainStore } from "@/store/blockchain/useBlockchainStore";
 
 export default function Sidebar() {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const user = useUserStore((state) => state.user);
     const profileName = user?.fullname.split(' ') || []; 
+    const removeWalletAddress = useBlockchainStore((state) => state.removeWalletAddress);
 
     const router = useRouter();
     const logout = useUserStore((state) => state.logout);
     const handleLogout = () => {
         const confirmLogout = window.confirm("Are you sure you want to log out?");
         if (confirmLogout) {
+            removeWalletAddress();
+            localStorage.removeItem('User-Wallet-Storage');
             logout();
             router.push('/');
         }
@@ -29,7 +33,7 @@ export default function Sidebar() {
                 {/* User Info Section */}
                 <div className="flex flex-col items-center py-6 transition-opacity duration-300">
                     <User size={40} className="mb-2" />
-                    {!isCollapsed && <span className="font-syne font-semibold text-center">{`${profileName[0]} ${profileName[1][0]}.`}</span>}
+                    {!isCollapsed && <span className="font-syne font-semibold text-center">{`${profileName && profileName[0]} ${profileName && profileName[1] && profileName[1][0]}.`}</span>}
                 </div>
 
                 {/* Centered Navigation Sections */}

@@ -148,7 +148,7 @@ export default function Hero() {
 
                                 <ul className="text-left space-y-2 mb-6">
                                     {cover.benefits.map((benefit, i) => (
-                                        <li key={i} className="flex items-start space-x-2 block">
+                                        <li key={i} className="sm:flex items-start space-x-2 block">
                                             ✅<span className='ml-3 text-black'>{benefit}</span>
                                         </li>
                                     ))}
