@@ -6,6 +6,8 @@ import useLoginStore from "@/store/authStore/useLoginStore";
 import { AuthSchemaType } from "@/schema/zodSchema";
 import { useUserStore } from "@/store/authStore/useUserStore";
 import Link from "next/link";
+import { useBlockchainStore } from "@/store/blockchain/useBlockchainStore";
+
 
 export default function Login() {
     const setUser = useUserStore((state) => state.setUser);
@@ -16,6 +18,7 @@ export default function Login() {
     });
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
+    const {setWalletAddress} = useBlockchainStore();
     
     // Redirect already authenticated users away from login page
     // useAuth(false);
@@ -67,7 +70,8 @@ export default function Login() {
                     accessToken: data.accessToken,
                     refreshToken: data.refreshToken
                 });
-                console.log(data.user)
+                // console.log(data.user)
+                setWalletAddress(''); // Set wallet address if available
                 router.push('/dashboard');
             } else {
                 setError(data.message || "Login failed. Please check your credentials.");

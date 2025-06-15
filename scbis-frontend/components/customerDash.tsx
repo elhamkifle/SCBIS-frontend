@@ -27,7 +27,7 @@ export default function Dashboard() {
   const { policies } = usePoliciesStore();
   const { claims } = useClaimsStore();
   const user = useUserStore((state) => state.user);
-  const profileName = user?.fullname.split(' ') || []
+  const profileName = user?.fullname?.split(' ') || []
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -50,7 +50,7 @@ export default function Dashboard() {
     <main className="bg-white min-h-screen text-gray-800">
       <div className="max-w-7xl mx-auto px-4 pt-8 pb-12">
         <h1 className="text-lg font-syne md:text-4xl font-bold text-blue-500 mb-10 text-center" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-          Hello {`${profileName[0]} ${profileName[1][0]}.`}
+          Hello {`${profileName && profileName[0]} ${profileName && profileName[1] && profileName[1][0]}.`}
         </h1>
 
         <div className="flex flex-row flex-wrap justify-between items-center gap-8 mb-14">
@@ -80,7 +80,7 @@ export default function Dashboard() {
                   <p><span className="text-gray-500">Policy Type:</span> <span className="font-bold">{policy.policyType}</span></p>
                   <p><span className="text-gray-500">Purpose:</span> <span className="font-bold">{policy.purpose}</span></p>
                   <p><span className="text-gray-500">Passengers:</span> <span className="font-bold">{policy.passengers}</span></p>
-                  <p><span className="text-gray-500">Policy Period:</span> <span className="font-bold">{policy.policyPeriod.start} - {policy.policyPeriod.end}</span></p>
+                  <p><span className="text-gray-500">Policy Period:</span> <span className="font-bold">{policy?.policyPeriod?.start} - {policy?.policyPeriod?.end}</span></p>
                 </div>
                 <Link href={`/policydetails?id=${policy.id}`}>
                   <button className="mt-5 w-full text-base text-blue-600 border border-blue-600 rounded py-2 hover:bg-blue-50 font-semibold">

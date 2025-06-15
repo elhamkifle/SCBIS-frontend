@@ -7,11 +7,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useNotificationStore} from "@/store/notificationStore/notifications";;
 import { useUserStore } from "@/store/authStore/useUserStore";
+import { useBlockchainStore } from "@/store/blockchain/useBlockchainStore";
+
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [filter, setFilter] = useState<"All" | "Unread">("All");
+  const {walletAddress, removeWalletAddress} = useBlockchainStore();
+  
+
 
   // Use the Zustand store
   const {
@@ -40,6 +45,8 @@ export default function Header() {
     const confirmLogout = window.confirm("Are you sure you want to log out?");
     if (confirmLogout) {
       logout();
+      removeWalletAddress();
+      localStorage.removeItem('User-Wallet-Storage'); // Clear wallet address from local storage
       router.push('/');
     }
   };
@@ -64,6 +71,8 @@ export default function Header() {
         <Link href="#" className="text-white hover:text-green-400 font-syne">
           About Us
         </Link>
+       
+        <Link href='/get-policy' className="text-white">Go</Link>
       </nav>
 
       {/* Bell Icon (Right side on large screens) */}
@@ -131,6 +140,7 @@ export default function Header() {
               About Us
             </Link>
 
+          
             {/* Icons for Help, Settings, Logout */}
             <div className="flex justify-center gap-4 mt-4">
               <button className="p-2 bg-gray-700 rounded-full hover:bg-gray-600">
