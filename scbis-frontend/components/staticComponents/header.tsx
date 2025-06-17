@@ -138,7 +138,7 @@ export default function Header() {
           Claim Submission
         </Link>
         
-        <Link href="#" className="text-white hover:text-green-400 font-syne">
+        <Link href="/about-us" className="text-white hover:text-green-400 font-syne">
           About Us
         </Link>
       </nav>
@@ -205,7 +205,7 @@ export default function Header() {
             <Link href="#" className="text-white hover:text-green-400">
               Claim Status
             </Link>
-            <Link href="#" className="text-white hover:text-green-400">
+            <Link href="/about-us" className="text-white hover:text-green-400">
               About Us
             </Link>
 
