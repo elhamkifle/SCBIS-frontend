@@ -5,7 +5,7 @@ import { useUserStore } from "@/store/authStore/useUserStore";
 // Create a new axios instance for authenticated requests
 const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
-  // baseURL: 'http://localhost:3001',
+  // baseURL: 'https://scbis-git-dev-hailes-projects-a12464a1.vercel.app',
   headers: {
     "Content-Type": "application/json",
     "Accept": "application/json"

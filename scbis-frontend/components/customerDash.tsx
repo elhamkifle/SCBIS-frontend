@@ -70,7 +70,7 @@ export default function Dashboard() {
       try {
         const accessToken = getAuthTokenFromCookie();
         const response = await axios.get(
-          'http://localhost:3001/policy/user-policies',
+          'https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/policy/user-policies',
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -98,7 +98,7 @@ export default function Dashboard() {
       try {
         const accessToken = getAuthTokenFromCookie();
         const response = await axios.get(
-          'http://localhost:3001/claims',
+          'https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/claims',
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,

@@ -227,7 +227,7 @@ export default function ClaimPreview() {
         return;
       }
 
-      const response = await axios.post("http://localhost:3001/claims", claimData, {
+      const response = await axios.post("https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/claims", claimData, {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
