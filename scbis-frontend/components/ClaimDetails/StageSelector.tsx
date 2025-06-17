@@ -1,6 +1,6 @@
 "use client";
 
-type ClaimStage = "submitted" | "adminApproved" | "policeReportUnderReview" | "proformaUnderReview" | "closed" | "winnerAnnounced"| "proformaSubmissionPending";
+type ClaimStage = "submitted" | "adminApproved" | "policeReportUnderReview" | "proformaUnderReview" | "closed" | "winnerAnnounced"| "proformaSubmissionPending" | "rejected";
 
 interface StageSelectorProps {
     currentStage: ClaimStage;
@@ -9,7 +9,7 @@ interface StageSelectorProps {
 
 export function StageSelector({ currentStage, onStageChange }: StageSelectorProps) {
     const stages: ClaimStage[] = [
-        "submitted", "adminApproved", "policeReportUnderReview", "proformaUnderReview", "closed", "winnerAnnounced", "proformaSubmissionPending"
+        "submitted", "adminApproved", "policeReportUnderReview", "proformaUnderReview", "closed", "winnerAnnounced", "proformaSubmissionPending", "rejected"
     ];
 
     return (

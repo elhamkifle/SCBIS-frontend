@@ -11,7 +11,7 @@ import { StageCard } from "@/components/ClaimDetails/StageCard";
 import { UnderReviewCard } from "@/components/ClaimDetails/UnderReviewCard";
 import { useRouter } from "next/navigation";
 
-type ClaimStage = "submitted" | "proformaSubmissionPending" | "adminApproved" | "policeReportUnderReview" | "proformaUnderReview" | "closed" | "winnerAnnounced";
+type ClaimStage = "submitted" | "proformaSubmissionPending" | "adminApproved" | "policeReportUnderReview" | "proformaUnderReview" | "closed" | "winnerAnnounced" | "rejected";
 
 export default function ClaimDetailsPage() {
     const params = useParams();
@@ -34,7 +34,6 @@ export default function ClaimDetailsPage() {
         const fetchClaimDetails = async () => {
             try {
                 setLoading(true);
-
                 // Otherwise fetch from backend
                 const accessToken = document.cookie.match(/(?:^|;\s*)auth_token=([^;]*)/)?.[1];
 
@@ -46,6 +45,8 @@ export default function ClaimDetailsPage() {
                         },
                     }
                 );
+
+                console.log(response.data)
 
                 setBackendClaim(response.data);
                 setLoading(false);
@@ -70,27 +71,27 @@ export default function ClaimDetailsPage() {
 
     const uploadPoliceReport = async () => {
         if (!policeReport) return;
-        
+
         try {
             setUploading(true);
-            
+
             // Upload to Cloudinary
             const formdata = new FormData();
             formdata.append('file', policeReport);
             formdata.append('upload_preset', 'docuploads');
-            
+
             const uploadResult = await axios.post(
                 `https://api.cloudinary.com/v1_1/dmzvqehan/upload`,
                 formdata
             );
-            
+
             if (uploadResult.statusText === "OK") {
                 console.log(uploadResult.data.secure_url);
                 const policeReportUrl = uploadResult.data.secure_url;
-                
+
                 // Update the claim with the police report URL
                 const accessToken = document.cookie.match(/(?:^|;\s*)auth_token=([^;]*)/)?.[1];
-                
+
                 const updateResponse = await axios.patch(
                     `https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/claims/${claimId}`,
                     {
@@ -103,7 +104,7 @@ export default function ClaimDetailsPage() {
                         },
                     }
                 );
-                
+
                 if (updateResponse.status === 200) {
                     // Update local state and move to next stage
                     setBackendClaim(updateResponse.data);
@@ -142,6 +143,8 @@ export default function ClaimDetailsPage() {
                 return "closed";
             case "winnerAnnounced":
                 return "winnerAnnounced";
+            case "rejected":
+                return "rejected";
             default:
                 return "submitted"; // Default case
         }
@@ -269,9 +272,8 @@ export default function ClaimDetailsPage() {
                                                                 <button
                                                                     onClick={uploadPoliceReport}
                                                                     disabled={uploading}
-                                                                    className={`w-full px-4 py-2 text-white rounded transition-colors ${
-                                                                        uploading ? 'bg-gray-400' : 'bg-green-600 hover:bg-green-700'
-                                                                    }`}
+                                                                    className={`w-full px-4 py-2 text-white rounded transition-colors ${uploading ? 'bg-gray-400' : 'bg-green-600 hover:bg-green-700'
+                                                                        }`}
                                                                 >
                                                                     {uploading ? 'Uploading...' : 'Submit Police Report'}
                                                                 </button>
@@ -338,6 +340,17 @@ export default function ClaimDetailsPage() {
                                             <p className="ml-8"> City: {backendClaim.sparePartsFromLocation?.city}</p>
                                             <p className="ml-8"> City: {backendClaim.sparePartsFromLocation?.subCity}</p>
                                             <p className="ml-8"> Kebele: {backendClaim.sparePartsFromLocation?.kebele}</p>
+
+                                            <a href="/dashboard">
+                                                <button className="mt-4 px-4 py-2 bg-green-600 text-white rounded w-full">Back to Dashboard</button>
+                                            </a>
+                                        </StageCard>
+                                    );
+
+                                case "Rejected":
+                                    return (
+                                        <StageCard title="Your Claim has unfortunately been rejected.">
+                                            <p className="mb-4">Your claim has been rejected for {backendClaim.statusReason}</p>
 
                                             <a href="/dashboard">
                                                 <button className="mt-4 px-4 py-2 bg-green-600 text-white rounded w-full">Back to Dashboard</button>

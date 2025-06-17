@@ -8,23 +8,24 @@ import { useClaimsStore } from "@/store/dashboard/claims";
 import { useUserStore } from "@/store/authStore/useUserStore";
 import { useRouter } from "next/navigation";
 import { fetchUserData } from "@/utils/userUtils";
+import { useState } from "react";
 
 const actionImages: Record<string, string> = {
   "New Policy Purchase": "/purchase.png",
   "Submit a Claim": "/Claim.png",
-  "Renew Policy": "/Renew.png",
+  // "Renew Policy": "/Renew.png",
 };
 
 const actionLabels = [
   "New Policy Purchase",
   "Submit a Claim",
-  "Renew Policy",
+  // "Renew Policy",
 ] as const;
 
 const actionLinks: Record<typeof actionLabels[number], string> = {
   "New Policy Purchase": "/policy-purchase/vehicle-information/vehicle-list",
   "Submit a Claim": "/claim-submission/claim-policy-selection",
-  "Renew Policy": "/policy-purchase/vehicle-information/vehicle-list",
+  // "Renew Policy": "/policy-purchase/vehicle-information/vehicle-list",
 };
 
 export default function Dashboard() {
@@ -33,6 +34,7 @@ export default function Dashboard() {
   const user = useUserStore((state) => state.user);
   const profileName = user?.fullname.split(' ') || [];
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
 
   const getAuthTokenFromCookie = (): string | null => {
     const match = document.cookie.match(/(?:^|;\s*)auth_token=([^;]*)/);
@@ -60,32 +62,36 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    const fetchPolicies = async () => {
-      // Only fetch policies if user is verified
+    const fetchData = async () => {
       if (!user?.userVerified) {
-        console.log('🚫 User not verified - skipping policy fetch');
+        setIsLoading(false); // nothing to load
         return;
       }
 
       try {
         const accessToken = getAuthTokenFromCookie();
-        const response = await axios.get(
-          'https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/policy/user-policies',
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        );
-        console.log('Fetched policies:', response.data);
-        addPolicies(response.data);
+
+        const [policiesRes, claimsRes] = await Promise.all([
+          axios.get('https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/policy/user-policies', {
+            headers: { Authorization: `Bearer ${accessToken}` },
+          }),
+          axios.get('https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/claims', {
+            headers: { Authorization: `Bearer ${accessToken}` },
+          }),
+        ]);
+
+        addPolicies(policiesRes.data);
+        setClaims(claimsRes.data);
       } catch (error) {
-        console.error('Error fetching policies:', error);
+        console.error('Error fetching dashboard data:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    fetchPolicies();
-  }, [addPolicies, user?.userVerified]); // Add user verification to dependency array
+    fetchData();
+  }, [addPolicies, setClaims, user?.userVerified]);
+
 
   useEffect(() => {
     const fetchClaims = async () => {
@@ -152,6 +158,18 @@ export default function Dashboard() {
 
     if (isVerified) return null;
 
+    if (isLoading) {
+      return (
+        <main className="flex items-center justify-center min-h-screen bg-white">
+          <div className="text-center space-y-4">
+            <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto" />
+            <p className="text-lg text-gray-600 font-medium">Loading your info...</p>
+          </div>
+        </main>
+      );
+    }
+
+
     return (
       <div className="max-w-2xl mx-auto mb-8">
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 shadow-md">
@@ -163,7 +181,7 @@ export default function Dashboard() {
             </div>
             <h3 className="text-lg font-semibold text-yellow-800">Profile Verification Status</h3>
           </div>
-          
+
           {verificationStatus === 'PENDING' && (
             <div>
               <p className="text-yellow-700 mb-2">Your profile is under review</p>
@@ -172,7 +190,7 @@ export default function Dashboard() {
               </p>
             </div>
           )}
-          
+
           {verificationStatus === 'REJECTED' && (
             <div>
               <p className="text-red-700 mb-2">Profile verification was rejected</p>
@@ -187,9 +205,9 @@ export default function Dashboard() {
               </p>
             </div>
           )}
-          
+
           <div className="mt-4">
-            <Link 
+            <Link
               href="/policy-purchase/personal-information/personalDetails"
               className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
             >
