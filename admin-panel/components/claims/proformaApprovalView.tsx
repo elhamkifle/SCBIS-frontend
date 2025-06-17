@@ -88,15 +88,6 @@ export default function ProformaApprovalView({ claimId }: ProformaApprovalViewPr
     }
   }, [claimId]);
 
-  const formatDate = (date: string | Date | undefined) => {
-    if (!date) return "Not specified";
-    try {
-      return new Date(date).toLocaleDateString();
-    } catch {
-      return "Invalid date";
-    }
-  };
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case "proformaUnderReview":
@@ -151,6 +142,9 @@ export default function ProformaApprovalView({ claimId }: ProformaApprovalViewPr
         fixType: formData.fixType,
         note: note || undefined,
       };
+
+      console.log("🚀 Frontend sending approval data:", approvalData);
+      console.log("🏢 Spare parts location data:", formData.sparePartsFromLocation);
 
       await claimsApi.approveProforma(claimId, approvalData);
       

@@ -35,7 +35,7 @@ export interface User {
   joined?: string;
   registeredAt?: string;
   status?: "Active" | "Blocked" | "Suspended";
-  userVerified?: boolean;
+  userVerified: boolean;
   verificationStatus?: "PENDING" | "VERIFIED" | "REJECTED";
   verificationDate?: string;
   verificationNotes?: string;
@@ -927,18 +927,9 @@ export const claimsApi = {
       note?: string;
     }
   ): Promise<{ message: string }> => {
-    return apiRequest<{ message: string }>(`/admin/claims/${id}/status`, {
+    return apiRequest<{ message: string }>(`/admin/claims/${id}/approve-proforma`, {
       method: 'PUT',
-      body: JSON.stringify({ 
-        status: 'winnerAnnounced', 
-        note: approvalData.note,
-        // Include approval data in the request
-        coverageAmount: approvalData.coverageAmount,
-        garage: approvalData.garage,
-        sparePartsFrom: approvalData.sparePartsFrom,
-        sparePartsFromLocation: approvalData.sparePartsFromLocation,
-        fixType: approvalData.fixType
-      }),
+      body: JSON.stringify(approvalData),
     });
   },
 
@@ -970,4 +961,95 @@ export const premiumSettingsApi = {
   },
 };
 
-export default { userApi, adminApi, authApi, purchaseRequestsApi, claimsApi, premiumSettingsApi }; 
+// Dashboard interfaces matching backend
+export interface DashboardStats {
+  totalUsers: {
+    value: number;
+    trend: 'up' | 'down';
+    trendValue: string;
+    progress: number;
+  };
+  activePolicies: {
+    value: number;
+    trend: 'up' | 'down';
+    trendValue: string;
+    progress: number;
+  };
+  pendingRequests: {
+    value: number;
+    trend: 'up' | 'down';
+    trendValue: string;
+    progress: number;
+  };
+  pendingClaims: {
+    value: number;
+    trend: 'up' | 'down';
+    trendValue: string;
+    progress: number;
+  };
+}
+
+export interface ClaimsChartData {
+  monthlyData: Array<{
+    name: string;
+    pending: number;
+    approved: number;
+    rejected: number;
+    total: number;
+  }>;
+}
+
+export interface RecentActivity {
+  activities: Array<{
+    id: string;
+    message: string;
+    type: 'policy_purchased' | 'claim_submitted' | 'payment_confirmed' | 'proforma_sent' | 'user_verified';
+    userName?: string;
+    time: Date;
+    relativeTime: string;
+  }>;
+}
+
+export interface PolicyDistribution {
+  distribution: Array<{
+    name: string;
+    value: number;
+    percentage: number;
+  }>;
+  totalPolicies: number;
+}
+
+export interface RevenueSummary {
+  totalRevenue: number;
+  monthlyRevenue: number;
+  revenueGrowth: {
+    trend: 'up' | 'down';
+    percentage: string;
+  };
+}
+
+export interface DashboardResponse {
+  stats: DashboardStats;
+  claimsChart: ClaimsChartData;
+  recentActivity: RecentActivity;
+  policyDistribution: PolicyDistribution;
+  revenueSummary: RevenueSummary;
+  lastUpdated: Date;
+}
+
+// Dashboard API
+export const dashboardApi = {
+  // Get dashboard data
+  getDashboard: async (): Promise<DashboardResponse> => {
+    return apiRequest<DashboardResponse>('/admin/dashboard');
+  },
+
+  // Refresh dashboard cache
+  refreshDashboard: async (): Promise<{ message: string; timestamp: Date }> => {
+    return apiRequest<{ message: string; timestamp: Date }>('/admin/dashboard/refresh', {
+      method: 'POST',
+    });
+  },
+};
+
+export default { userApi, adminApi, authApi, purchaseRequestsApi, claimsApi, premiumSettingsApi, dashboardApi }; 

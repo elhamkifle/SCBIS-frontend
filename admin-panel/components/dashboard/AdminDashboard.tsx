@@ -1,32 +1,50 @@
-// app/dashboard/page.tsx or wherever your dashboard is rendered
+"use client";
 
-import DashboardStats from "@/components/dashboard/DashboardStats";
-import DashboardClaimsChart from "@/components/dashboard/DashboardClaimsChart";
-import RecentActivity from "@/components/dashboard/RecentActivity";
+import React, { useState } from "react";
+import DashboardStats from "./DashboardStats";
+import DashboardClaimsChart from "./DashboardClaimsChart";
+import RecentActivity from "./RecentActivity";
 import PolicyPieChart from "./PolicyPieChart";
 import SummaryStats from "./SummaryStats";
 
-export default function AdminDashboardPage() {
+export default function AdminDashboard() {
+  const [selectedCard, setSelectedCard] = useState<string | null>(null);
+
+  const handleCardClick = (type: "policies" | "revenue") => {
+    setSelectedCard(type);
+    // You can implement detailed view logic here
+    console.log(`Clicked on ${type} card`);
+  };
+
   return (
-    <div className="space-y-6 bg-gray-50 min-h-screen p-6">
-      <h1 className="text-2xl font-semibold text-gray-800">Dashboard</h1>
+    <div className="p-4 bg-gray-50 min-h-screen">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-800 mb-2">
+            Admin Dashboard
+          </h1>
+          <p className="text-gray-600">
+            Welcome to your insurance management dashboard
+          </p>
+        </div>
 
-      {/* KPI Cards */}
-      <DashboardStats />
+        {/* Summary Stats */}
+        <SummaryStats onCardClick={handleCardClick} />
 
-      {/* 2nd Row: Chart + Activity */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <DashboardClaimsChart />
-        <RecentActivity />
+        {/* KPI Stats */}
+        <div className="mb-6">
+          <DashboardStats />
+        </div>
+
+        {/* Charts Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <DashboardClaimsChart />
+          <RecentActivity />
+        </div>
+
+        {/* Policy Distribution Chart */}
+        <PolicyPieChart />
       </div>
-      <SummaryStats
-              totalPolicies={10234}
-              totalRevenue={189230}
-              onCardClick={() => {}}
-            />
-
-            {/* Policy Distribution Chart */}
-    <PolicyPieChart />
     </div>
   );
 }

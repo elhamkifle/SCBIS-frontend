@@ -47,20 +47,49 @@ function UsersPage() {
       } else if (verificationStatus === "rejected") {
         response = await userApi.getRejectedUsers({ limit: 50 });
       } else {
-        response = await userApi.getUsers({
-          search: searchQuery || undefined,
-          limit: 50
-        });
+        // For "All Users", we need to fetch from all verification endpoints and combine
+        const [pendingResponse, verifiedResponse, rejectedResponse] = await Promise.all([
+          userApi.getPendingVerifications({ limit: 50 }).catch(() => ({ users: [] })),
+          userApi.getVerifiedUsers({ limit: 50 }).catch(() => ({ users: [] })),
+          userApi.getRejectedUsers({ limit: 50 }).catch(() => ({ users: [] }))
+        ]);
+        
+        // Combine all users
+        const allUsers = [
+          ...pendingResponse.users,
+          ...verifiedResponse.users,
+          ...rejectedResponse.users
+        ];
+        
+        // Filter by search query if provided
+        const filteredUsers = searchQuery 
+          ? allUsers.filter(user => 
+              user.fullname?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              user.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              user.phoneNumber?.includes(searchQuery)
+            )
+          : allUsers;
+        
+        response = { 
+          users: filteredUsers,
+          pagination: { total: filteredUsers.length, page: 1, totalPages: 1 }
+        };
       }
       
       // Map the backend response to match frontend expectations
-      const mappedUsers = response.users.map(user => ({
-        ...user,
-        name: user.name || user.fullname || 'Unknown',
-        phone: user.phone || user.phoneNumber || 'N/A',
-        joined: user.joined || user.registeredAt || new Date().toISOString().split('T')[0],
-        status: (user.status || "Active") as "Active" | "Blocked" | "Suspended"
-      }));
+      const mappedUsers = response.users.map(user => {
+        const mappedUser = {
+          ...user,
+          name: user.name || user.fullname || 'Unknown',
+          phone: user.phone || user.phoneNumber || 'N/A',
+          joined: user.joined || user.registeredAt || new Date().toISOString().split('T')[0],
+          status: (user.status || "Active") as "Active" | "Blocked" | "Suspended",
+          verificationStatus: user.verificationStatus || (user.userVerified ? 'VERIFIED' : 'PENDING'),
+          policyCount: user.policyCount || 0
+        };
+        
+        return mappedUser;
+      });
       
       setUsers(mappedUsers);
     } catch (err) {

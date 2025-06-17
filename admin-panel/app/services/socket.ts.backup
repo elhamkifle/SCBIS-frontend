@@ -5,7 +5,7 @@ class SocketService {
   private socket: Socket | null = null;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
-  private baseUrl = 'https://scbis-git-dev-hailes-projects-a12464a1.vercel.app';
+  private baseUrl = 'http://localhost:3001';
 
   // Initialize socket connection
   connect(token?: string) {

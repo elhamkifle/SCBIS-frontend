@@ -29,7 +29,7 @@ export default function UserDetailsPage() {
   const [showActionDialog, setShowActionDialog] = useState(false);
   const [actionType, setActionType] = useState<'suspend' | 'activate' | null>(null);
   const [actionNotes, setActionNotes] = useState("");
-
+  console.log(user);
   // Fetch user details from API
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -445,14 +445,14 @@ ${user.claims.map(c => `- ${c.type} (${c.status}) - Submitted: ${c.submittedAt}`
           </Card>
 
           {/* Notes */}
-          <Card>
-            <CardContent className="p-6 space-y-2">
-              <h2 className="text-xl font-semibold mb-2">Notes / Flags</h2>
-              <p className="text-gray-700 bg-gray-100 p-3 rounded-md shadow-sm whitespace-pre-line">
-                {user.notes || "No notes available for this user."}
-              </p>
-            </CardContent>
-          </Card>
+          {user.notes && (
+            <Card>
+              <CardContent className="p-6">
+                <h2 className="text-xl font-semibold mb-4">Admin Notes</h2>
+                <p className="text-gray-800 bg-gray-50 p-4 rounded-md border">{user.notes}</p>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Policies */}
           <Card>
@@ -469,13 +469,14 @@ ${user.claims.map(c => `- ${c.type} (${c.status}) - Submitted: ${c.submittedAt}`
                           <p className="font-medium">{policy.type}</p>
                           <p className="text-sm text-gray-600">ID: {policy.id}</p>
                           <p className="text-sm text-gray-600">
-                            {new Date(policy.startDate).toLocaleDateString()} - {new Date(policy.endDate).toLocaleDateString()}
+                            Period: {new Date(policy.startDate).toLocaleDateString()} - {new Date(policy.endDate).toLocaleDateString()}
+                            {/* {new Date(policy.startDate).toLocaleDateString()} - {new Date(policy.endDate).toLocaleDateString()} */}
                           </p>
                         </div>
                         <span className={`px-2 py-1 rounded text-sm font-semibold ${
                           policy.status === 'Active' ? 'bg-green-100 text-green-700' :
-                          policy.status === 'Pending' ? 'bg-yellow-100 text-yellow-700' :
-                          'bg-red-100 text-red-700'
+                          policy.status === 'Expired' ? 'bg-red-100 text-red-700' :
+                          'bg-yellow-100 text-yellow-700'
                         }`}>
                           {policy.status}
                         </span>
@@ -533,12 +534,26 @@ ${user.claims.map(c => `- ${c.type} (${c.status}) - Submitted: ${c.submittedAt}`
                     alt="Profile" 
                     className="w-32 h-32 mx-auto rounded-full object-cover cursor-pointer border-4 border-gray-200"
                     onClick={() => setSelectedImage(user.profileImageUrl)}
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      // Show the "No Image" placeholder
+                      const parent = target.parentElement;
+                      if (parent) {
+                        const placeholder = parent.querySelector('.image-placeholder') as HTMLElement;
+                        if (placeholder) {
+                          placeholder.style.display = 'flex';
+                        }
+                      }
+                    }}
                   />
-                ) : (
-                  <div className="w-32 h-32 mx-auto rounded-full bg-gray-200 flex items-center justify-center">
-                    <span className="text-gray-500 text-lg">No Image</span>
-                  </div>
-                )}
+                ) : null}
+                <div 
+                  className="w-32 h-32 mx-auto rounded-full bg-gray-200 flex items-center justify-center image-placeholder"
+                  style={{ display: user.profileImageUrl ? 'none' : 'flex' }}
+                >
+                  <span className="text-gray-500 text-lg">No Image</span>
+                </div>
                 <p className="text-sm text-gray-600">Profile Picture</p>
               </div>
             </CardContent>

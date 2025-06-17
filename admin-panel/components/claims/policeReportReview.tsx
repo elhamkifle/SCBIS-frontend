@@ -18,7 +18,6 @@ import { ArrowLeft, RefreshCw, Download } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { claimsApi, type Claim } from "@/app/services/api";
-import Image from "next/image";
 
 interface PoliceReportReviewProps {
   claimId: string;
@@ -33,14 +32,17 @@ export default function PoliceReportReview({ claimId }: PoliceReportReviewProps)
   const [dialogAction, setDialogAction] = useState<'approve' | 'reject' | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [note, setNote] = useState("");
+  const [imageLoading, setImageLoading] = useState(true);
 
   // Fetch claim details
   const fetchClaim = async () => {
     try {
       setLoading(true);
       setError(null);
+      setImageLoading(true); // Reset image loading state
       
       const response = await claimsApi.getClaimById(claimId);
+      console.log('🔍 API Response:', response);
       setClaim(response);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to fetch claim details";
@@ -56,6 +58,29 @@ export default function PoliceReportReview({ claimId }: PoliceReportReviewProps)
       fetchClaim();
     }
   }, [claimId]);
+
+  // Debug police report URL when claim data changes
+  useEffect(() => {
+    if (claim?.policeReport) {
+      console.log('🔍 Police Report URL:', claim.policeReport);
+      console.log('🔍 Full claim object:', claim);
+      console.log('🔍 Image loading state:', imageLoading);
+    } else {
+      console.log('❌ No police report found in claim:', claim);
+    }
+  }, [claim?.policeReport, imageLoading]);
+
+  // Debug image rendering
+  useEffect(() => {
+    if (claim?.policeReport) {
+      console.log('🔍 Rendering image section - imageLoading:', imageLoading, 'policeReport:', claim.policeReport);
+      if (imageLoading) {
+        console.log('🔍 Showing loading skeleton');
+      } else {
+        console.log('🔍 Should be showing image now');
+      }
+    }
+  }, [claim?.policeReport, imageLoading]);
 
   const formatDate = (date: string | Date | undefined) => {
     if (!date) return "Not specified";
@@ -306,25 +331,45 @@ export default function PoliceReportReview({ claimId }: PoliceReportReviewProps)
                 <div className="mt-4">
                   <p className="text-sm text-gray-500 mb-2">Police Report Document</p>
                   <div className="border rounded-lg p-4 bg-gray-50">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <svg className="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        <div>
-                          <p className="font-medium">Police Report</p>
-                          <p className="text-sm text-gray-500">Click to view document</p>
-                        </div>
+                    {/* Display the actual image */}
+                    <div className="space-y-3">
+                      {imageLoading && (
+                        <Skeleton className="w-full h-64 rounded-lg" />
+                      )}
+                      
+                      <img
+                        src={claim.policeReport}
+                        alt="Police Report Document"
+                        className={`w-full max-w-2xl mx-auto rounded-lg border shadow-sm ${imageLoading ? 'hidden' : 'block'}`}
+                        style={{ maxHeight: '500px', objectFit: 'contain' }}
+                        onLoad={() => {
+                          console.log('✅ Police report image loaded successfully');
+                          console.log('🔍 Image element:', document.querySelector('img[alt="Police Report Document"]'));
+                          setImageLoading(false);
+                        }}
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          console.error('❌ Failed to load police report image:', e);
+                          console.error('🔍 Error target:', target);
+                          console.error('🔍 Image URL:', claim.policeReport);
+                          console.error('🔍 Image naturalWidth:', target.naturalWidth);
+                          console.error('🔍 Image naturalHeight:', target.naturalHeight);
+                          setImageLoading(false);
+                        }}
+                      />
+                      
+                      {/* Keep the view button for opening in new tab */}
+                      <div className="flex justify-center">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => window.open(claim.policeReport, '_blank')}
+                          className="flex items-center gap-2"
+                        >
+                          <Download className="h-4 w-4" />
+                          Open in New Tab
+                        </Button>
                       </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => window.open(claim.policeReport, '_blank')}
-                        className="flex items-center gap-2"
-                      >
-                        <Download className="h-4 w-4" />
-                        View Report
-                      </Button>
                     </div>
                   </div>
                 </div>

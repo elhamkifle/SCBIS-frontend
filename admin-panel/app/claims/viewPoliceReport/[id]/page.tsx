@@ -1,11 +1,12 @@
 import PoliceReportReview from "@/components/claims/policeReportReview";
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
-export default function Page({ params }: PageProps) {
-  return <PoliceReportReview claimId={params.id} />;
+export default async function Page({ params }: PageProps) {
+  const { id } = await params;
+  return <PoliceReportReview claimId={id} />;
 }
