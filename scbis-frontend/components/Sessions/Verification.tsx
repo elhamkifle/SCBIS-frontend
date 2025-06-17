@@ -110,7 +110,7 @@ const Verification = () => {
 
         // const formattedPhone = phone.startsWith('+') ? phone : `+${phone}`;
         // console.log(formattedPhone, "here is the formatted phone number")
-        const serverResponse = await fetch('http://localhost:3001/auth/verify-email', {
+        const serverResponse = await fetch('https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/auth/verify-email', {
             method: 'POST',
             body: JSON.stringify({ 
                 identifier: email,
