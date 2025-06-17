@@ -31,7 +31,7 @@ interface AccidentDetailsState {
   visibilityObstructions: string;
   intersectionType: string;
   error: string;
-  sketchFiles: string[];
+  sketchFiles: string;
   addVehicle: () => void;
   removeVehicle: (index: number) => void;
   updateVehicle: (index: number, data: Partial<OtherVehicle>) => void;
@@ -96,17 +96,17 @@ export const useAccidentDetailsStore = create<AccidentDetailsState>()(
         kebele: '',
         sefer: ''
       },
-      sketchFiles: [],      
+      sketchFiles: '',
       error: '',
-      addVehicle: () => 
-        set((state) => ({ 
-          otherVehicles: [...state.otherVehicles, { ...initialOtherVehicle }] 
+      addVehicle: () =>
+        set((state) => ({
+          otherVehicles: [...state.otherVehicles, { ...initialOtherVehicle }]
         })),
-      removeVehicle: (index) => 
-        set((state) => ({ 
-          otherVehicles: state.otherVehicles.filter((_, i) => i !== index) 
+      removeVehicle: (index) =>
+        set((state) => ({
+          otherVehicles: state.otherVehicles.filter((_, i) => i !== index)
         })),
-      updateVehicle: (index, data) => 
+      updateVehicle: (index, data) =>
         set((state) => {
           const updatedVehicles = [...state.otherVehicles];
           updatedVehicles[index] = { ...updatedVehicles[index], ...data };
@@ -121,18 +121,17 @@ export const useAccidentDetailsStore = create<AccidentDetailsState>()(
       setTrafficCondition: (trafficCondition) => set({ trafficCondition }),
       setadditionalDescription: (additionalDescription) => set({ additionalDescription }),
       setTimeOfDay: (timeOfDay) => set({ timeOfDay }),
-      sethornSounded: (hornSounded) => set({hornSounded}), 
+      sethornSounded: (hornSounded) => set({ hornSounded }),
       setHeadlightsOn: (headlightsOn) => set({ headlightsOn }),
-      setwereYouInVehicle: (wereYouInVehicle) => set({wereYouInVehicle}),
+      setwereYouInVehicle: (wereYouInVehicle) => set({ wereYouInVehicle }),
       setVisibilityObstructions: (visibilityObstructions) => set({ visibilityObstructions }),
       setintersectionType: (intersectionType) => set({ intersectionType }),
-      addSketchFile: (url) =>
-        set((state) => ({
-          sketchFiles: [...state.sketchFiles, url]
-        })),
+      addSketchFile: (url: string) =>
+        set(() => ({ sketchFiles: url })),
+
       setError: (error) => set({ error }),
-      clearAllData: () => 
-        set({ 
+      clearAllData: () =>
+        set({
           otherVehicles: [{ ...initialOtherVehicle }],
           positionOnRoad: '',
           roadSurface: '',
@@ -153,9 +152,9 @@ export const useAccidentDetailsStore = create<AccidentDetailsState>()(
             kebele: '',
             sefer: ''
           },
-          sketchFiles: [],
+          sketchFiles: '',
           error: ''
-        })      
+        })
     }),
     {
       name: 'accident-details-storage',

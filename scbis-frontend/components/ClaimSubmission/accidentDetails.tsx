@@ -149,7 +149,13 @@ export default function AccidentDetails() {
         );
 
         if (res.status === 200) {
-          uploadedUrls.push(res.data.secure_url);
+          const sketchFile = res.data.secure_url;
+
+          // Save to Zustand
+          const { addSketchFile } = useAccidentDetailsStore.getState();
+          addSketchFile(sketchFile);
+           const currentSketchFile = useAccidentDetailsStore.getState().sketchFiles;
+    console.log("✅ Stored sketchFile in Zustand:", currentSketchFile);
         } else {
           throw new Error('Upload failed');
         }
@@ -216,7 +222,7 @@ export default function AccidentDetails() {
         <div className="relative w-full">
           <label htmlFor='dateOfAccident' aria-label='dateOfAccident' className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Date of Accident *</label>
           <input
-             id="dateOfAccident"
+            id="dateOfAccident"
             type="date"
             name="dateOfAccident"
             value={dateOfAccident}

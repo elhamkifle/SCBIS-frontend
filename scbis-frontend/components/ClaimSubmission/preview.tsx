@@ -209,7 +209,10 @@ export default function ClaimPreview() {
         thirdPartyDamageDesc,
         injuriesAny,
         injuredPersons: [injuredPersons],
-      }
+      },
+      sketchFiles,
+      vehicleDamageFiles,
+      thirdPartyDamageFiles,
     }
 
     console.log(claimData);
@@ -1229,6 +1232,7 @@ export default function ClaimPreview() {
             <div>
               <strong>Alone in Vehicle:</strong> {aloneInVehicle}
             </div>
+            {/* <div> {sketchFiles}, {vehicleDamageFiles}, {thirdPartyDamageFiles}</div> */}
 
             {aloneInVehicle === 'No I wasn\'t alone' && vehicleOccupants.length > 0 && (
               <div className="col-span-2">
