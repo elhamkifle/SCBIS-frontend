@@ -298,7 +298,7 @@ export default function Dashboard() {
                         <p><span className="text-gray-500">Fix Type:</span> <span className="font-bold">{claim.fixType}</span></p>
                       </div>
                       <button
-                        onClick={() => router.push(`/claimdetails/${claim._id}`)}
+                        onClick={() => router.push(`/claim-details/${claim._id}`)}
                         className="mt-5 w-full text-base text-blue-600 border border-blue-600 rounded py-2 hover:bg-blue-50 font-semibold"
                       >
                         View Details
