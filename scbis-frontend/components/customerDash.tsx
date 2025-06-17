@@ -13,19 +13,19 @@ import { useState } from "react";
 const actionImages: Record<string, string> = {
   "New Policy Purchase": "/purchase.png",
   "Submit a Claim": "/Claim.png",
-  // "Renew Policy": "/Renew.png",
+  "Renew Policy": "/Renew.png",
 };
 
 const actionLabels = [
   "New Policy Purchase",
   "Submit a Claim",
-  // "Renew Policy",
+  "Renew Policy",
 ] as const;
 
 const actionLinks: Record<typeof actionLabels[number], string> = {
   "New Policy Purchase": "/policy-purchase/vehicle-information/vehicle-list",
   "Submit a Claim": "/claim-submission/claim-policy-selection",
-  // "Renew Policy": "/policy-purchase/vehicle-information/vehicle-list",
+  "Renew Policy": "/renew-policy/policy-selection",
 };
 
 export default function Dashboard() {
@@ -90,6 +90,7 @@ export default function Dashboard() {
     };
 
     fetchData();
+    console.log(policies)
   }, [addPolicies, setClaims, user?.userVerified]);
 
 

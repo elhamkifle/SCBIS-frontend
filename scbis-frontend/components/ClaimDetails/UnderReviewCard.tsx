@@ -20,7 +20,6 @@ interface UnderReviewCardProps {
     statusColor: string;
     description: string;
     note: string;
-    onNext: () => void;
     buttonLabel: string;
     claimData?: ClaimData;
 }
@@ -31,7 +30,6 @@ export function UnderReviewCard({
     statusColor,
     description,
     note,
-    onNext,
     buttonLabel,
     claimData,
 }: UnderReviewCardProps) {
@@ -167,11 +165,10 @@ export function UnderReviewCard({
             <p className="text-md mt-8">
                 <span className="font-bold text-blue-700">N.B:</span> {note}
             </p>
-            {onNext && (
+
                 <button className="mt-8 px-4 py-2 bg-blue-600 text-white rounded w-full" onClick={() => router.push("/dashboard")}>
                     Back to Dashboard 
                 </button>
-            )}
         </div>
     );
 } 

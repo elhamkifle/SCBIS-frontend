@@ -53,8 +53,14 @@ export default function ClaimPolicySelection() {
                         },
                     }
                 );
-                console.log('Fetched policies:', response.data);
-                addPolicies(response.data);
+
+                // Filter only ACTIVE policies
+                const activePolicies = response.data.filter(
+                    (policy: any) => policy.status?.value?.toLowerCase() === 'active'
+                );
+
+                console.log('Active policies:', activePolicies);
+                addPolicies(activePolicies);
             } catch (error) {
                 console.error('Error fetching policies:', error);
             }
@@ -62,6 +68,7 @@ export default function ClaimPolicySelection() {
 
         fetchPolicies();
     }, [addPolicies]);
+
 
     return (
         <div className="flex flex-col items-center px-4 mb-10">
@@ -81,60 +88,81 @@ export default function ClaimPolicySelection() {
                 <p className='text-[18px]'>Please select the insurance policy by clicking the card.</p>
             </div>
 
-            <div className="flex justify-center w-full">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-24">
-                    {policies.map((policy) => {
-                        const generalDetails =
-                            policy.privateVehicle?.generalDetails ||
-                            policy.commercialVehicle?.generalDetails;
-
-                        return (
-                            <div
-                                key={policy._id}
-                                className={`bg-white px-16 py-8 rounded-2xl shadow-lg flex flex-col justify-around space-y-4 text-center md:mb-[20px] cursor-pointer ${selectedPolicy === policy._id
-                                        ? 'border-2 border-green-500'
-                                        : 'border border-gray-300'
-                                    }`}
-                                style={{
-                                    boxShadow:
-                                        '0px 10px 20px rgba(0, 123, 255, 0.4), 0px 4px 8px rgba(0, 0, 0, 0.1)',
-                                }}
-                                onClick={() => handleSelect(policy._id)}
-                            >
-                                <p className="text-sm text-gray-400">Policy ID: {policy._id}</p>
-                                <h3 className="text-xl font-semibold">{policy.title}</h3>
-                                <p className="text-md">
-                                    <span className="text-[#3AA4FF] font-bold">Coverage End Date:</span>{' '}
-                                    {policy.coverageEndDate}
-                                </p>
-                                <p className="text-md">
-                                    <span className="text-[#3AA4FF] font-bold">Territory:</span>{' '}
-                                    {policy.territory}
-                                </p>
-
-                                {generalDetails && (
-                                    <>
-                                        <p className="text-md">
-                                            <span className="text-[#3AA4FF] font-bold">Make:</span>{' '}
-                                            {generalDetails.make}
-                                        </p>
-                                        <p className="text-md">
-                                            <span className="text-[#3AA4FF] font-bold">Model:</span>{' '}
-                                            {generalDetails.model}
-                                        </p>
-                                        <p className="text-md">
-                                            <span className="text-[#3AA4FF] font-bold">Plate Number:</span>{' '}
-                                            {generalDetails.plateNumber}
-                                        </p>
-                                    </>
-                                )}
-                            </div>
-                        );
-                    })}
-
-
-                </div>
+<div className="flex justify-center w-full">
+    {policies.length === 0 ? (
+        <div className="flex flex-col items-center mt-10">
+            <p className="text-gray-700 text-lg mb-4 text-center">
+                You currently have no <span className="font-semibold text-blue-600">active insurance policies</span> eligible for claim submission.
+            </p>
+            <div className="flex gap-4">
+                <button
+                    onClick={() => router.push('/dashboard')}
+                    className="bg-gray-300 hover:bg-gray-400 text-black font-medium px-6 py-2 rounded"
+                >
+                    Back to Dashboard
+                </button>
+                <button
+                    onClick={() => router.push('/policy-purchase/vehicle-information/vehicle-list')}
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded"
+                >
+                    Create New Policy
+                </button>
             </div>
+        </div>
+    ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-24">
+            {policies.map((policy) => {
+                const generalDetails =
+                    policy.privateVehicle?.generalDetails ||
+                    policy.commercialVehicle?.generalDetails;
+
+                return (
+                    <div
+                        key={policy._id}
+                        className={`bg-white px-16 py-8 rounded-2xl shadow-lg flex flex-col justify-around space-y-4 text-center md:mb-[20px] cursor-pointer ${selectedPolicy === policy._id
+                                ? 'border-2 border-green-500'
+                                : 'border border-gray-300'
+                            }`}
+                        style={{
+                            boxShadow:
+                                '0px 10px 20px rgba(0, 123, 255, 0.4), 0px 4px 8px rgba(0, 0, 0, 0.1)',
+                        }}
+                        onClick={() => handleSelect(policy._id)}
+                    >
+                        <p className="text-md text-black">Policy ID: {policy.policyId}</p>
+                        <h4 className="text-xl font-semibold">{policy.policyType}</h4>
+                        <p className="text-md">
+                            <span className="text-[#3AA4FF] font-bold">Duration:</span>{' '}
+                            {policy.duration} days
+                        </p>
+                        <p className="text-md">
+                            <span className="text-[#3AA4FF] font-bold">Territory:</span>{' '}
+                            {policy.territory}
+                        </p>
+
+                        {generalDetails && (
+                            <>
+                                <p className="text-md">
+                                    <span className="text-[#3AA4FF] font-bold">Make:</span>{' '}
+                                    {generalDetails.make}
+                                </p>
+                                <p className="text-md">
+                                    <span className="text-[#3AA4FF] font-bold">Model:</span>{' '}
+                                    {generalDetails.model}
+                                </p>
+                                <p className="text-md">
+                                    <span className="text-[#3AA4FF] font-bold">Plate Number:</span>{' '}
+                                    {generalDetails.plateNumber}
+                                </p>
+                            </>
+                        )}
+                    </div>
+                );
+            })}
+        </div>
+    )}
+</div>
+
 
             {error && <p className="text-red-500 mt-4 text-center">{error}</p>}
 
@@ -144,7 +172,7 @@ export default function ClaimPolicySelection() {
                     <div className="fixed inset-0 flex items-center justify-center p-4">
                         <Dialog.Panel className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
                             <Dialog.Title className="text-lg font-bold mb-8">
-                                {selectedPolicyDetails?.title}
+                                {selectedPolicyDetails?.policyType}
                             </Dialog.Title>
                             <div className="mt-4">
                                 <p>Coverage End Date: {selectedPolicyDetails?.coverageEndDate}</p>
