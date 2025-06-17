@@ -267,7 +267,7 @@ export default function VehicleListPage() {
       <div className="flex justify-between w-full max-w-6xl mt-8">
         <button
           onClick={() => router.back()}
-          className="border border-black px-6 py-2 rounded-lg hover:bg-gray-50"
+          className="border border-black px-6 py-2 rounded-lg hover:bg-gray-50 text-black"
         >
           Back
         </button>
