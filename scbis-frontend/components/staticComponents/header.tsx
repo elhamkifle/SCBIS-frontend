@@ -14,7 +14,7 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [filter, setFilter] = useState<"All" | "Unread">("All");
-  const {walletAddress, removeWalletAddress} = useBlockchainStore();
+  const {removeWalletAddress} = useBlockchainStore();
   
 
 
@@ -72,7 +72,7 @@ export default function Header() {
           About Us
         </Link>
        
-        <Link href='/get-policy' className="text-white">Go</Link>
+        {/* <Link href='/get-policy' className="text-white">Go</Link> */}
       </nav>
 
       {/* Bell Icon (Right side on large screens) */}
