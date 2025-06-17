@@ -35,7 +35,7 @@ export default function AboutPage() {
         {
             name: "Haile Adugna",
             role: "Full Stack Developer (Backend heavy)",
-            image: "/images/team/jane.jpg",
+            image: "/haile.jpg",
             email:"haileadugna@gmail.com"
         }
     
