@@ -31,7 +31,7 @@ interface AccidentDetailsState {
   visibilityObstructions: string;
   intersectionType: string;
   error: string;
-  sketchFiles: string;
+  sketchFiles: string[];
   addVehicle: () => void;
   removeVehicle: (index: number) => void;
   updateVehicle: (index: number, data: Partial<OtherVehicle>) => void;
@@ -96,7 +96,7 @@ export const useAccidentDetailsStore = create<AccidentDetailsState>()(
         kebele: '',
         sefer: ''
       },
-      sketchFiles: '',      
+      sketchFiles: [],      
       error: '',
       addVehicle: () => 
         set((state) => ({ 
@@ -126,7 +126,7 @@ export const useAccidentDetailsStore = create<AccidentDetailsState>()(
       setwereYouInVehicle: (wereYouInVehicle) => set({wereYouInVehicle}),
       setVisibilityObstructions: (visibilityObstructions) => set({ visibilityObstructions }),
       setintersectionType: (intersectionType) => set({ intersectionType }),
-      addSketchFile: (url: string) => set(() => ({ sketchFiles: url })),
+      addSketchFile: (url) => set({ sketchFiles: [url] }),
       setError: (error) => set({ error }),
       clearAllData: () => 
         set({ 
@@ -150,7 +150,7 @@ export const useAccidentDetailsStore = create<AccidentDetailsState>()(
             kebele: '',
             sefer: ''
           },
-          sketchFiles: '',
+          sketchFiles: [],
           error: ''
         })      
     }),

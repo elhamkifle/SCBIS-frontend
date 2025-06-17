@@ -1,4 +1,3 @@
-import { string } from 'zod';
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
@@ -12,8 +11,8 @@ interface DamageDetailsState {
   thirdPartyDamageDesc: string;
   injuriesAny: boolean;
   injuredPersons: InjuredPerson;
-  vehicleDamageFiles: string;
-  thirdPartyDamageFiles: string;
+  vehicleDamageFiles: string[]; 
+  thirdPartyDamageFiles: string[]; 
 
   error: string;
 
@@ -22,12 +21,10 @@ interface DamageDetailsState {
   setinjuriesAny: (status: boolean) => void;
   setInjuredPersons: (person: Partial<InjuredPerson>) => void;
 
-  addVehicleDamageFile: (url: string) => void;
-  removeVehicleDamageFile: () => void;
-
-
-  addThirdPartyDamageFile: (url: string) => void;
-  removeThirdPartyDamageFile: () => void;
+  addVehicleDamageFile: (url: string) => void; 
+  removeVehicleDamageFile: (index: number) => void; 
+  addThirdPartyDamageFile: (url: string) => void; 
+  removeThirdPartyDamageFile: (index: number) => void; 
 
   setError: (error: string) => void;
   clearAllData: () => void;
@@ -40,8 +37,8 @@ export const useDamageDetailsStore = create<DamageDetailsState>()(
       thirdPartyDamageDesc: '',
       injuriesAny: false,
       injuredPersons: { name: '', address: '' },
-      vehicleDamageFiles: '',
-      thirdPartyDamageFiles: '',
+      vehicleDamageFiles: [],
+      thirdPartyDamageFiles: [],
       error: '',
 
       setvehicleDamageDesc: (desc) => set({ vehicleDamageDesc: desc }),
@@ -52,19 +49,21 @@ export const useDamageDetailsStore = create<DamageDetailsState>()(
           injuredPersons: { ...state.injuredPersons, ...person },
         })),
 
-      addVehicleDamageFile: (url) =>
-        set({ vehicleDamageFiles: url }),
+      addVehicleDamageFile: (url) => set({ vehicleDamageFiles: [url] }),
+      removeVehicleDamageFile: (index) =>
+        set((state) => {
+          const updated = [...state.vehicleDamageFiles];
+          updated.splice(index, 1);
+          return { vehicleDamageFiles: updated };
+        }),
 
-      removeVehicleDamageFile: () =>
-        set({ vehicleDamageFiles: '' }),
-
-
-      addThirdPartyDamageFile: (url) =>
-        set({ thirdPartyDamageFiles: url }),
-
-      removeThirdPartyDamageFile: () =>
-        set({ thirdPartyDamageFiles: '' }), // just clears the one string
-
+      addThirdPartyDamageFile: (url) => set({ thirdPartyDamageFiles: [url] }),
+      removeThirdPartyDamageFile: (index) =>
+        set((state) => {
+          const updated = [...state.thirdPartyDamageFiles];
+          updated.splice(index, 1);
+          return { thirdPartyDamageFiles: updated };
+        }),
 
       setError: (error) => set({ error }),
 
@@ -74,8 +73,8 @@ export const useDamageDetailsStore = create<DamageDetailsState>()(
           thirdPartyDamageDesc: '',
           injuriesAny: false,
           injuredPersons: { name: '', address: '' },
-          vehicleDamageFiles: '',
-          thirdPartyDamageFiles: '',
+          vehicleDamageFiles: [],
+          thirdPartyDamageFiles: [],
           error: '',
         }),
     }),

@@ -39,12 +39,12 @@ interface Claim {
     policeReportRequestLetter: string;
     damageImages: string[];
     evidenceDocuments: string[];
-    sketchFiles: string;
-    vehicleDamageFiles: string;
+    sketchFiles: string[];
+    vehicleDamageFiles: string[];
     thirdPartyDamageFiles: string[];
-    otherVehicles: any[]; 
-    vehicleOccupants: any[]; 
-    independentWitnesses: any[]; 
+    otherVehicles: any[]; // You might want to define a proper type
+    vehicleOccupants: any[]; // You might want to define a proper type
+    independentWitnesses: any[]; // You might want to define a proper type
     createdAt: string;
     updatedAt: string;
     dateSubmitted: string;
