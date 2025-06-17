@@ -9,8 +9,6 @@ import { useVehicleInfoStore } from '@/store/policyPurchase/vehicleDetails';
 import { useDriverInformationStore } from '@/store/policyPurchase/driverInformation';
 import { useVehicleSelectionStore } from '@/store/vehicleSelection/vehicleSelectionStore';
 import { policySelectionService, buildPolicySelectionPayload } from '@/utils/policyApi';
-import { useVehicleSelectionStore } from '@/store/vehicleSelection/vehicleSelectionStore';
-import { policySelectionService, buildPolicySelectionPayload } from '@/utils/policyApi';
 
 export default function PolicyPreview() {
   const router = useRouter();

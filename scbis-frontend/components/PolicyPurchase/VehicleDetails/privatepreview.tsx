@@ -11,6 +11,7 @@ import { useVehicleSelectionStore } from '@/store/vehicleSelection/vehicleSelect
 import { useVehicleDocumentsStore } from '@/store/vehicleDetails/vehicleDocuments';
 import { vehiclePersistenceService } from '@/utils/vehicleApi';
 import { useUserStore } from '@/store/authStore/useUserStore';
+import { baseAPI } from '@/utils/axiosInstance';
 // import { set } from 'zod';
 
 // type VehicleDetails = {
