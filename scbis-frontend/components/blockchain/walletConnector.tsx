@@ -3,8 +3,6 @@ import { useEffect, useState } from "react";
 import { useWallet } from "@/components/blockchain/hooks/useWallet";
 // import { BlockchainStore, useBlockchainStore } from "@/store/blockchain/useBlockchainStore";
 
-import Cookies from "js-cookie";
-
 export default function WalletConnector() {
   const { connectWallet } = useWallet();
   const [walletAddress] = useState<string | null>(null); 
