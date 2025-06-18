@@ -106,14 +106,12 @@ function AllPoliciesPage() {
 
         // Listen for new purchase requests
         const unsubscribeNew = socket.on('new-purchase-request', (data) => {
-          console.log('New purchase request:', data);
           // Refresh the list to include new request
           fetchPolicies(pagination.page, search, filter);
         });
 
         // Listen for status changes
         const unsubscribeStatusChange = socket.on('purchase-request-status-changed', (data) => {
-          console.log('Status changed:', data);
           // Update the specific request in the list
           setPolicies(prev => prev.map(policy => 
             policy.id === data.data.id 
@@ -124,7 +122,6 @@ function AllPoliciesPage() {
 
         // Listen for approvals
         const unsubscribeApproved = socket.on('purchase-request-approved', (data) => {
-          console.log('Request approved:', data);
           setPolicies(prev => prev.map(policy => 
             policy.id === data.data.id 
               ? { ...policy, status: 'approved' }
@@ -134,7 +131,6 @@ function AllPoliciesPage() {
 
         // Listen for rejections
         const unsubscribeRejected = socket.on('purchase-request-rejected', (data) => {
-          console.log('Request rejected:', data);
           setPolicies(prev => prev.map(policy => 
             policy.id === data.data.id 
               ? { ...policy, status: 'rejected' }
@@ -144,7 +140,6 @@ function AllPoliciesPage() {
 
         // Listen for stats updates
         const unsubscribeStats = socket.on('purchase-requests-stats-updated', (data) => {
-          console.log('Stats updated:', data);
           setStats(data.data);
         });
 
@@ -253,10 +248,13 @@ function AllPoliciesPage() {
               onChange={(e) => setFilter(e.target.value as 'pending' | 'approved' | 'rejected' | 'all')}
               disabled={loading}
             >
-              <option value="all">All Statuses</option>
+              <option value="">All Statuses</option>
               <option value="pending">Pending</option>
               <option value="approved">Approved</option>
               <option value="rejected">Rejected</option>
+              <option value="documentReuploadRequest">documentReuploadRequest</option>
+              <option value="expired">Expired</option>
+              <option value="premiumDecided">PremiumDecided</option>
             </select>
           </div>
         </div>
@@ -304,7 +302,7 @@ function AllPoliciesPage() {
             <Card key={policy.id} className="hover:shadow-md transition-all duration-300">
               <CardContent className="p-4 grid grid-cols-12 gap-4 items-center">
                 <div className="col-span-3">
-                  <h2 className="font-medium">{policy.user?.name || "Unknown User"}</h2>
+                  <h2 className="font-medium">{policy.user?.fullname || "Unknown User"}</h2>
                   <p className="text-sm text-gray-500">{policy.user?.email || "No email"}</p>
                 </div>
                 <div className="col-span-2 text-sm font-mono">{policy.id}</div>

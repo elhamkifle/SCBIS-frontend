@@ -8,7 +8,6 @@ import { useRef, useState } from "react";
 export default function ProfileSettings({ formData, updateForm, handleImageChange, imagePreview }: any) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  console.log('chekckd \n', formData);
   return (
     <Card>
       <CardContent className="p-6 space-y-6">

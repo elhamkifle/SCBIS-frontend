@@ -42,7 +42,6 @@ function IncomingRequestsPage() {
 
         // Listen for new purchase requests
         const unsubscribeNew = socket.on('new-purchase-request', (data) => {
-          console.log('New purchase request:', data);
           // Add new request to the top of the list with proper type conversion
           const newRequest: PurchaseRequest = {
             ...data.data,
@@ -53,7 +52,6 @@ function IncomingRequestsPage() {
 
         // Listen for status changes
         const unsubscribeStatusChange = socket.on('purchase-request-status-changed', (data) => {
-          console.log('Status changed:', data);
           // Update the request in the list
           setRequests(prev => prev.map(req => 
             req.id === data.data.id 
@@ -64,7 +62,6 @@ function IncomingRequestsPage() {
 
         // Listen for approvals
         const unsubscribeApproved = socket.on('purchase-request-approved', (data) => {
-          console.log('Request approved:', data);
           // Update the request status
           setRequests(prev => prev.map(req => 
             req.id === data.data.id 
@@ -75,7 +72,6 @@ function IncomingRequestsPage() {
 
         // Listen for rejections
         const unsubscribeRejected = socket.on('purchase-request-rejected', (data) => {
-          console.log('Request rejected:', data);
           // Update the request status
           setRequests(prev => prev.map(req => 
             req.id === data.data.id 
@@ -86,8 +82,13 @@ function IncomingRequestsPage() {
 
         // Listen for stats updates
         const unsubscribeStats = socket.on('purchase-requests-stats-updated', (data) => {
-          console.log('Stats updated:', data);
           setStats(data.data);
+        });
+
+        // Listen for reupload requests
+        const unsubscribeReuploadRequested = socket.on('purchase-request-reupload-requested', (data) => {
+          // This is a global notification - no need to update the request list
+          // The notification will be handled by PurchaseRequestNotifications component
         });
 
         // Return cleanup function
@@ -97,6 +98,7 @@ function IncomingRequestsPage() {
           unsubscribeApproved();
           unsubscribeRejected();
           unsubscribeStats();
+          unsubscribeReuploadRequested();
           socket.disconnect();
         };
       } catch (error) {
@@ -180,8 +182,11 @@ function IncomingRequestsPage() {
             <Card key={req.id} className="transition-all duration-300 hover:shadow-md">
               <CardContent className="p-4 flex items-center justify-between">
                 <div>
-                  <h2 className="font-medium text-lg">{req.user?.name || "Unknown User"}</h2>
+                  <h2 className="font-medium text-lg">{req.user?.fullname || "Unknown User"}</h2>
                   <p className="text-sm text-gray-500">Policy: {req.policyType || "N/A"}</p>
+                  {req.policyId && (
+                    <p className="text-sm text-gray-600">Policy ID: {req.policyId}</p>
+                  )}
                   <p className="text-xs text-gray-400">
                     Submitted on: {req.submittedOn ? new Date(req.submittedOn).toLocaleDateString() : "N/A"}
                   </p>

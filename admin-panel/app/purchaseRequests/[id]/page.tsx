@@ -45,9 +45,19 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const [requestData, setRequestData] = useState<PurchaseRequest | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [socketConnected, setSocketConnected] = useState(false);
 
   const socket = usePurchaseRequestsSocket();
 
+  // Helper function to get status value
+  const getStatusValue = (status: string | { value: string }): string => {
+    if (typeof status === 'string') {
+      return status;
+    }
+    return status.value || 'pending';
+  };
+
+  // Fetch request details - separate from socket logic
   useEffect(() => {
     const fetchRequestDetails = async () => {
       try {
@@ -66,16 +76,22 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
     if (id) {
       fetchRequestDetails();
     }
+  }, [id]); // Only depend on id
 
-    // Set up Socket.IO listeners for real-time updates
+  // Socket connection setup - separate useEffect
+  useEffect(() => {
+    if (!id) return;
+
+    let cleanupFunctions: (() => void)[] = [];
+
     const setupSocketListeners = async () => {
       try {
         await socket.connect();
+        setSocketConnected(true);
 
         // Listen for status changes for this specific request
         const unsubscribeStatusChange = socket.on('purchase-request-status-changed', (data) => {
           if (data.data.id === id) {
-            console.log('Status changed for current request:', data);
             setRequestData(prev => prev ? { ...prev, status: data.data.newStatus } : null);
 
             toast({
@@ -89,7 +105,6 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
         // Listen for approvals
         const unsubscribeApproved = socket.on('purchase-request-approved', (data) => {
           if (data.data.id === id) {
-            console.log('Current request approved:', data);
             setRequestData(prev => prev ? { ...prev, status: 'approved' } : null);
 
             toast({
@@ -102,7 +117,6 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
         // Listen for rejections
         const unsubscribeRejected = socket.on('purchase-request-rejected', (data) => {
           if (data.data.id === id) {
-            console.log('Current request rejected:', data);
             setRequestData(prev => prev ? { ...prev, status: 'rejected' } : null);
 
             toast({
@@ -113,19 +127,36 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
           }
         });
 
-        // Return cleanup function
-        return () => {
-          unsubscribeStatusChange();
-          unsubscribeApproved();
-          unsubscribeRejected();
-        };
+        // Listen for reupload requests
+        const unsubscribeReuploadRequested = socket.on('purchase-request-reupload-requested', (data) => {
+          
+          if (data.data.id === id) {
+
+            toast({
+              title: "File Reupload Requested",
+              description: `${data.message} - Files: ${data.data.files}${data.data.reason ? ` (${data.data.reason})` : ''}`,
+            });
+          } else {
+            
+          }
+        });
+
+        // Store cleanup functions
+        cleanupFunctions = [unsubscribeStatusChange, unsubscribeApproved, unsubscribeRejected, unsubscribeReuploadRequested];
+        
       } catch (error) {
-        console.error('Failed to setup Socket.IO listeners:', error);
+        console.error('❌ Failed to setup Socket.IO listeners:', error);
+        setSocketConnected(false);
       }
     };
 
     setupSocketListeners();
-  }, [id]);
+
+    // Cleanup function
+    return () => {
+      cleanupFunctions.forEach(cleanup => cleanup());
+    };
+  }, [id, socket, toast]); // Include socket and toast in dependencies but they shouldn't change often
 
   const handleReject = async () => {
     if (!requestData) return;
@@ -163,15 +194,28 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
 
     setIsRequestingReupload(true);
     try {
-      // Here you would call your API to request reupload
-      // For now, we'll just simulate it
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Map selected file to array of files for the API
+      let filesToReupload: string[] = [];
+      if (selectedFile === "Vehicle Libre") {
+        filesToReupload = ["vehicleLibre"];
+      } else if (selectedFile === "Driver&rsquo;s License") {
+        filesToReupload = ["driversLicense"];
+      } else if (selectedFile === "Both Vehicle Libre and License") {
+        filesToReupload = ["vehicleLibre", "driversLicense"];
+      }
+
+      // Call the actual API endpoint
+      await purchaseRequestsApi.requestReupload(
+        requestData._id || requestData.id, 
+        filesToReupload,
+        selectedFile // Send the exact selected text as reason
+      );
 
       toast({
         title: "Reupload Requested",
         description: selectedFile === "Both Vehicle Libre and License"
-          ? `Requested reupload of both Vehicle Libre and Driver's License for request #${requestData.id}`
-          : `Requested reupload of ${selectedFile} for request #${requestData.id}`,
+          ? `Requested reupload of both Vehicle Libre and Driver&rsquo;s License for request #${requestData.policyId || requestData.id}`
+          : `Requested reupload of ${selectedFile} for request #${requestData.policyId || requestData.id}`,
       });
 
       setIsRequestingReupload(false);
@@ -179,10 +223,10 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
       setSelectedFile("");
       setIsSuccess(true);
     } catch (err) {
-      console.error("Failed to request reupload:", err);
+      console.error("❌ Failed to request reupload:", err);
       toast({
         title: "Error",
-        description: "Failed to request document reupload. Please try again.",
+        description: err instanceof Error ? err.message : "Failed to request document reupload. Please try again.",
         variant: "destructive",
       });
       setIsRequestingReupload(false);
@@ -254,7 +298,15 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
 
   return (
     <div className="p-8 space-y-8 bg-gray-50 min-h-screen">
-      <h1 className="text-3xl font-bold text-gray-800">Car Insurance Request Details</h1>
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold text-gray-800">Car Insurance Request Details</h1>
+        <div className="flex items-center space-x-2">
+          <div className={`w-3 h-3 rounded-full ${socketConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
+          <span className="text-sm text-gray-600">
+            Socket: {socketConnected ? 'Connected' : 'Disconnected'}
+          </span>
+        </div>
+      </div>
       <p>Request ID: {requestData.id}</p>
 
       {/* Policy Info */}
@@ -267,12 +319,12 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
             <p><strong>Coverage Area:</strong> {requestData.coverageArea || "N/A"}</p>
             <p><strong>Premium:</strong> {requestData.premium ? `${requestData.premium.toLocaleString()} Birr` : "N/A"}</p>
             <p><strong>Status:</strong>
-              <span className={`ml-2 px-2 py-1 rounded-full text-xs font-semibold ${requestData.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                requestData.status === 'approved' ? 'bg-green-100 text-green-700' :
-                  requestData.status === 'canceled' ? 'bg-red-100 text-red-700' :
+              <span className={`ml-2 px-2 py-1 rounded-full text-xs font-semibold ${getStatusValue(requestData.status) === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                getStatusValue(requestData.status) === 'approved' ? 'bg-green-100 text-green-700' :
+                  getStatusValue(requestData.status) === 'canceled' ? 'bg-red-100 text-red-700' :
                     'bg-gray-100 text-gray-700'
                 }`}>
-                {requestData.status?.charAt(0).toUpperCase() + requestData.status?.slice(1) || "Unknown"}
+                {getStatusValue(requestData.status)?.charAt(0).toUpperCase() + getStatusValue(requestData.status)?.slice(1) || "Unknown"}
               </span>
             </p>
             <p><strong>Submitted On:</strong> {requestData.submittedOn ? new Date(requestData.submittedOn).toLocaleDateString() : "N/A"}</p>
@@ -285,54 +337,64 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
         <CardContent className="p-6 space-y-4">
           <div className="bg-purple-50 p-2 rounded-md font-semibold text-purple-800">Personal Information</div>
           <div className="grid md:grid-cols-2 gap-4 text-gray-700">
-            <p><strong>Full Name:</strong> {requestData.user?.name || "N/A"}</p>
-            <p><strong>Email:</strong> {requestData.user?.email || "N/A"}</p>
-            <p><strong>Phone Number:</strong> {requestData.user?.phoneNumber || "N/A"}</p>
-            <p><strong>User ID:</strong> {requestData.user?.id || "N/A"}</p>
+            <p><strong>Full Name:</strong> {requestData.user?.fullname || "Unknown User"}</p>
+            <p><strong>Email:</strong> {requestData.user?.email || "Not provided"}</p>
+            <p><strong>Phone Number:</strong> {requestData.user?.phoneNumber || "Not provided"}</p>
+            <p><strong>User ID:</strong> {requestData.userId || requestData.user?.id || "N/A"}</p>
           </div>
 
           <div className="mt-4">
             <h3 className="font-semibold mb-2">Identity Documents</h3>
-            {requestData.documents && requestData.documents.length > 0 ? (
+            {requestData.user?.idDocumentUrls && requestData.user.idDocumentUrls.length > 0 ? (
               <div className="grid grid-cols-2 gap-4">
-                {requestData.documents.map((doc, index) => (
+                {requestData.user.idDocumentUrls.map((url: string, index: number) => (
                   <div
                     key={index}
                     className="border rounded-lg p-2 cursor-pointer hover:shadow-md transition-shadow"
-                    onClick={() => setSelectedImage(doc.url || "/docs/placeholder.png")}
+                    onClick={() => setSelectedImage(url)}
                   >
-                    <div className="relative h-48 w-full">
+                    <div className="relative h-32 w-full">
                       <Image
-                        src={doc.url || "/docs/placeholder.png"}
-                        alt={doc.name || `Document ${index + 1}`}
+                        src={url}
+                        alt={`Identity Document ${index + 1}`}
                         fill
                         className="object-contain"
+                        onError={(e) => {
+                          e.currentTarget.src = '/docs/id.png';
+                        }}
                       />
                     </div>
-                    <p className="text-center mt-2">{doc.name || `Document ${index + 1}`}</p>
+                    <p className="text-center mt-2 text-sm">Identity Document {index + 1}</p>
                   </div>
                 ))}
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-4">
-                {/* Placeholder documents */}
-                {Array.from({ length: 2 }).map((_, index) => (
-                  <div
-                    key={index}
-                    className="border rounded-lg p-2 cursor-pointer hover:shadow-md transition-shadow"
-                    onClick={() => setSelectedImage("/docs/placeholder.png")}
-                  >
-                    <div className="relative h-48 w-full">
-                      <Image
-                        src="/docs/placeholder.png"
-                        alt={`Document Placeholder ${index + 1}`}
-                        fill
-                        className="object-contain"
-                      />
+                {/* Default document placeholders */}
+                <div className="border rounded-lg p-2">
+                  <div className="relative h-32 w-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center rounded">
+                    <div className="text-center text-gray-400">
+                      <svg width="24" height="24" viewBox="0 0 48 48" fill="none" className="mx-auto mb-1">
+                        <path d="M12 16L16 12H32L36 16V36H12V16Z" stroke="currentColor" strokeWidth="2" fill="none"/>
+                        <path d="M20 24L24 28L32 20" stroke="currentColor" strokeWidth="2" fill="none"/>
+                      </svg>
+                      <p className="text-xs">ID Document</p>
                     </div>
-                    <p className="text-center mt-2">Document {index + 1}</p>
                   </div>
-                ))}
+                  <p className="text-center mt-2 text-sm text-gray-500">Identity Document</p>
+                </div>
+                <div className="border rounded-lg p-2">
+                  <div className="relative h-32 w-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center rounded">
+                    <div className="text-center text-gray-400">
+                      <svg width="24" height="24" viewBox="0 0 48 48" fill="none" className="mx-auto mb-1">
+                        <path d="M12 16L16 12H32L36 16V36H12V16Z" stroke="currentColor" strokeWidth="2" fill="none"/>
+                        <path d="M20 24L24 28L32 20" stroke="currentColor" strokeWidth="2" fill="none"/>
+                      </svg>
+                      <p className="text-xs">Additional Doc</p>
+                    </div>
+                  </div>
+                  <p className="text-center mt-2 text-sm text-gray-500">Additional Document</p>
+                </div>
               </div>
             )}
           </div>
@@ -340,67 +402,115 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
       </Card>
 
       {/* Vehicle Info */}
-      {requestData.vehicle ? (
+      {requestData.vehicle && (
         <Card>
           <CardContent className="p-6 space-y-4">
             <div className="bg-green-50 p-2 rounded-md font-semibold text-green-800">Vehicle Details</div>
             <div className="grid md:grid-cols-2 gap-4 text-gray-700">
-              <p><strong>Vehicle Type:</strong> {requestData.vehicle.type || "N/A"}</p>
-              <p><strong>Category:</strong> {requestData.vehicle.details?.vehicleCategory || "N/A"}</p>
-              <p><strong>Make:</strong> {requestData.vehicle.details?.generalDetails?.make || "N/A"}</p>
-              <p><strong>Model:</strong> {requestData.vehicle.details?.generalDetails?.model || "N/A"}</p>
-              <p><strong>Engine Capacity:</strong> {requestData.vehicle.details?.generalDetails?.engineCapacity ? `${requestData.vehicle.details.generalDetails.engineCapacity} CC` : "N/A"}</p>
-              <p><strong>Plate Number:</strong> {requestData.vehicle.details?.generalDetails?.plateNumber || "N/A"}</p>
-              <p><strong>Body Type:</strong> {requestData.vehicle.details?.generalDetails?.bodyType || "N/A"}</p>
-              <p><strong>Engine Number:</strong> {requestData.vehicle.details?.generalDetails?.engineNumber || "N/A"}</p>
-              <p><strong>Purchased Value:</strong> {requestData.vehicle.details?.ownershipUsage?.purchasedValue ? `${requestData.vehicle.details.ownershipUsage.purchasedValue.toLocaleString()} Birr` : "N/A"}</p>
-              <p><strong>Duty Free:</strong> {requestData.vehicle.details?.ownershipUsage?.dutyFree ? "Yes" : "No"}</p>
-              <p><strong>Usage Type:</strong> {requestData.vehicle.details?.usageType?.join(", ") || "N/A"}</p>
+              <p><strong>Vehicle Type:</strong> {requestData.vehicle.vehicleType || "N/A"}</p>
+              <p><strong>Category:</strong> {requestData.vehicle.privateVehicle?.vehicleCategory || "N/A"}</p>
+              <p><strong>Make:</strong> {requestData.vehicle.privateVehicle?.generalDetails?.make || "N/A"}</p>
+              <p><strong>Model:</strong> {requestData.vehicle.privateVehicle?.generalDetails?.model || "N/A"}</p>
+              <p><strong>Manufacturing Year:</strong> {requestData.vehicle.privateVehicle?.generalDetails?.manufacturingYear || "N/A"}</p>
+              <p><strong>Engine Capacity:</strong> {requestData.vehicle.privateVehicle?.generalDetails?.engineCapacity ? `${requestData.vehicle.privateVehicle.generalDetails.engineCapacity} CC` : "N/A"}</p>
+              <p><strong>Plate Number:</strong> {requestData.vehicle.privateVehicle?.generalDetails?.plateNumber || "N/A"}</p>
+              <p><strong>Chassis Number:</strong> {requestData.vehicle.privateVehicle?.generalDetails?.chassisNumber || "N/A"}</p>
+              <p><strong>Body Type:</strong> {requestData.vehicle.privateVehicle?.generalDetails?.bodyType || "N/A"}</p>
+              <p><strong>Engine Number:</strong> {requestData.vehicle.privateVehicle?.generalDetails?.engineNumber || "N/A"}</p>
+              <p><strong>Purchased Value:</strong> {requestData.vehicle.privateVehicle?.ownershipUsage?.purchasedValue ? `${requestData.vehicle.privateVehicle.ownershipUsage.purchasedValue.toLocaleString()} Birr` : "N/A"}</p>
+              <p><strong>Duty Free:</strong> {requestData.vehicle.privateVehicle?.ownershipUsage?.dutyFree ? "Yes" : "No"}</p>
+              <p><strong>Usage Type:</strong> {requestData.vehicle.privateVehicle?.usageType?.join(", ") || "N/A"}</p>
             </div>
 
             <div className="mt-4">
               <h3 className="font-semibold mb-2">Vehicle Documents</h3>
               <div className="grid grid-cols-2 gap-4">
-                {/* Placeholder vehicle documents */}
-                {Array.from({ length: 2 }).map((_, index) => (
-                  <div
-                    key={index}
-                    className="border rounded-lg p-2 cursor-pointer hover:shadow-md transition-shadow"
-                    onClick={() => setSelectedImage("/docs/placeholder.png")}
-                  >
-                    <div className="relative h-48 w-full">
+                {/* Driver's License */}
+                <div
+                  className="border rounded-lg p-2 cursor-pointer hover:shadow-md transition-shadow"
+                  onClick={() => setSelectedImage(
+                    requestData.vehicle?.privateVehicle?.documents?.driversLicense || null
+                  )}
+                >
+                  <div className="relative h-32 w-full">
+                    {requestData.vehicle?.privateVehicle?.documents?.driversLicense ? (
                       <Image
-                        src="/docs/placeholder.png"
-                        alt={`Vehicle Document ${index + 1}`}
+                        src={requestData.vehicle.privateVehicle.documents.driversLicense}
+                        alt="Driver License"
                         fill
                         className="object-contain"
+                        onError={(e) => {
+                          e.currentTarget.src = '/docs/id.png';
+                        }}
                       />
-                    </div>
-                    <p className="text-center mt-2">{index === 0 ? "Vehicle Libre" : "Registration"}</p>
+                    ) : (
+                      <div className="w-full h-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center rounded">
+                        <div className="text-center text-gray-400">
+                          <svg width="24" height="24" viewBox="0 0 48 48" fill="none" className="mx-auto mb-1">
+                            <path d="M12 16L16 12H32L36 16V36H12V16Z" stroke="currentColor" strokeWidth="2" fill="none"/>
+                            <path d="M20 24L24 28L32 20" stroke="currentColor" strokeWidth="2" fill="none"/>
+                          </svg>
+                          <p className="text-xs">No Image</p>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                ))}
+                  <p className="text-center mt-2 text-sm">Driver License</p>
+                  {!requestData.vehicle?.privateVehicle?.documents?.driversLicense && (
+                    <p className="text-center text-xs text-gray-500">No image uploaded</p>
+                  )}
+                </div>
+
+                {/* Vehicle Libre */}
+                <div
+                  className="border rounded-lg p-2 cursor-pointer hover:shadow-md transition-shadow"
+                  onClick={() => setSelectedImage(
+                    requestData.vehicle?.privateVehicle?.documents?.vehicleLibre || null
+                  )}
+                >
+                  <div className="relative h-32 w-full">
+                    {requestData.vehicle?.privateVehicle?.documents?.vehicleLibre ? (
+                      <Image
+                        src={requestData.vehicle.privateVehicle.documents.vehicleLibre}
+                        alt="Vehicle Libre"
+                        fill
+                        className="object-contain"
+                        onError={(e) => {
+                          e.currentTarget.src = '/docs/libre.png';
+                        }}
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center rounded">
+                        <div className="text-center text-gray-400">
+                          <svg width="24" height="24" viewBox="0 0 48 48" fill="none" className="mx-auto mb-1">
+                            <path d="M12 16L16 12H32L36 16V36H12V16Z" stroke="currentColor" strokeWidth="2" fill="none"/>
+                            <path d="M20 24L24 28L32 20" stroke="currentColor" strokeWidth="2" fill="none"/>
+                          </svg>
+                          <p className="text-xs">No Image</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-center mt-2 text-sm">Vehicle Libre</p>
+                  {!requestData.vehicle?.privateVehicle?.documents?.vehicleLibre && (
+                    <p className="text-center text-xs text-gray-500">No image uploaded</p>
+                  )}
+                </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      ) : (
-        <Card>
-          <CardContent className="p-6">
-            <div className="bg-green-50 p-2 rounded-md font-semibold text-green-800">Vehicle Details</div>
-            <p className="mt-4 text-gray-500">No vehicle information available for this request.</p>
           </CardContent>
         </Card>
       )}
 
       {/* Ownership & Usage */}
-      {requestData.vehicle?.details?.ownershipUsage && (
+      {requestData.vehicle?.privateVehicle?.ownershipUsage && (
         <Card>
           <CardContent className="p-6 space-y-4">
             <div className="bg-yellow-50 p-2 rounded-md font-semibold text-yellow-800">Ownership & Usage</div>
             <div className="grid md:grid-cols-2 gap-4 text-gray-700">
-              <p><strong>Owner Type:</strong> {requestData.vehicle.details.ownershipUsage.ownerType || "N/A"}</p>
-              <p><strong>Driver Type:</strong> {requestData.vehicle.details.ownershipUsage.driverType || "N/A"}</p>
-              <p><strong>Seating Capacity:</strong> {requestData.vehicle.details.ownershipUsage.seatingCapacity || "N/A"}</p>
+              <p><strong>Owner Type:</strong> {requestData.vehicle.privateVehicle.ownershipUsage.ownerType || "N/A"}</p>
+              <p><strong>Driver Type:</strong> {requestData.vehicle.privateVehicle.ownershipUsage.driverType || "N/A"}</p>
+              <p><strong>Seating Capacity:</strong> {requestData.vehicle.privateVehicle.ownershipUsage.seatingCapacity || "N/A"}</p>
             </div>
           </CardContent>
         </Card>
@@ -425,19 +535,19 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
         <Button
           variant="destructive"
           onClick={() => setRejectOpen(true)}
-          disabled={requestData.status !== 'pending'}
+          disabled={getStatusValue(requestData.status) !== 'pending'}
         >
           Reject Request
         </Button>
         <Button
           className="bg-yellow-500 hover:bg-yellow-600 text-white"
           onClick={() => setReuploadOpen(true)}
-          disabled={requestData.status !== 'pending'}
+          disabled={getStatusValue(requestData.status) !== 'pending'}
         >
           Request File Reuploads
         </Button>
         <Link href={`/purchaseRequests/${requestData.id}/premium-calculation`}>
-          <Button disabled={requestData.status !== 'pending'}>
+          <Button disabled={getStatusValue(requestData.status) !== 'pending'}>
             Approve & Calculate Premium
           </Button>
         </Link>
@@ -517,7 +627,7 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="Vehicle Libre">Vehicle Libre</SelectItem>
-                <SelectItem value="Driver's License">Driver's License</SelectItem>
+                <SelectItem value="Driver&rsquo;s License">Driver&rsquo;s License</SelectItem>
                 <SelectItem value="Both Vehicle Libre and License">Both Vehicle Libre and License</SelectItem>
               </SelectContent>
             </Select>

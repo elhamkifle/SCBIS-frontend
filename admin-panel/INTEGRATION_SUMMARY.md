@@ -6,7 +6,7 @@ Successfully integrated the frontend admin panel with the backend API endpoints.
 ## API Service Architecture
 
 ### Centralized API Service (`app/services/api.ts`)
-- **Base URL**: `http://localhost:3001`
+- **Base URL**: `https://scbis-git-dev-hailes-projects-a12464a1.vercel.app`
 - **Authentication**: Bearer token authentication using `accessToken` from localStorage
 - **Error Handling**: Centralized error handling with proper error messages
 - **TypeScript**: Fully typed interfaces for all API responses
