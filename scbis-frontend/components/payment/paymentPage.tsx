@@ -96,7 +96,7 @@ export default function PaymentPage() {
         setPolicies(policyData);
         if (policiesRes.status==200) {
           
-          PolicyIssue(policyData?.policyId, policyData?.policyType, policyData?.coverageArea,policyData?.duration,policyData?.premium,policiesRes?.data.userId)
+          PolicyIssue(policyData?.policyId, policyData?.policyType, policyData?.coverageArea,policyData?.duration,policyData?.premium)
         }
         console.log('Policies fetched:', policiesRes.data);
         
@@ -117,7 +117,7 @@ export default function PaymentPage() {
 
           const blockchainData = {
               user: walletAddress,
-              policyId:"POL-644448",
+              policyId,
               policyType,
               issuerName: user?.fullname,
               plateNumber: policyId.slice(2),
