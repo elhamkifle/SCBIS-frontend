@@ -179,8 +179,8 @@ export default function PaymentPage() {
         "email":user?.email,
         "first_name":`${user?.fullname.split(' ')[0]}`,
         "last_name":`${user?.fullname.split(' ')[1] || ''}`,
-        "callback_url":"https://scbis-frontend-4p0p446l9-elham-mulugetas-projects.vercel.app/",
-        "return_url":`https://2803-196-188-252-125.ngrok-free.app/payment/${pID}?tx_ref=true`
+        "callback_url":"https://scbis-frontend.vercel.app/",
+        "return_url":`https://scbis-frontend.vercel.app/payment/${pID}?tx_ref=true`
     })
 
     console.log(serverResponse)
