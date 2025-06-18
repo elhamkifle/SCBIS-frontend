@@ -79,10 +79,10 @@ function UsersPage() {
       // Map the backend response to match frontend expectations
       const mappedUsers = response.users.map(user => {
         const mappedUser = {
-          ...user,
-          name: user.name || user.fullname || 'Unknown',
-          phone: user.phone || user.phoneNumber || 'N/A',
-          joined: user.joined || user.registeredAt || new Date().toISOString().split('T')[0],
+        ...user,
+        name: user.name || user.fullname || 'Unknown',
+        phone: user.phone || user.phoneNumber || 'N/A',
+        joined: user.joined || user.registeredAt || new Date().toISOString().split('T')[0],
           status: (user.status || "Active") as "Active" | "Blocked" | "Suspended",
           verificationStatus: user.verificationStatus || (user.userVerified ? 'VERIFIED' : 'PENDING'),
           policyCount: user.policyCount || 0

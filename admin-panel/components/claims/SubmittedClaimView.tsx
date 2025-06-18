@@ -41,6 +41,66 @@ export default function SubmittedClaimView({ claimId }: SubmittedClaimViewProps)
       setError(null);
       
       const response = await claimsApi.getClaimById(claimId);
+      console.log('=== CLAIM DATA DEBUG ===');
+      console.log('Full claim response:', response);
+      console.log('Claim keys:', Object.keys(response));
+      console.log('=== DETAILED FIELD CHECK ===');
+      
+      // Log each major field group
+      console.log('Basic fields:', {
+        id: response.id,
+        claimId: response.claimId,
+        claimantName: response.claimantName,
+        policyNumber: response.policyNumber,
+        status: response.status,
+        vehicleInfo: response.vehicleInfo
+      });
+      
+      console.log('Driver fields:', {
+        driverName: response.driverName,
+        driverFullName: response.driverFullName,
+        isDriverSameAsInsured: response.isDriverSameAsInsured,
+        driver: response.driver
+      });
+      
+      console.log('Accident fields:', {
+        accidentDate: response.accidentDate,
+        dateOfAccident: response.dateOfAccident,
+        timeOfAccident: response.timeOfAccident,
+        location: response.location,
+        locationDetails: response.locationDetails,
+        speed: response.speed
+      });
+      
+      console.log('Financial fields:', {
+        claimAmount: response.claimAmount,
+        coverageAmount: response.coverageAmount,
+        approvedAmount: response.approvedAmount
+      });
+      
+      console.log('Evidence fields:', {
+        damageImages: response.damageImages,
+        evidenceDocuments: response.evidenceDocuments,
+        vehicleDamageFiles: response.vehicleDamageFiles,
+        vehicleDamageDesc: response.vehicleDamageDesc,
+        sketchFiles: response.sketchFiles
+      });
+      
+      console.log('Police fields:', {
+        policeInvolved: response.policeInvolved,
+        policeOfficerName: response.policeOfficerName,
+        policeStation: response.policeStation,
+        policeReport: response.policeReport
+      });
+      
+      console.log('Other fields:', {
+        otherVehicles: response.otherVehicles,
+        vehicleOccupants: response.vehicleOccupants,
+        independentWitnesses: response.independentWitnesses,
+        injuries: response.injuries,
+        statusHistory: response.statusHistory
+      });
+      
       setClaim(response);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to fetch claim details";
@@ -294,6 +354,46 @@ export default function SubmittedClaimView({ claimId }: SubmittedClaimViewProps)
 
       <Card>
         <CardContent className="space-y-6 p-6">
+          {/* Data Availability Summary */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h2 className="text-lg font-semibold text-blue-800 mb-2">Data Availability Summary</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+              <div className="flex items-center gap-2">
+                <span className={`w-3 h-3 rounded-full ${claim.claimantName ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                <span>Basic Info</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className={`w-3 h-3 rounded-full ${claim.driver || claim.driverName ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                <span>Driver Details</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className={`w-3 h-3 rounded-full ${claim.locationDetails || claim.location ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                <span>Location Details</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className={`w-3 h-3 rounded-full ${claim.damageImages?.length || claim.evidenceDocuments?.length ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                <span>Evidence</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className={`w-3 h-3 rounded-full ${claim.policeInvolved !== undefined || claim.policeReport ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                <span>Police Info</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className={`w-3 h-3 rounded-full ${claim.independentWitnesses?.length || claim.whyNoWitness ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                <span>Witnesses</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className={`w-3 h-3 rounded-full ${claim.injuries || claim.otherVehicles?.length ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                <span>Other Parties</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className={`w-3 h-3 rounded-full ${claim.claimAmount || claim.coverageAmount ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                <span>Financial</span>
+              </div>
+            </div>
+            <p className="text-xs text-blue-600 mt-2">🟢 Available • 🔴 Missing</p>
+          </div>
+
           {/* Basic Information */}
           <div className="space-y-4">
             <h2 className="text-lg font-semibold">Basic Information</h2>
@@ -313,14 +413,372 @@ export default function SubmittedClaimView({ claimId }: SubmittedClaimViewProps)
               <Detail label="Time" value={claim.timeOfAccident || "N/A"} />
               <Detail label="Location" value={formatLocation(claim.location)} />
               <Detail label="Driver Name" value={claim.driverName || claim.driverFullName || "N/A"} />
+              <Detail label="Speed at Accident" value={claim.speed ? `${claim.speed} km/h` : "N/A"} />
+              <Detail label="Time of Day" value={claim.timeOfDay || "N/A"} />
             </div>
           </div>
 
-          {/* Additional Details */}
-          {claim.description && (
+          {/* Location Details */}
+          {claim.locationDetails && (
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold">Detailed Location Information</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Detail label="City" value={claim.locationDetails.city || "N/A"} />
+                <Detail label="Sub City" value={claim.locationDetails.subCity || "N/A"} />
+                <Detail label="Kebele" value={claim.locationDetails.kebele || "N/A"} />
+                <Detail label="Sefer" value={claim.locationDetails.sefer || "N/A"} />
+              </div>
+            </div>
+          )}
+
+          {/* Driver Information */}
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold">Driver Information</h2>
+            <div className="mb-2">
+              <Detail label="Is Driver Same as Insured?" value={claim.isDriverSameAsInsured ? "Yes" : "No"} />
+            </div>
+            {claim.driver && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Detail label="First Name" value={claim.driver.firstName || "N/A"} />
+                <Detail label="Last Name" value={claim.driver.lastName || "N/A"} />
+                <Detail label="Age" value={claim.driver.age?.toString() || "N/A"} />
+                <Detail label="Phone Number" value={claim.driver.phoneNumber || "N/A"} />
+                <Detail label="City" value={claim.driver.city || "N/A"} />
+                <Detail label="Sub City" value={claim.driver.subCity || "N/A"} />
+                <Detail label="Kebele" value={claim.driver.kebele || "N/A"} />
+                <Detail label="License Number" value={claim.driver.licenseNo || "N/A"} />
+                <Detail label="License Grade" value={claim.driver.grade || "N/A"} />
+                <Detail label="License Expiry" value={formatDate(claim.driver.expirationDate)} />
+              </div>
+            )}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Detail label="Insured Full Name" value={claim.insuredFullName || "N/A"} />
+            </div>
+          </div>
+
+          {/* Road and Traffic Conditions */}
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold">Road and Traffic Conditions</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Detail label="Position on Road" value={claim.positionOnRoad || "N/A"} />
+              <Detail label="Road Surface" value={claim.roadSurface || "N/A"} />
+              <Detail label="Traffic Condition" value={claim.trafficCondition || "N/A"} />
+              <Detail label="Intersection Type" value={claim.intersectionType || "N/A"} />
+              <Detail label="Visibility Obstructions" value={claim.visibilityObstructions || "N/A"} />
+            </div>
+          </div>
+
+          {/* Vehicle Conditions at Time of Accident */}
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold">Vehicle Conditions</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Detail label="Were you in vehicle?" value={claim.wereYouInVehicle !== undefined ? (claim.wereYouInVehicle ? "Yes" : "No") : "N/A"} />
+              <Detail label="Horn Sounded?" value={claim.hornSounded !== undefined ? (claim.hornSounded ? "Yes" : "No") : "N/A"} />
+              <Detail label="Headlights On?" value={claim.headlightsOn !== undefined ? (claim.headlightsOn ? "Yes" : "No") : "N/A"} />
+              <Detail label="Alone in Vehicle?" value={claim.aloneInVehicle !== undefined ? (claim.aloneInVehicle ? "Yes" : "No") : "N/A"} />
+            </div>
+          </div>
+
+          {/* Other Vehicles Involved */}
+          {claim.otherVehicles && claim.otherVehicles.length > 0 && (
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold">Other Vehicles Involved</h2>
+              {claim.otherVehicles.map((vehicle, index) => (
+                <div key={index} className="border rounded-lg p-4 bg-gray-50">
+                  <h3 className="font-medium mb-2">Vehicle {index + 1}</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Detail label="Driver Name" value={vehicle.driverName || "N/A"} />
+                    <Detail label="Driver Address" value={vehicle.driverAddress || "N/A"} />
+                    <Detail label="Driver Phone" value={vehicle.driverPhone || "N/A"} />
+                  </div>
+                </div>
+              ))}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Detail label="Responsible Party" value={claim.responsibleParty || "N/A"} />
+                <Detail label="Other Insured Status" value={claim.otherInsuredStatus || "N/A"} />
+                <Detail label="Other Insurance Company" value={claim.otherInsuranceCompanyName || "N/A"} />
+              </div>
+            </div>
+          )}
+
+          {/* Vehicle Occupants */}
+          {claim.vehicleOccupants && claim.vehicleOccupants.length > 0 && (
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold">Vehicle Occupants</h2>
+              <div className="space-y-2">
+                {claim.vehicleOccupants.map((occupant, index) => (
+                  <div key={index} className="border rounded-lg p-3 bg-gray-50">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Detail label="Name" value={occupant.name || "N/A"} />
+                      <Detail label="Contact" value={occupant.contact || "N/A"} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Police Involvement */}
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold">Police Involvement</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Detail label="Police Involved?" value={claim.policeInvolved !== undefined ? (claim.policeInvolved ? "Yes" : "No") : "N/A"} />
+              <Detail label="Police Officer Name" value={claim.policeOfficerName || "N/A"} />
+              <Detail label="Police Station" value={claim.policeStation || "N/A"} />
+            </div>
+            {claim.policeReport && (
+              <div className="mt-4">
+                <Detail label="Police Report" value="Available" />
+                <a 
+                  href={claim.policeReport} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-800 underline text-sm"
+                >
+                  View Police Report
+                </a>
+              </div>
+            )}
+            {claim.policeReportRequestLetter && (
+              <div className="mt-2">
+                <Detail label="Police Report Request Letter" value="Available" />
+                <a 
+                  href={claim.policeReportRequestLetter} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-800 underline text-sm"
+                >
+                  View Request Letter
+                </a>
+              </div>
+            )}
+          </div>
+
+          {/* Witnesses */}
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold">Witnesses</h2>
+            <div className="mb-4">
+              <Detail label="Independent Witness Present?" value={claim.independentWitnessPresent !== undefined ? (claim.independentWitnessPresent ? "Yes" : "No") : "N/A"} />
+            </div>
+            {claim.independentWitnesses && claim.independentWitnesses.length > 0 ? (
+              <div className="space-y-2">
+                {claim.independentWitnesses.map((witness, index) => (
+                  <div key={index} className="border rounded-lg p-3 bg-gray-50">
+                    <h3 className="font-medium mb-2">Witness {index + 1}</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Detail label="Name" value={witness.name || "N/A"} />
+                      <Detail label="Contact" value={witness.contact || "N/A"} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div>
+                <Detail label="Reason for No Witness" value={claim.whyNoWitness || "N/A"} />
+              </div>
+            )}
+          </div>
+
+          {/* Injuries */}
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold">Injuries</h2>
+            <div className="mb-4">
+              <Detail label="Any Injuries?" value={claim.injuries?.anyInjuries !== undefined ? (claim.injuries.anyInjuries ? "Yes" : "No") : "N/A"} />
+            </div>
+            {claim.injuries?.injuredPersons && claim.injuries.injuredPersons.length > 0 && (
+              <div className="space-y-2">
+                {claim.injuries.injuredPersons.map((person, index) => (
+                  <div key={index} className="border rounded-lg p-3 bg-gray-50">
+                    <h3 className="font-medium mb-2">Injured Person {index + 1}</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Detail label="Name" value={person.name || "N/A"} />
+                      <Detail label="Address" value={person.address || "N/A"} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Financial Information */}
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold">Financial Information</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Detail label="Claim Amount" value={claim.claimAmount ? `ETB ${claim.claimAmount.toLocaleString()}` : "N/A"} />
+              <Detail label="Coverage Amount" value={claim.coverageAmount ? `ETB ${claim.coverageAmount.toLocaleString()}` : "N/A"} />
+              <Detail label="Approved Amount" value={claim.approvedAmount ? `ETB ${claim.approvedAmount.toLocaleString()}` : "N/A"} />
+            </div>
+          </div>
+
+          {/* Repair Information */}
+          {(claim.garage || claim.sparePartsFrom || claim.fixType || claim.sparePartsFromLocation) && (
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold">Repair Information</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Detail label="Garage" value={claim.garage || "N/A"} />
+                <Detail label="Spare Parts From" value={claim.sparePartsFrom || "N/A"} />
+                <Detail label="Fix Type" value={claim.fixType || "N/A"} />
+              </div>
+              {claim.sparePartsFromLocation && (
+                <div className="mt-4">
+                  <h3 className="font-medium mb-2">Spare Parts Location</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Detail label="City" value={claim.sparePartsFromLocation.city || "N/A"} />
+                    <Detail label="Sub City" value={claim.sparePartsFromLocation.subCity || "N/A"} />
+                    <Detail label="Kebele" value={claim.sparePartsFromLocation.kebele || "N/A"} />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Additional Description */}
+          {claim.additionalDescription && (
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold">Additional Description</h2>
+              <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded">{claim.additionalDescription}</p>
+            </div>
+          )}
+
+          {/* Basic Description (if different from additional) */}
+          {claim.description && claim.description !== claim.additionalDescription && (
             <div className="space-y-4">
               <h2 className="text-lg font-semibold">Description</h2>
               <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded">{claim.description}</p>
+            </div>
+          )}
+
+
+          {/* Comprehensive Evidence and Documentation */}
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold">Evidence and Documentation</h2>
+            
+            {/* Vehicle Damage Description */}
+            {claim.vehicleDamageDesc && (
+              <div className="space-y-2">
+                <h3 className="font-medium">Vehicle Damage Description</h3>
+                <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded">{claim.vehicleDamageDesc}</p>
+              </div>
+            )}
+
+            {/* Third Party Damage */}
+            {(claim.thirdPartyDamageFiles || claim.thirdPartyDamageDesc) && (
+              <div className="space-y-2">
+                <h3 className="font-medium">Third Party Damage</h3>
+                {claim.thirdPartyDamageDesc && (
+                  <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded">{claim.thirdPartyDamageDesc}</p>
+                )}
+                {claim.thirdPartyDamageFiles && (
+                  <div className="bg-gray-50 p-3 rounded">
+                    <a 
+                      href={claim.thirdPartyDamageFiles} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800 underline text-sm"
+                    >
+                      View Third Party Damage Files
+                    </a>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Sketch Files */}
+            {claim.sketchFiles && (
+              <div className="space-y-2">
+                <h3 className="font-medium">Accident Sketch</h3>
+                <div className="bg-gray-50 p-3 rounded">
+                  <a 
+                    href={claim.sketchFiles} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-800 underline text-sm"
+                  >
+                    View Accident Sketch Files
+                  </a>
+                </div>
+              </div>
+            )}
+
+            {/* Evidence Documents */}
+            {claim.evidenceDocuments && claim.evidenceDocuments.length > 0 && (
+              <div className="space-y-2">
+                <h3 className="font-medium">Additional Evidence Documents</h3>
+                <div className="space-y-2">
+                  {claim.evidenceDocuments.map((doc, index) => (
+                    <div key={index} className="bg-gray-50 p-3 rounded">
+                      <a 
+                        href={doc} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800 underline text-sm"
+                      >
+                        Document {index + 1}
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Declaration and Signature */}
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold">Declaration and Signature</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Detail label="Declaration Agreed?" value={claim.declaration !== undefined ? (claim.declaration ? "Yes" : "No") : "N/A"} />
+              <Detail label="Agreed to Declaration?" value={claim.agreedToDeclaration !== undefined ? (claim.agreedToDeclaration ? "Yes" : "No") : "N/A"} />
+              <Detail label="Signature Date" value={formatDate(claim.signatureDate)} />
+            </div>
+          </div>
+
+          {/* Status History */}
+          {claim.statusHistory && claim.statusHistory.length > 0 && (
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold">Status History</h2>
+              <div className="space-y-2">
+                {claim.statusHistory.map((history, index) => (
+                  <div key={index} className="border rounded-lg p-3 bg-gray-50">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <Badge className={getStatusColor(history.status)} variant="secondary">
+                          {history.status}
+                        </Badge>
+                        {history.note && (
+                          <p className="text-sm text-gray-600 mt-1">{history.note}</p>
+                        )}
+                      </div>
+                      <span className="text-xs text-gray-500">{formatDate(history.date)}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Assessor Notes */}
+          {claim.assessorNotes && (
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold">Assessor Notes</h2>
+              <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded">{claim.assessorNotes}</p>
+            </div>
+          )}
+
+          {/* Additional Status Information */}
+          {claim.statusReason && (
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold">Status Reason</h2>
+              <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded">{claim.statusReason}</p>
+            </div>
+          )}
+
+          {/* Proforma Information */}
+          {(claim.proformaSubmitted !== undefined || claim.garage || claim.sparePartsFrom) && (
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold">Proforma Information</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Detail label="Proforma Submitted?" value={claim.proformaSubmitted !== undefined ? (claim.proformaSubmitted ? "Yes" : "No") : "N/A"} />
+              </div>
             </div>
           )}
 

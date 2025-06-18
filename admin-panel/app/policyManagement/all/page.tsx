@@ -253,10 +253,13 @@ function AllPoliciesPage() {
               onChange={(e) => setFilter(e.target.value as 'pending' | 'approved' | 'rejected' | 'all')}
               disabled={loading}
             >
-              <option value="all">All Statuses</option>
+              <option value="">All Statuses</option>
               <option value="pending">Pending</option>
               <option value="approved">Approved</option>
               <option value="rejected">Rejected</option>
+              <option value="documentReuploadRequest">documentReuploadRequest</option>
+              <option value="expired">Expired</option>
+              <option value="premiumDecided">PremiumDecided</option>
             </select>
           </div>
         </div>
@@ -304,7 +307,7 @@ function AllPoliciesPage() {
             <Card key={policy.id} className="hover:shadow-md transition-all duration-300">
               <CardContent className="p-4 grid grid-cols-12 gap-4 items-center">
                 <div className="col-span-3">
-                  <h2 className="font-medium">{policy.user?.name || "Unknown User"}</h2>
+                  <h2 className="font-medium">{policy.user?.fullname || "Unknown User"}</h2>
                   <p className="text-sm text-gray-500">{policy.user?.email || "No email"}</p>
                 </div>
                 <div className="col-span-2 text-sm font-mono">{policy.id}</div>

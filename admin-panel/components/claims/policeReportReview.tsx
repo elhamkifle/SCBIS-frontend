@@ -360,15 +360,15 @@ export default function PoliceReportReview({ claimId }: PoliceReportReviewProps)
                       
                       {/* Keep the view button for opening in new tab */}
                       <div className="flex justify-center">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => window.open(claim.policeReport, '_blank')}
-                          className="flex items-center gap-2"
-                        >
-                          <Download className="h-4 w-4" />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => window.open(claim.policeReport, '_blank')}
+                        className="flex items-center gap-2"
+                      >
+                        <Download className="h-4 w-4" />
                           Open in New Tab
-                        </Button>
+                      </Button>
                       </div>
                     </div>
                   </div>

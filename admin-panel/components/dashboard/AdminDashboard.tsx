@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import DashboardStats from "./DashboardStats";
 import DashboardClaimsChart from "./DashboardClaimsChart";
 import RecentActivity from "./RecentActivity";
@@ -8,10 +8,7 @@ import PolicyPieChart from "./PolicyPieChart";
 import SummaryStats from "./SummaryStats";
 
 export default function AdminDashboard() {
-  const [selectedCard, setSelectedCard] = useState<string | null>(null);
-
   const handleCardClick = (type: "policies" | "revenue") => {
-    setSelectedCard(type);
     // You can implement detailed view logic here
     console.log(`Clicked on ${type} card`);
   };

@@ -188,7 +188,7 @@ function IncomingRequestsPage() {
             <Card key={req.id} className="transition-all duration-300 hover:shadow-md">
               <CardContent className="p-4 flex items-center justify-between">
                 <div>
-                  <h2 className="font-medium text-lg">{req.user?.name || "Unknown User"}</h2>
+                  <h2 className="font-medium text-lg">{req.user?.fullname || "Unknown User"}</h2>
                   <p className="text-sm text-gray-500">Policy: {req.policyType || "N/A"}</p>
                   {req.policyId && (
                     <p className="text-sm text-gray-600">Policy ID: {req.policyId}</p>
