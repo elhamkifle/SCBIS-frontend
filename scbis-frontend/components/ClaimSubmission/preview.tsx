@@ -150,6 +150,7 @@ export default function ClaimPreview() {
   };
 
   const handleSubmit = async () => {
+    toast.loading('Claim submission in progress')
     const claimData = {
       policyId: selectedPolicyObj._id,
       isDriverSameAsInsured,
@@ -246,23 +247,24 @@ export default function ClaimPreview() {
           }
         });
 
+
         if (fetchedPolicy.status===200){
+          
           const blokchainData = {
           claimOwner:walletAddress,
           policyId:fetchedPolicy.data?.policyId || "POL-12345678",
           claimId:response.data._id,
-          amountClaimed:response.data?.coverageAmount || 0,
+          amountClaimed:response.data?.coverageAmount || 130650,
           insuredName:response.data.insuredFullName,
           driverName:response.data?.driverFullName || "",
           description:response.data?.additionalDescription || "The car Was hit by another car",
-          plateNumber:response.data.policyId.splice(2) || "01123432",
+          plateNumber:response.data.policyId.slice(2) || "01123432",
           proforma:response.data?.policeReport || "",
           medicalRecords:"kjskdjsjdksjds",
           accidentType:response.data?.intersectionType || "Car to Car"
         }
 
         const res = await axios.post("https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/blockchain/add-claim",blokchainData)
-
         if (res.status===201){
           toast.success('Claim Added Successfully to the blockchain')
         }
@@ -273,7 +275,6 @@ export default function ClaimPreview() {
         }
       }
 
-      console.log(response);
 
       const storesToClear = [
         'accident-details-storage',
