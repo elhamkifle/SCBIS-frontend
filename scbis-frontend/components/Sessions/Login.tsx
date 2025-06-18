@@ -69,7 +69,6 @@ export default function Login() {
                     accessToken: data.accessToken,
                     refreshToken: data.refreshToken
                 });
-                console.log(data.user)
                 router.push('/dashboard');
             } else {
                 setError(data.message || "Login failed. Please check your credentials.");

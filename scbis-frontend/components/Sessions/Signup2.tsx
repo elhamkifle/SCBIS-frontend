@@ -67,8 +67,6 @@ export default function SignupStep2() {
         setError(data.message || "Registration failed. Please try again.")
       }
 
-      console.log(data) 
-
     }
 
     catch {

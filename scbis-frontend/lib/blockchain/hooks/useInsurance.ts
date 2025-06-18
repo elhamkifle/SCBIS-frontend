@@ -15,9 +15,7 @@ export function useInsurance(signer: ethers.Signer | null) {
 
     try {
       const contract = getInsuranceContract(signer);
-      console.log("🔗 Fetching policies from contract:", contract.address);
       const result = await contract.getMyPolicies();
-      console.log("📜 Policies fetched:", result,typeof(result));
       const formatted = result.map((p: any) => ({
         policyId: p.policyId,
         policyType: p.policyType,

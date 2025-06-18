@@ -26,7 +26,7 @@ export default function AddressForm() {
         // Create address data object from backend response
         const addressData = {
             country: user.country || '',
-            state: user.regionOrState || user.state || '', // Map regionOrState to state
+            state: user.regionOrState || '', // Map regionOrState to state
             city: user.city || '',
             subcity: user.subcity || '',
             zone: user.zone || '',

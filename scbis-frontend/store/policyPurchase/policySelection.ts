@@ -24,7 +24,6 @@ export const usePolicyStore = create<PolicyStore>()(
       ...initialState,
       selectPolicy: (policy) => {
         set({ selectedPolicy: policy });
-        console.log('Selected Policy:', policy);
       },
       setError: (error) => {
         set({ error });

@@ -32,12 +32,6 @@ interface Policy {
 }
 
 export default function PaymentPage() {
-  const [form, setForm] = useState({
-    name: '',
-    cardNumber: '',
-    expiry: '',
-    cvv: '',
-  })
 
   const { walletAddress, connectWallet, isConnected } = useWallet();
 
@@ -96,7 +90,7 @@ export default function PaymentPage() {
         setPolicies(policyData);
         if (policiesRes.status==200) {
           
-          PolicyIssue(policyData?.policyId, policyData?.policyType, policyData?.coverageArea,policyData?.duration,policyData?.premium,policiesRes?.data.userId)
+          PolicyIssue(policyData?.policyId, policyData?.policyType, policyData?.coverageArea,policyData?.duration,policyData?.premium)
         }
         console.log('Policies fetched:', policiesRes.data);
         
@@ -108,7 +102,7 @@ export default function PaymentPage() {
     };
 
 
-    const PolicyIssue = async(policyId:string,policyType:string,coverageArea:string,duration:number,amount:number,userId:string)=>{
+    const PolicyIssue = async(policyId:string,policyType:string,coverageArea:string,duration:number,amount:number)=>{
       if (tx_ref && isConnected){
         // const approved = await baseAPI.get(`https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/payment/verify/${txValue}`)
 
@@ -117,7 +111,7 @@ export default function PaymentPage() {
 
           const blockchainData = {
               user: walletAddress,
-              policyId:"POL-694548",
+              policyId,
               policyType,
               issuerName: user?.fullname,
               plateNumber: policyId.slice(2),
@@ -136,9 +130,18 @@ export default function PaymentPage() {
           if (issuedPOlicy.data.success){
             toast.success(`Policy issued successfully ${issuedPOlicy.data.message}`)
             const accessToken = getAuthTokenFromCookie();
-            const updatedPolicy = await axios.put(`https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/policy/update-policy-status/${pID}`,{userId,statusValue:"active"},{
-            headers: { Authorization: `Bearer ${accessToken}` },
-          })
+
+            const updatedPolicy = await axios.put(
+                `https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/policy/update-policy-status/${pID}`,
+                {
+                  status: { value: 'active' },
+                },
+                {
+                  headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                  },
+                }
+              );
             if (updatedPolicy.status===200){
               window.location.href = "/dashboard"
             }

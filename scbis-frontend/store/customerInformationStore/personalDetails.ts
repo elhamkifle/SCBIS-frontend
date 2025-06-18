@@ -53,7 +53,6 @@ export const usePersonalDetailStore = create<PersonalDetailStore>()(
             isDataModified: isModified
           };
         });
-        console.log('Updated personal details:', { ...get().formData, ...data });
       },
 
       setOriginalData: (data) => {
@@ -87,7 +86,6 @@ export const usePersonalDetailStore = create<PersonalDetailStore>()(
       },
       
       logFormData: () => {
-        console.log('Current personal details:', get().formData);
       },
     }),
     {
