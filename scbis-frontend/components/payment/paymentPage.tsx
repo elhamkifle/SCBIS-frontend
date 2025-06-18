@@ -123,10 +123,10 @@ export default function PaymentPage() {
 
           toast.loading('Policy issue in progress',{id:toastId})
           
-          console.log(blockchainData,"blockchainData")
+          
           const issuedPOlicy = await axios.post('https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/blockchain/issue-policy',blockchainData)
           
-          setTimeout(() => { toast.dismiss() }, 5000)
+         
           if (issuedPOlicy.data.success){
             toast.success(`Policy issued successfully ${issuedPOlicy.data.message}`)
             const accessToken = getAuthTokenFromCookie();
