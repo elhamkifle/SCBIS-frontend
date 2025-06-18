@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import Header from '@/components/staticComponents/header'
 import Sidebar from '@/components/staticComponents/sidebar'
 import { Footer } from '@/components/staticComponents/footer'
@@ -27,7 +27,9 @@ const page = () => {
                     {/* Main Content */}
                     <main className="flex-1 ">
                         <div className="max-w-6xl mx-auto px-4">
-                           <PaymentPage/>
+                           <Suspense fallback={<div>Loading...</div>}>
+                               <PaymentPage/>
+                           </Suspense>
                         </div>
                     </main>
     
