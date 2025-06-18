@@ -105,6 +105,7 @@ export default function PurchaseRequestApproved() {
 
   const handleAccept = async () => {
     // Implement accept logic
+    router.push(`/payment/${policy?._id}`)
     console.log('Policy accepted');
   };
 

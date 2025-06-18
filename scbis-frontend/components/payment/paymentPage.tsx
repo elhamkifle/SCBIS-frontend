@@ -27,7 +27,7 @@ interface Policy {
     createdAt: string;
     vehicleType: "Private" | "Commercial" | string;
     imageUrl?: string;
-    premiumAmount: number;
+    premium: number;
     
 }
 
@@ -85,18 +85,18 @@ export default function PaymentPage() {
         const accessToken = getAuthTokenFromCookie();
 
         const [policiesRes] = await Promise.all([
-          axios.get(`https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/policy/user-policies`, {
+          axios.get(`https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/policy/policy-details/${pID}`, {
             headers: { Authorization: `Bearer ${accessToken}` },
           }),
       
         ]);
 
-        const policyData = policiesRes.data.find((policy: Policy) => policy._id === pID)
+        const policyData = policiesRes.data
 
         setPolicies(policyData);
         if (policiesRes.status==200) {
           
-          PolicyIssue(policyData?.policyId, policyData?.policyType, policyData?.coverageArea,policyData?.duration)
+          PolicyIssue(policyData?.policyId, policyData?.policyType, policyData?.coverageArea,policyData?.duration,policyData?.premium,policiesRes?.data.userId)
         }
         console.log('Policies fetched:', policiesRes.data);
         
@@ -108,7 +108,7 @@ export default function PaymentPage() {
     };
 
 
-    const PolicyIssue = async(policyId:string,policyType:string,coverageArea:string,duration:number)=>{
+    const PolicyIssue = async(policyId:string,policyType:string,coverageArea:string,duration:number,amount:number,userId:string)=>{
       if (tx_ref && isConnected){
         // const approved = await baseAPI.get(`https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/payment/verify/${txValue}`)
 
@@ -117,12 +117,12 @@ export default function PaymentPage() {
 
           const blockchainData = {
               user: walletAddress,
-              policyId,
+              policyId:"POL-694548",
               policyType,
               issuerName: user?.fullname,
               plateNumber: policyId.slice(2),
               vehicleType: "private",
-              premiumAmount: 1200,
+              premiumAmount: amount,
               coverageArea,
               durationInDays:duration
           }
@@ -135,7 +135,14 @@ export default function PaymentPage() {
           setTimeout(() => { toast.dismiss() }, 5000)
           if (issuedPOlicy.data.success){
             toast.success(`Policy issued successfully ${issuedPOlicy.data.message}`)
-            window.location.href = "/dashboard"
+            const accessToken = getAuthTokenFromCookie();
+            const updatedPolicy = await axios.put(`https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/policy/update-policy-status/${pID}`,{userId,statusValue:"active"},{
+            headers: { Authorization: `Bearer ${accessToken}` },
+          })
+            if (updatedPolicy.status===200){
+              window.location.href = "/dashboard"
+            }
+            
 
           }
 
@@ -164,7 +171,7 @@ export default function PaymentPage() {
     toast.loading('Processing payment...')
 
     const serverResponse = await baseAPI.post('/payment/initialize',{
-        "amount":"100.00",
+        "amount":`${policies?.premium}`,
         "currency":"ETB",
         "email":user?.email,
         "first_name":`${user?.fullname.split(' ')[0]}`,
@@ -193,7 +200,7 @@ export default function PaymentPage() {
 
         <div className="mb-4 text-sm text-slate-400 text-center">
           <p className='text-white text-base'>Policy Type: <span className="text-sm text-white">{policies?.policyType || "N/A"}</span></p>
-          <p className='text-white text-base'>Amount Due: <span className="text-sm text-green-400">{policies?.premiumAmount || "N/A"}</span></p>
+          <p className='text-white text-base'>Amount Due: <span className="text-sm text-green-400">{policies?.premium?policies.premium + " ETB" : "N/A"}</span></p>
         </div>
 
         <form  className="space-y-5">
