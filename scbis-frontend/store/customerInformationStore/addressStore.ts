@@ -52,7 +52,6 @@ export const useAddressStore = create<AddressStore>()(
             isDataModified: isModified
           };
         });
-        console.log('Updated address data:', { ...get().address, ...data });
       },
 
       // Method to set original address data from user profile
@@ -79,7 +78,6 @@ export const useAddressStore = create<AddressStore>()(
 
       // Method for logging address state (for debugging purposes)
       logAddressData: () => {
-        console.log('Current address state:', get().address);
       },
     }),
     {

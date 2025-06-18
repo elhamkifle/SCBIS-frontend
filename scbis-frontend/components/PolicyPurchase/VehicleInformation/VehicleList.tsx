@@ -82,26 +82,22 @@ export default function VehicleList() {
   const [localLoading, setLocalLoading] = useState(false);
 
   useEffect(() => {
-    console.log('🚗 Vehicle List Page mounted');
     
     // Only fetch vehicles if user is verified
     if (user?.userVerified === true) {
       fetchUserVehicles();
     } else {
-      console.log('🚫 User not verified - skipping vehicle fetch');
       setLoading(false);
     }
   }, [user?.userVerified]);
 
   const fetchUserVehicles = async () => {
-    console.log('🔄 Starting to fetch user vehicles...');
     setLoading(true);
     setLocalLoading(true);
     setError(null);
 
     try {
       const userVehicles = await vehicleApi.getUserVehicles();
-      console.log('✅ Successfully fetched vehicles:', userVehicles);
       setVehicles(userVehicles || []);
     } catch (err) {
       console.error('❌ Error fetching vehicles:', err);
@@ -109,24 +105,19 @@ export default function VehicleList() {
     } finally {
       setLoading(false);
       setLocalLoading(false);
-      console.log('🏁 Finished fetching vehicles');
     }
   };
 
   const handleSelectVehicle = async (vehicle: VehicleData) => {
-    console.log('🎯 User selected vehicle:', vehicle);
     
     try {
       setLocalLoading(true);
       
       // Fetch detailed vehicle information
-      console.log(`🔍 Fetching detailed info for vehicle ID: ${vehicle._id}`);
       const detailedVehicle = await vehicleApi.getVehicleDetails(vehicle._id);
       
       // Store the selected vehicle
       setSelectedVehicle(vehicle._id, detailedVehicle);
-      
-      console.log('✅ Vehicle selected successfully, navigating to purpose page...');
       router.push('/policy-purchase/purchase/policySelection');
     } catch (err) {
       console.error('❌ Error selecting vehicle:', err);
@@ -137,9 +128,7 @@ export default function VehicleList() {
   };
 
   const handleCreateNewVehicle = () => {
-    console.log('🆕 User chose to create new vehicle');
     setCreateNewVehicle();
-    console.log('➡️ Navigating to purpose page for new vehicle...');
     router.push('/policy-purchase/vehicle-information/purpose');
   };
 
@@ -193,12 +182,6 @@ export default function VehicleList() {
       {/* Header */}
       <div className="w-full flex justify-between items-center mt-2 mb-6">
         <h2 className="md:text-xl sm:text-lg font-bold">Select Vehicle</h2>
-        <button
-          className="bg-[#0F1D3F] sm:text-xs md:text-lg text-white px-4 py-2 rounded"
-          onClick={() => console.log('💾 Save as draft clicked')}
-        >
-          Save as draft
-        </button>
       </div>
 
       {/* Error Display */}

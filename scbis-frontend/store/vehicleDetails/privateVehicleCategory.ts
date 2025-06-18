@@ -23,7 +23,6 @@ export const usePrivateVehicleCategoryStore = create<PrivateVehicleState>()(
       setError: (error) => set({ error }),
       logSelection: () => {
         const { carType, usageType } = get();
-        console.log('Current selection:', { carType, usageType });
       },
       clearSelection: () => set({ 
         carType: '', 

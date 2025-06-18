@@ -97,7 +97,6 @@ const calculatePremium = (
   coverageArea: string,
   vehicleValue?: number
 ): number => {
-  console.log('🧮 Calculating premium for:', { policyType, durationDays, coverageArea, vehicleValue });
 
   // Base premium rates (per day)
   const basePremiumRates: Record<string, number> = {
@@ -138,7 +137,6 @@ const calculatePremium = (
   }
   
   const finalPremium = Math.round(premium);
-  console.log('💰 Calculated premium:', finalPremium);
   
   return finalPremium;
 };
@@ -221,12 +219,7 @@ const validatePolicyData = (policySelection: PolicySelectionDto): {
     transformedData.vehicleInformation = transformVehicleInformation(policySelection.vehicleInformation);
   }
   
-  console.log('🔍 Complete transformed data being sent to backend:', {
-    hasVehicleData: !!transformedData.vehicleData,
-    hasDriverData: !!transformedData.driverData, 
-    hasVehicleInformation: !!transformedData.vehicleInformation,
-    transformedData
-  });
+
   
   return { isValid: true, errors: [], transformedData };
 };
@@ -237,7 +230,7 @@ export const policySelectionService = {
    * Save policy selection data
    */
   async savePolicySelection(policySelection: PolicySelectionDto): Promise<PolicySelectionResponse> {
-    console.log('🔄 Saving policy selection:', policySelection);
+
     
     // Validate and transform data
     const validation = validatePolicyData(policySelection);
@@ -247,12 +240,10 @@ export const policySelectionService = {
       throw new Error(`Validation failed: ${validation.errors.join(', ')}`);
     }
     
-    console.log('✅ Data validated successfully. Sending transformed data:', validation.transformedData);
+
     
     try {
       const response = await apiClient.post('/policy/policy-selection', validation.transformedData);
-      
-      console.log('✅ Policy selection saved successfully:', response.data);
       return response.data;
     } catch (error) {
       console.error('❌ Error saving policy selection:', error);
@@ -274,12 +265,9 @@ export const policySelectionService = {
    * Get policy details by vehicle ID
    */
   async getPolicyByVehicleId(vehicleId: string): Promise<PolicySelectionResponse> {
-    console.log('🔄 Fetching policy for vehicle:', vehicleId);
     
     try {
       const response = await apiClient.get(`/policy/vehicle/${vehicleId}`);
-      
-      console.log('✅ Policy fetched successfully:', response.data);
       return response.data;
     } catch (error) {
       console.error('❌ Error fetching policy:', error);
@@ -350,15 +338,6 @@ export const buildPolicySelectionPayload = (
     passengersInsured: string;
   }
 ): PolicySelectionDto => {
-  console.log('🔧 Building policy selection payload:', {
-    vehicleId,
-    selectedPolicy,
-    policyDuration,
-    jurisdiction,
-    vehicleData,
-    driverData,
-    vehicleInformation
-  });
 
   return {
     vehicleId,

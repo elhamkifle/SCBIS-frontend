@@ -48,7 +48,6 @@ export const useGeneralVehicleStore = create<GeneralVehicleState>()(
           }
         }),
       logFormData: () => {
-        console.log('Current vehicle details:', get().formData);
       },
     }),
     {

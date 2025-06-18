@@ -64,7 +64,6 @@ export function useAuth(requireAuth = true) {
           const userData = await fetchUserData();
           if (userData === null) {
             // User is no longer authenticated, handle gracefully
-            console.log("User authentication has expired");
           }
         } catch (err) {
           console.error("Failed to refresh user data:", err);

@@ -39,7 +39,6 @@ export const useOwnershipUsageStore = create<OwnershipUsageState>()(
           }
         }),
       logFormData: () => {
-        console.log('Current ownership details:', get().formData);
       },
     }),
     {

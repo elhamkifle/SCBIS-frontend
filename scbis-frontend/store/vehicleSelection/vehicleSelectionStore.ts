@@ -70,7 +70,6 @@ export const useVehicleSelectionStore = create<VehicleSelectionState & VehicleSe
       ...initialState,
 
       setSelectedVehicle: (vehicleId: string, vehicleData: VehicleData) => {
-        console.log('🚗 Vehicle selected:', { vehicleId, vehicleData });
         set({
           selectedVehicleId: vehicleId,
           isExistingVehicle: true,
@@ -80,7 +79,6 @@ export const useVehicleSelectionStore = create<VehicleSelectionState & VehicleSe
       },
 
       setCreateNewVehicle: () => {
-        console.log('🆕 Create new vehicle selected');
         set({
           selectedVehicleId: null,
           isExistingVehicle: false,
@@ -90,22 +88,18 @@ export const useVehicleSelectionStore = create<VehicleSelectionState & VehicleSe
       },
 
       setVehicles: (vehicles: VehicleData[]) => {
-        console.log(`📋 Setting ${vehicles.length} vehicles in store`);
         set({ vehicles });
       },
 
       setLoading: (loading: boolean) => {
-        console.log(`⏳ Loading state: ${loading}`);
         set({ isLoading: loading });
       },
 
       setError: (error: string | null) => {
-        console.log(`❌ Error state: ${error}`);
         set({ error, isLoading: false });
       },
 
       clearSelection: () => {
-        console.log('🧹 Clearing vehicle selection');
         set({
           selectedVehicleId: null,
           isExistingVehicle: false,
@@ -115,7 +109,6 @@ export const useVehicleSelectionStore = create<VehicleSelectionState & VehicleSe
       },
 
       clearAll: () => {
-        console.log('🧹 Clearing all vehicle selection data');
         set(initialState);
       },
     }),
