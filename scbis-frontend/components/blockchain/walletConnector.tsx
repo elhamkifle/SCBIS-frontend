@@ -7,7 +7,7 @@ import Cookies from "js-cookie";
 
 export default function WalletConnector() {
   const { connectWallet } = useWallet();
-  const [walletAddress,setWalletAddress] = useState<string | null>(null); 
+  const [walletAddress] = useState<string | null>(null); 
   const [showPopup, setShowPopup] = useState(false);
   const [showConnectButton, setShowConnectButton] = useState(false);
   

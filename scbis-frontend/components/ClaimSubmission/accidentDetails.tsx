@@ -86,32 +86,32 @@ export default function AccidentDetails() {
     return '';
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (selectedFile) {
-      const validationError = validateFile(selectedFile);
-      if (validationError) {
-        setFileError(validationError);
-      } else {
-        setFileError('');
-        setFiles([selectedFile]); // Only allow one file
-      }
-    }
-  };
+  // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const selectedFile = e.target.files?.[0];
+  //   if (selectedFile) {
+  //     const validationError = validateFile(selectedFile);
+  //     if (validationError) {
+  //       setFileError(validationError);
+  //     } else {
+  //       setFileError('');
+  //       setFiles([selectedFile]); // Only allow one file
+  //     }
+  //   }
+  // };
 
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    const droppedFile = e.dataTransfer.files[0];
-    if (droppedFile) {
-      const validationError = validateFile(droppedFile);
-      if (validationError) {
-        setFileError(validationError);
-      } else {
-        setFileError('');
-        setFiles([droppedFile]); // Only allow one file
-      }
-    }
-  };
+  // const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+  //   e.preventDefault();
+  //   const droppedFile = e.dataTransfer.files[0];
+  //   if (droppedFile) {
+  //     const validationError = validateFile(droppedFile);
+  //     if (validationError) {
+  //       setFileError(validationError);
+  //     } else {
+  //       setFileError('');
+  //       setFiles([droppedFile]); // Only allow one file
+  //     }
+  //   }
+  // };
 
   const handleVehicleChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -133,10 +133,10 @@ export default function AccidentDetails() {
 
   }
 
-  const handleDeleteFile = () => {
-    setFiles([]);
-    setFileError('');
-  };
+  // const handleDeleteFile = () => {
+  //   setFiles([]);
+  //   setFileError('');
+  // };
 
   return (
     <div className="max-w-5xl mx-auto p-6 bg-white">

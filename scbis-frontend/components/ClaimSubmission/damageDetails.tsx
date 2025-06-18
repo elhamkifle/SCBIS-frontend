@@ -51,16 +51,16 @@ export default function DamageDetails() {
       return;
     }
 
-    // if (!vehicleFiles.length && !vehicleDamageDesc.trim()) {
-    //   return setError('❌ Please upload a photo or provide a description of the damage to your vehicle.');
-    // }
+    if (!vehicleDamageDesc.trim()) {
+      return setError(' Please provide a description of the damage to your vehicle.');
+    }
 
-    if (!thirdPartyFiles.length && !thirdPartyDamageDesc.trim()) {
-      return setError('❌ Please upload a photo or provide a description of the third-party damage.');
+    if (!thirdPartyDamageDesc.trim()) {
+      return setError('Please provide a description of the third-party damage.');
     }
 
     if (injuriesAny && (!injuredPersons.name.trim() || !injuredPersons.address.trim())) {
-      return setError('❌ Please provide name and address of the injured person.');
+      return setError('Please provide name and address of the injured person.');
     }
 
     setError('');
@@ -92,48 +92,48 @@ export default function DamageDetails() {
     router.push('/claim-submission/witness-information');
   };
 
-  const renderDropArea = (
-    files: File[],
-    setFiles: React.Dispatch<React.SetStateAction<File[]>>,
-    inputId: string
-  ) => (
-    <div
-      className="md:w-1/2 w-full flex flex-col items-center justify-center bg-blue-100 p-6 py-14 rounded-lg"
-      onDragOver={(e) => e.preventDefault()}
-      onDrop={(e) => {
-        e.preventDefault();
-        const file = e.dataTransfer.files[0];
-        if (file) setFiles([file]); // Only one file allowed
-      }}
-    >
-      <p className='text-xl font-bold mb-2'>Drop Files Here</p>
-      <p className='text-md font-bold mb-4'>Or</p>
-      <input
-        type="file"
-        id={inputId}
-        accept=".pdf,.jpg,.png"
-        onChange={(e) => {
-          const file = e.target.files?.[0];
-          if (file) setFiles([file]); // Only one file allowed
-        }}
-        className="hidden"
-      />
-      <label htmlFor={inputId} className="bg-green-500 text-white px-4 py-2 rounded cursor-pointer hover:bg-green-600">
-        Browse Files
-      </label>
-      {files.map((file, index) => (
-        <div key={index} className="mt-2 text-green-500 text-sm">
-          ✅ File ready for upload: {file.name}
-          <button
-            onClick={() => setFiles([])}
-            className="ml-2 text-red-500 hover:text-red-700"
-          >
-            Delete
-          </button>
-        </div>
-      ))}
-    </div>
-  );
+  // const renderDropArea = (
+  //   files: File[],
+  //   setFiles: React.Dispatch<React.SetStateAction<File[]>>,
+  //   inputId: string
+  // ) => (
+  //   <div
+  //     className="md:w-1/2 w-full flex flex-col items-center justify-center bg-blue-100 p-6 py-14 rounded-lg"
+  //     onDragOver={(e) => e.preventDefault()}
+  //     onDrop={(e) => {
+  //       e.preventDefault();
+  //       const file = e.dataTransfer.files[0];
+  //       if (file) setFiles([file]); // Only one file allowed
+  //     }}
+  //   >
+  //     <p className='text-xl font-bold mb-2'>Drop Files Here</p>
+  //     <p className='text-md font-bold mb-4'>Or</p>
+  //     <input
+  //       type="file"
+  //       id={inputId}
+  //       accept=".pdf,.jpg,.png"
+  //       onChange={(e) => {
+  //         const file = e.target.files?.[0];
+  //         if (file) setFiles([file]); // Only one file allowed
+  //       }}
+  //       className="hidden"
+  //     />
+  //     <label htmlFor={inputId} className="bg-green-500 text-white px-4 py-2 rounded cursor-pointer hover:bg-green-600">
+  //       Browse Files
+  //     </label>
+  //     {files.map((file, index) => (
+  //       <div key={index} className="mt-2 text-green-500 text-sm">
+  //         ✅ File ready for upload: {file.name}
+  //         <button
+  //           onClick={() => setFiles([])}
+  //           className="ml-2 text-red-500 hover:text-red-700"
+  //         >
+  //           Delete
+  //         </button>
+  //       </div>
+  //     ))}
+  //   </div>
+  // );
 
   return (
     <div className="p-6 space-y-6">

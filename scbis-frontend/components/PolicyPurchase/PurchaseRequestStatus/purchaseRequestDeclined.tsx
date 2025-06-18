@@ -110,7 +110,7 @@ export default function PurchaseRequestDeclined() {
     );
   };
 
-  const updatePolicyStatus = async (status: string): Promise<void> => {
+  const updatePolicyStatus = async (): Promise<void> => {
     if (!policy?._id) throw new Error('No policy ID available');
     
     const accessToken = document.cookie.match(/(?:^|;\s*)auth_token=([^;]*)/)?.[1];
@@ -256,7 +256,7 @@ export default function PurchaseRequestDeclined() {
             {/* Drivers License Upload Section */}
             {needsLicense && (
               <div className="mb-6">
-                <h4 className="font-semibold mb-2">Driver's License</h4>
+                <h4 className="font-semibold mb-2">Drivers License</h4>
                 <div className="bg-blue-50 p-4 rounded-lg">
                   {driversLicenseFile ? (
                     <div className="flex items-center justify-between">
@@ -281,7 +281,7 @@ export default function PurchaseRequestDeclined() {
                         htmlFor="license-upload"
                         className="block bg-green-500 text-white px-4 py-2 rounded cursor-pointer hover:bg-green-600 text-center"
                       >
-                        Upload Driver's License
+                        Upload Drivers License
                       </label>
                     </>
                   )}

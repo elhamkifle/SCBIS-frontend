@@ -30,7 +30,6 @@ export function UnderReviewCard({
     statusColor,
     description,
     note,
-    buttonLabel,
     claimData,
 }: UnderReviewCardProps) {
     const router = useRouter();
