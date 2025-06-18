@@ -9,7 +9,6 @@ export const fetchUserData = async () => {
   const user = useUserStore.getState().user;
   
   if (!user || !user._id) {
-    console.log('User not authenticated - skipping fetchUserData');
     return null;
   }
   

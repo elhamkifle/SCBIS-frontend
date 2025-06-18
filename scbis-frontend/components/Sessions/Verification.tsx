@@ -83,7 +83,6 @@ const Verification = () => {
         }
 
         setIsResending(false)
-        console.log(await serverResponse.json(),"here is the server Response")
     }
 
     const HandleSubmit = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -106,10 +105,6 @@ const Verification = () => {
             setIsSubmitting(false)
             return
         }
-        console.log(verificationNum, "here is the verification number",  email);
-
-        // const formattedPhone = phone.startsWith('+') ? phone : `+${phone}`;
-        // console.log(formattedPhone, "here is the formatted phone number")
         const serverResponse = await fetch('https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/auth/verify-email', {
             method: 'POST',
             body: JSON.stringify({ 

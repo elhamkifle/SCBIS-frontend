@@ -32,8 +32,6 @@ const ForgotPassword = () => {
 
     const HandleSubmit = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 
-        console.log("Clicked more than once")
-
         e.preventDefault()
         setIsSubmitting(true)
         setErrors({
@@ -88,8 +86,6 @@ const ForgotPassword = () => {
         }
 
         setIsSubmitting(false)
-
-        console.log(await serverResponse.json(),"here is the server reposonse")
 
     }
 
