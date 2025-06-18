@@ -13,19 +13,19 @@ import { useState } from "react";
 const actionImages: Record<string, string> = {
   "New Policy Purchase": "/purchase.png",
   "Submit a Claim": "/Claim.png",
-  // "Renew Policy": "/Renew.png",
+  "Renew Policy": "/Renew.png",
 };
 
 const actionLabels = [
   "New Policy Purchase",
   "Submit a Claim",
-  // "Renew Policy",
+  "Renew Policy",
 ] as const;
 
 const actionLinks: Record<typeof actionLabels[number], string> = {
   "New Policy Purchase": "/policy-purchase/vehicle-information/vehicle-list",
   "Submit a Claim": "/claim-submission/claim-policy-selection",
-  // "Renew Policy": "/policy-purchase/vehicle-information/vehicle-list",
+  "Renew Policy": "/renew-policy/policy-selection",
 };
 
 export default function Dashboard() {
@@ -90,6 +90,7 @@ export default function Dashboard() {
     };
 
     fetchData();
+    console.log(policies)
   }, [addPolicies, setClaims, user?.userVerified]);
 
 
@@ -224,16 +225,17 @@ export default function Dashboard() {
   return (
     <main className="bg-white min-h-screen text-gray-800">
       <div className="max-w-7xl mx-auto px-4 pt-8 pb-12">
-        <h1 className="text-lg font-syne md:text-4xl font-bold text-blue-500 mb-10 text-center" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-          Hello {`${profileName[0]} ${profileName[1]?.[0] || ''}.`}
-        </h1>
 
-        {/* Show verification status box for unverified users */}
+
+
         <VerificationStatusBox />
 
         {/* Show normal dashboard content only for verified users */}
         {isUserVerified && (
           <>
+            <h1 className="text-lg font-syne md:text-4xl font-bold text-blue-500 mb-10 text-center" style={{ fontFamily: 'Montserrat, sans-serif' }}>
+              Hello {`${profileName[0]} ${profileName[1]?.[0] || ''}.`}
+            </h1>
             <div className="flex flex-row flex-wrap justify-between items-center gap-8 mb-14">
               {actionLabels.map((label) => (
                 <Link key={label} href={actionLinks[label]} className="flex-1 min-w-[220px] max-w-[350px]">

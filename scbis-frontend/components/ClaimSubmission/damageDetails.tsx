@@ -51,9 +51,9 @@ export default function DamageDetails() {
       return;
     }
 
-    if (!vehicleFiles.length && !vehicleDamageDesc.trim()) {
-      return setError('❌ Please upload a photo or provide a description of the damage to your vehicle.');
-    }
+    // if (!vehicleFiles.length && !vehicleDamageDesc.trim()) {
+    //   return setError('❌ Please upload a photo or provide a description of the damage to your vehicle.');
+    // }
 
     if (!thirdPartyFiles.length && !thirdPartyDamageDesc.trim()) {
       return setError('❌ Please upload a photo or provide a description of the third-party damage.');
@@ -149,7 +149,7 @@ export default function DamageDetails() {
       <div>
         <label className="font-semibold block mb-2">Details of damage to your vehicle (Photos Or Brief description)</label>
         <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 items-start">
-          {renderDropArea(vehicleFiles, setVehicleFiles, 'vehicleUpload')}
+          {/* {renderDropArea(vehicleFiles, setVehicleFiles, 'vehicleUpload')} */}
           <div className="w-full lg:w-1/2">
             <label className="font-semibold block mb-2">Details of damage to your vehicle</label>
             <textarea
@@ -164,7 +164,7 @@ export default function DamageDetails() {
       <div>
         <label className="font-semibold block mb-2">Details of damage to Third Party&rsquo;s property & Vehicle(s)</label>
         <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 items-start">
-          {renderDropArea(thirdPartyFiles, setThirdPartyFiles, 'thirdPartyUpload')}
+          {/* {renderDropArea(thirdPartyFiles, setThirdPartyFiles, 'thirdPartyUpload')} */}
           <div className="w-full lg:w-1/2">
             <label className="font-semibold block mb-2">Details of damage to Third Party&rsquo;s property & Vehicle</label>
             <textarea
