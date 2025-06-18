@@ -120,10 +120,8 @@ export default function PurchaseRequestNotifications() {
 
     // File reupload requested
     const unsubscribeReuploadRequested = socket.on('purchase-request-reupload-requested', (data) => {
-      console.log('🔔 [Notifications] Reupload request event received:', data);
       
       if (!mounted) {
-        console.log('⚠️ [Notifications] Component not mounted, ignoring event');
         return;
       }
       
@@ -138,7 +136,6 @@ export default function PurchaseRequestNotifications() {
         borderColor: 'border-orange-200'
       };
       
-      console.log('📋 [Notifications] Adding notification:', notification);
       setNotifications(prev => [notification, ...prev.slice(0, 9)]);
     });
     unsubscribeFunctions.push(unsubscribeReuploadRequested);

@@ -106,14 +106,12 @@ function AllPoliciesPage() {
 
         // Listen for new purchase requests
         const unsubscribeNew = socket.on('new-purchase-request', (data) => {
-          console.log('New purchase request:', data);
           // Refresh the list to include new request
           fetchPolicies(pagination.page, search, filter);
         });
 
         // Listen for status changes
         const unsubscribeStatusChange = socket.on('purchase-request-status-changed', (data) => {
-          console.log('Status changed:', data);
           // Update the specific request in the list
           setPolicies(prev => prev.map(policy => 
             policy.id === data.data.id 
@@ -124,7 +122,6 @@ function AllPoliciesPage() {
 
         // Listen for approvals
         const unsubscribeApproved = socket.on('purchase-request-approved', (data) => {
-          console.log('Request approved:', data);
           setPolicies(prev => prev.map(policy => 
             policy.id === data.data.id 
               ? { ...policy, status: 'approved' }
@@ -134,7 +131,6 @@ function AllPoliciesPage() {
 
         // Listen for rejections
         const unsubscribeRejected = socket.on('purchase-request-rejected', (data) => {
-          console.log('Request rejected:', data);
           setPolicies(prev => prev.map(policy => 
             policy.id === data.data.id 
               ? { ...policy, status: 'rejected' }
@@ -144,7 +140,6 @@ function AllPoliciesPage() {
 
         // Listen for stats updates
         const unsubscribeStats = socket.on('purchase-requests-stats-updated', (data) => {
-          console.log('Stats updated:', data);
           setStats(data.data);
         });
 

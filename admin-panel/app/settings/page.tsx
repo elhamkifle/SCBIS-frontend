@@ -40,10 +40,7 @@ function SettingsPage() {
   useEffect(() => {
     const { user, accessToken } = getAuthCredentials(); // Ensure token is still fetched if page needs it
     // The HOC handles redirection, but the page might still need user data if it's already past the HOC check
-    console.log(user, accessToken);
     if (accessToken && user && user._id) { 
-      console.log('\nuser\n', user);
-
       setFormData({
         fullname: user.fullname || "Default Full Name",
         email: user.email || "default@example.com",
@@ -53,10 +50,7 @@ function SettingsPage() {
         timezone: user.timezone || "GMT+3 (EAT)",
       });
     } else if (!accessToken) {
-      console.log('\naccessToken\n', accessToken);
-        // This case should ideally be caught by withAuth HOC and redirected.
-        // If it reaches here, it might mean the user was initially authenticated then token removed.
-        console.warn("User data or token not found for settings page. Check HOC.");
+      console.warn("User data or token not found for settings page. Check HOC.");
     }
   }, []);
 
@@ -89,18 +83,12 @@ function SettingsPage() {
       language: formData.language,
       timezone: formData.timezone,
     };
-    console.log('\npayload\n', payload);
     try {
       const updatedUser = await adminApi.updateProfile(payload);
 
       // --- Update localStorage with the new user data ---
       if (typeof window !== "undefined" && updatedUser) {
         localStorage.setItem("user", JSON.stringify(updatedUser));
-        console.log("User data in localStorage updated:", updatedUser);
-
-        // Optionally, re-populate formData from the updatedUser to ensure UI consistency
-        // This is useful if the backend modifies/formats data (e.g., phone number)
-        // or if there are fields in updatedUser not directly in formData but should be reflected.
         setFormData({
           fullname: updatedUser.fullname || "",
           email: updatedUser.email || "",
@@ -122,7 +110,6 @@ function SettingsPage() {
   };
 
   const handleLogout = () => {
-    console.log("User logged out");
     logout(); // Use AuthContext logout which handles redirect
     setShowLogoutConfirm(false);
   };
@@ -156,7 +143,6 @@ function SettingsPage() {
     }
   };
 
-  console.log('formData\n', formData);
   return (
     <div className="p-8 bg-gray-50 min-h-screen space-y-8">
       <h1 className="text-3xl font-bold text-gray-800">Settings</h1>

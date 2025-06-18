@@ -63,9 +63,7 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
       try {
         setLoading(true);
         setError(null);
-        console.log('Fetching request details for ID:', id);
         const data = await purchaseRequestsApi.getById(id);
-        console.log('Raw API response:', data);
         setRequestData(data);
       } catch (err) {
         console.error("Failed to fetch request details:", err);
@@ -88,15 +86,12 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
 
     const setupSocketListeners = async () => {
       try {
-        console.log('🔌 Setting up Socket.IO listeners...');
         await socket.connect();
-        console.log('✅ Socket.IO connected successfully');
         setSocketConnected(true);
 
         // Listen for status changes for this specific request
         const unsubscribeStatusChange = socket.on('purchase-request-status-changed', (data) => {
           if (data.data.id === id) {
-            console.log('Status changed for current request:', data);
             setRequestData(prev => prev ? { ...prev, status: data.data.newStatus } : null);
 
             toast({
@@ -110,7 +105,6 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
         // Listen for approvals
         const unsubscribeApproved = socket.on('purchase-request-approved', (data) => {
           if (data.data.id === id) {
-            console.log('Current request approved:', data);
             setRequestData(prev => prev ? { ...prev, status: 'approved' } : null);
 
             toast({
@@ -123,7 +117,6 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
         // Listen for rejections
         const unsubscribeRejected = socket.on('purchase-request-rejected', (data) => {
           if (data.data.id === id) {
-            console.log('Current request rejected:', data);
             setRequestData(prev => prev ? { ...prev, status: 'rejected' } : null);
 
             toast({
@@ -136,26 +129,21 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
 
         // Listen for reupload requests
         const unsubscribeReuploadRequested = socket.on('purchase-request-reupload-requested', (data) => {
-          console.log('🔔 Reupload request event received:', data);
-          console.log('📋 Current request ID:', id);
-          console.log('📋 Event request ID:', data.data.id);
           
           if (data.data.id === id) {
-            console.log('✅ File reupload requested for current request:', data);
 
             toast({
               title: "File Reupload Requested",
               description: `${data.message} - Files: ${data.data.files}${data.data.reason ? ` (${data.data.reason})` : ''}`,
             });
           } else {
-            console.log('ℹ️ Reupload request for different request, ignoring');
+            
           }
         });
 
         // Store cleanup functions
         cleanupFunctions = [unsubscribeStatusChange, unsubscribeApproved, unsubscribeRejected, unsubscribeReuploadRequested];
         
-        console.log('🎯 All Socket.IO listeners set up successfully');
       } catch (error) {
         console.error('❌ Failed to setup Socket.IO listeners:', error);
         setSocketConnected(false);
@@ -204,12 +192,6 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const handleRequestReupload = async () => {
     if (!requestData || !selectedFile) return;
 
-    console.log('🔄 Starting reupload request...', {
-      requestId: requestData._id || requestData.id,
-      selectedFile,
-      requestData: requestData
-    });
-
     setIsRequestingReupload(true);
     try {
       // Map selected file to array of files for the API
@@ -222,16 +204,12 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
         filesToReupload = ["vehicleLibre", "driversLicense"];
       }
 
-      console.log('📋 Files to reupload:', filesToReupload);
-
       // Call the actual API endpoint
-      const response = await purchaseRequestsApi.requestReupload(
+      await purchaseRequestsApi.requestReupload(
         requestData._id || requestData.id, 
         filesToReupload,
         selectedFile // Send the exact selected text as reason
       );
-
-      console.log('✅ API Response:', response);
 
       toast({
         title: "Reupload Requested",

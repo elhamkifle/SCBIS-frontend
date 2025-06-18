@@ -80,14 +80,12 @@ const clearAuthAndRedirect = (router: AppRouterInstance, currentPath?: string) =
           const currentPath = window.location.pathname;
           
          if (!token) {
-            console.log('No authentication token found. Redirecting to login...');
             clearAuthAndRedirect(router, currentPath);
             return;
           }
 
           // Check if token is expired
           if (isTokenExpired(token)) {
-            console.log('Authentication token has expired. Redirecting to login...');
             clearAuthAndRedirect(router, currentPath);
             return;
           }
@@ -95,7 +93,6 @@ const clearAuthAndRedirect = (router: AppRouterInstance, currentPath?: string) =
           // Check if user data exists
           const userData = localStorage.getItem('user');
           if (!userData) {
-            console.log('User data not found. Redirecting to login...');
             clearAuthAndRedirect(router, currentPath);
             return;
           }

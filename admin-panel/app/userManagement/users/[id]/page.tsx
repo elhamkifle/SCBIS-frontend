@@ -29,7 +29,6 @@ export default function UserDetailsPage() {
   const [showActionDialog, setShowActionDialog] = useState(false);
   const [actionType, setActionType] = useState<'suspend' | 'activate' | null>(null);
   const [actionNotes, setActionNotes] = useState("");
-  console.log(user);
   // Fetch user details from API
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -43,7 +42,6 @@ export default function UserDetailsPage() {
         setLoading(true);
         setError(null);
         const userData = await userApi.getUserDetails(id);
-        console.log('User data received:', userData); // Debug log
         setUser(userData);
       } catch (err) {
         console.error("Failed to fetch user details:", err);
@@ -391,9 +389,6 @@ ${user.claims.map(c => `- ${c.type} (${c.status}) - Submitted: ${c.submittedAt}`
                               const target = e.target as HTMLImageElement;
                               target.style.display = 'none';
                             }}
-                            onLoad={() => {
-                              console.log('Image loaded successfully:', url);
-                            }}
                           />
                           <div 
                             className="absolute inset-0 bg-gray-200 rounded flex items-center justify-center cursor-pointer"
@@ -470,7 +465,6 @@ ${user.claims.map(c => `- ${c.type} (${c.status}) - Submitted: ${c.submittedAt}`
                           <p className="text-sm text-gray-600">ID: {policy.id}</p>
                           <p className="text-sm text-gray-600">
                             Period: {new Date(policy.startDate).toLocaleDateString()} - {new Date(policy.endDate).toLocaleDateString()}
-                            {/* {new Date(policy.startDate).toLocaleDateString()} - {new Date(policy.endDate).toLocaleDateString()} */}
                           </p>
                         </div>
                         <span className={`px-2 py-1 rounded text-sm font-semibold ${

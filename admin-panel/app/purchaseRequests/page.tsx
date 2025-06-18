@@ -42,7 +42,6 @@ function IncomingRequestsPage() {
 
         // Listen for new purchase requests
         const unsubscribeNew = socket.on('new-purchase-request', (data) => {
-          console.log('New purchase request:', data);
           // Add new request to the top of the list with proper type conversion
           const newRequest: PurchaseRequest = {
             ...data.data,
@@ -53,7 +52,6 @@ function IncomingRequestsPage() {
 
         // Listen for status changes
         const unsubscribeStatusChange = socket.on('purchase-request-status-changed', (data) => {
-          console.log('Status changed:', data);
           // Update the request in the list
           setRequests(prev => prev.map(req => 
             req.id === data.data.id 
@@ -64,7 +62,6 @@ function IncomingRequestsPage() {
 
         // Listen for approvals
         const unsubscribeApproved = socket.on('purchase-request-approved', (data) => {
-          console.log('Request approved:', data);
           // Update the request status
           setRequests(prev => prev.map(req => 
             req.id === data.data.id 
@@ -75,7 +72,6 @@ function IncomingRequestsPage() {
 
         // Listen for rejections
         const unsubscribeRejected = socket.on('purchase-request-rejected', (data) => {
-          console.log('Request rejected:', data);
           // Update the request status
           setRequests(prev => prev.map(req => 
             req.id === data.data.id 
@@ -86,13 +82,11 @@ function IncomingRequestsPage() {
 
         // Listen for stats updates
         const unsubscribeStats = socket.on('purchase-requests-stats-updated', (data) => {
-          console.log('Stats updated:', data);
           setStats(data.data);
         });
 
         // Listen for reupload requests
         const unsubscribeReuploadRequested = socket.on('purchase-request-reupload-requested', (data) => {
-          console.log('File reupload requested:', data);
           // This is a global notification - no need to update the request list
           // The notification will be handled by PurchaseRequestNotifications component
         });

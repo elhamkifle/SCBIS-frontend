@@ -41,65 +41,6 @@ export default function SubmittedClaimView({ claimId }: SubmittedClaimViewProps)
       setError(null);
       
       const response = await claimsApi.getClaimById(claimId);
-      console.log('=== CLAIM DATA DEBUG ===');
-      console.log('Full claim response:', response);
-      console.log('Claim keys:', Object.keys(response));
-      console.log('=== DETAILED FIELD CHECK ===');
-      
-      // Log each major field group
-      console.log('Basic fields:', {
-        id: response.id,
-        claimId: response.claimId,
-        claimantName: response.claimantName,
-        policyNumber: response.policyNumber,
-        status: response.status,
-        vehicleInfo: response.vehicleInfo
-      });
-      
-      console.log('Driver fields:', {
-        driverName: response.driverName,
-        driverFullName: response.driverFullName,
-        isDriverSameAsInsured: response.isDriverSameAsInsured,
-        driver: response.driver
-      });
-      
-      console.log('Accident fields:', {
-        accidentDate: response.accidentDate,
-        dateOfAccident: response.dateOfAccident,
-        timeOfAccident: response.timeOfAccident,
-        location: response.location,
-        locationDetails: response.locationDetails,
-        speed: response.speed
-      });
-      
-      console.log('Financial fields:', {
-        claimAmount: response.claimAmount,
-        coverageAmount: response.coverageAmount,
-        approvedAmount: response.approvedAmount
-      });
-      
-      console.log('Evidence fields:', {
-        damageImages: response.damageImages,
-        evidenceDocuments: response.evidenceDocuments,
-        vehicleDamageFiles: response.vehicleDamageFiles,
-        vehicleDamageDesc: response.vehicleDamageDesc,
-        sketchFiles: response.sketchFiles
-      });
-      
-      console.log('Police fields:', {
-        policeInvolved: response.policeInvolved,
-        policeOfficerName: response.policeOfficerName,
-        policeStation: response.policeStation,
-        policeReport: response.policeReport
-      });
-      
-      console.log('Other fields:', {
-        otherVehicles: response.otherVehicles,
-        vehicleOccupants: response.vehicleOccupants,
-        independentWitnesses: response.independentWitnesses,
-        injuries: response.injuries,
-        statusHistory: response.statusHistory
-      });
       
       setClaim(response);
     } catch (err) {

@@ -143,9 +143,6 @@ export default function ProformaApprovalView({ claimId }: ProformaApprovalViewPr
         note: note || undefined,
       };
 
-      console.log("🚀 Frontend sending approval data:", approvalData);
-      console.log("🏢 Spare parts location data:", formData.sparePartsFromLocation);
-
       await claimsApi.approveProforma(claimId, approvalData);
       
       // Update local state

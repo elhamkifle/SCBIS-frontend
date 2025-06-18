@@ -42,7 +42,6 @@ export default function PoliceReportReview({ claimId }: PoliceReportReviewProps)
       setImageLoading(true); // Reset image loading state
       
       const response = await claimsApi.getClaimById(claimId);
-      console.log('🔍 API Response:', response);
       setClaim(response);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to fetch claim details";
@@ -62,23 +61,16 @@ export default function PoliceReportReview({ claimId }: PoliceReportReviewProps)
   // Debug police report URL when claim data changes
   useEffect(() => {
     if (claim?.policeReport) {
-      console.log('🔍 Police Report URL:', claim.policeReport);
-      console.log('🔍 Full claim object:', claim);
-      console.log('🔍 Image loading state:', imageLoading);
+      
     } else {
-      console.log('❌ No police report found in claim:', claim);
+      
     }
   }, [claim?.policeReport, imageLoading]);
 
   // Debug image rendering
   useEffect(() => {
     if (claim?.policeReport) {
-      console.log('🔍 Rendering image section - imageLoading:', imageLoading, 'policeReport:', claim.policeReport);
-      if (imageLoading) {
-        console.log('🔍 Showing loading skeleton');
-      } else {
-        console.log('🔍 Should be showing image now');
-      }
+      
     }
   }, [claim?.policeReport, imageLoading]);
 
@@ -343,17 +335,9 @@ export default function PoliceReportReview({ claimId }: PoliceReportReviewProps)
                         className={`w-full max-w-2xl mx-auto rounded-lg border shadow-sm ${imageLoading ? 'hidden' : 'block'}`}
                         style={{ maxHeight: '500px', objectFit: 'contain' }}
                         onLoad={() => {
-                          console.log('✅ Police report image loaded successfully');
-                          console.log('🔍 Image element:', document.querySelector('img[alt="Police Report Document"]'));
                           setImageLoading(false);
                         }}
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          console.error('❌ Failed to load police report image:', e);
-                          console.error('🔍 Error target:', target);
-                          console.error('🔍 Image URL:', claim.policeReport);
-                          console.error('🔍 Image naturalWidth:', target.naturalWidth);
-                          console.error('🔍 Image naturalHeight:', target.naturalHeight);
+                        onError={() => {
                           setImageLoading(false);
                         }}
                       />

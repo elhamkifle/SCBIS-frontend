@@ -109,7 +109,6 @@ function CarInsuranceAdminSettings() {
   const handleConfirmSave = async () => {
     setSaving(true);
     try {
-      console.log("Saving settings to backend...", settings);
       
       const response = await premiumSettingsApi.updateSettings(settings);
       

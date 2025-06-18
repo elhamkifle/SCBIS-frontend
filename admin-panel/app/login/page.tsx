@@ -32,8 +32,6 @@ export default function AdminLogin() {
         user: data.user
       });
 
-      console.log("Login successful:", data);
-      
       // Check for redirect URL in multiple places
       let redirectUrl = '/';
       
@@ -58,7 +56,6 @@ export default function AdminLogin() {
         redirectUrl = '/';
       }
       
-      console.log('Redirecting to:', redirectUrl);
       router.push(redirectUrl);
       
       return { success: true, user: data.user };

@@ -8,9 +8,8 @@ import PolicyPieChart from "./PolicyPieChart";
 import SummaryStats from "./SummaryStats";
 
 export default function AdminDashboard() {
-  const handleCardClick = (type: "policies" | "revenue") => {
+  const handleCardClick = () => {
     // You can implement detailed view logic here
-    console.log(`Clicked on ${type} card`);
   };
 
   return (

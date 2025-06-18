@@ -67,10 +67,8 @@ function PremiumCalculationPage({ params }: { params: Promise<{ id: string }> })
       try {
         setLoading(true);
         setError(null);
-        console.log('🔄 Calculating premium for request:', id);
         
         const response = await purchaseRequestsApi.calculatePremium(id);
-        console.log('✅ Premium calculation response:', response);
         
         if (response.success && response.data) {
           setCalculationData(response.data);
@@ -100,7 +98,6 @@ function PremiumCalculationPage({ params }: { params: Promise<{ id: string }> })
 
     setIsApproving(true);
     try {
-      console.log('🔄 Approving request with premium data...');
       
       const approvalData = {
         calculatedPremium: calculationData.finalPremium,
@@ -110,10 +107,7 @@ function PremiumCalculationPage({ params }: { params: Promise<{ id: string }> })
         notes: approvalNotes || undefined,
       };
 
-      console.log('📋 Approval data:', approvalData);
-
       const response = await purchaseRequestsApi.approveWithPremium(id, approvalData);
-      console.log('✅ Approval response:', response);
 
       if (response.success) {
         toast({
