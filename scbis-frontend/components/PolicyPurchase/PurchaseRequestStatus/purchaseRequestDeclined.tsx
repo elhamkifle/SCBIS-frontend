@@ -128,8 +128,7 @@ export default function PurchaseRequestDeclined() {
       setUploading(true);
       setError('');
 
-      // First update policy status to "pending"
-      await updatePolicyStatus('pending');
+      await updatePolicyStatus();
 
       // Check which documents need to be uploaded
       const needsLicense = policy?.statusReason?.toLowerCase().includes('license');
