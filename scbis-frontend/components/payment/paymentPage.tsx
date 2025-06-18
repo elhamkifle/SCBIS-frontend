@@ -32,12 +32,6 @@ interface Policy {
 }
 
 export default function PaymentPage() {
-  const [form, setForm] = useState({
-    name: '',
-    cardNumber: '',
-    expiry: '',
-    cvv: '',
-  })
 
   const { walletAddress, connectWallet, isConnected } = useWallet();
 

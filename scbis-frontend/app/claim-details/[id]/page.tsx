@@ -119,10 +119,6 @@ export default function ClaimDetailsPage() {
         }
     };
 
-    const handleStageChange = (newStage: ClaimStage) => {
-        claim.setClaim({ stage: newStage });
-    };
-
     // Determine stage based on claim status and other properties
     const determineStage = (): ClaimStage => {
         if (!backendClaim) return "submitted";
@@ -358,7 +354,6 @@ export default function ClaimDetailsPage() {
                                         </StageCard>
                                     );
                                 default:
-                                    const exhaustiveCheck = currentStage;
                                     return <StageCard title="Unknown Stage"><p>Unknown claim stage: {currentStage}</p></StageCard>;
                             }
                         })()}

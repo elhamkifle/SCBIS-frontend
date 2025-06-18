@@ -23,7 +23,7 @@ export function useWallet() {
 
     try {
       const provider = new ethers.BrowserProvider(window.ethereum as any);
-      const accounts = await provider.send("eth_requestAccounts", []);
+      // const accounts = await provider.send("eth_requestAccounts", []);
       const signer = await provider.getSigner();
       console.warn(signer,"here is the signer")
     //   setWalletAddress(accounts[0]);
@@ -35,7 +35,7 @@ export function useWallet() {
   };
 
      
-  const { policies, loading } = useInsurance(signer);
+  const { policies } = useInsurance(signer);
 
   console.log("Here is the policies",policies)
 
