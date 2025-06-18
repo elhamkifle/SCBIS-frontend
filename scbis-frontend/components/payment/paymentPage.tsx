@@ -1,10 +1,33 @@
 'use client'
-
+import React, { useEffect } from 'react'
 import { baseAPI } from '@/utils/axiosInstance'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { usePoliciesStore } from '@/store/dashboard/policies'
+import { useUserStore } from '@/store/authStore/useUserStore'
 import { useParams } from 'next/navigation'
+import { fetchUserData } from '@/utils/userUtils'
+import axios from 'axios'
+
+interface Policy {
+    _id: string;
+    policyType: string;
+    coverageEndDate: string;
+    coverageArea: string;
+    territory: string;
+    policyId: string;
+    duration: number;
+    policyPeriodFrom: string;
+    policyPeriodTo: string;
+    status: {
+        value: "Active" | "Renewal" | "Expired" | string;
+        _id: string;
+    };
+    createdAt: string;
+    vehicleType: "Private" | "Commercial" | string;
+    imageUrl?: string;
+    premiumAmount: number;
+    
+}
 
 export default function PaymentPage() {
   const [form, setForm] = useState({
@@ -15,25 +38,75 @@ export default function PaymentPage() {
   })
 
   const [loading, setLoading] = useState(false)
-  const { policies, addPolicies } = usePoliciesStore();
+  const [ policies, setPolicies ] = useState<Policy>();
   const pID = useParams().id as string;
 
-  const currentPolicy = policies.find(policy => policy._id ===  pID);
+  // const currentPolicy = policies.find(policy => policy._id ===  pID);
+  const user = useUserStore((state) => state.user);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
-  }
+  const getAuthTokenFromCookie = (): string | null => {
+    const match = document.cookie.match(/(?:^|;\s*)auth_token=([^;]*)/);
+    return match ? decodeURIComponent(match[1]) : null;
+  };
+
+    // Auto-refresh user data every 30 seconds to check verification status
+  useEffect(() => {
+    const refreshUserData = async () => {
+      try {
+        const userData = await fetchUserData();
+        if (userData === null) {
+          console.log('User not authenticated - stopping auto-refresh');
+          return;
+        }
+      } catch (error) {
+        console.error('Error refreshing user data:', error);
+      }
+    };
+
+    refreshUserData(); // Initial fetch
+    const interval = setInterval(refreshUserData, 30000); // Every 30 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!user?.userVerified) {
+        
+        return;
+      }
+
+      try {
+        const accessToken = getAuthTokenFromCookie();
+
+        const [policiesRes] = await Promise.all([
+          axios.get(`https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/policy/user-policies`, {
+            headers: { Authorization: `Bearer ${accessToken}` },
+          }),
+      
+        ]);
+
+        setPolicies(policiesRes.data.find((policy: Policy) => policy._id === pID));
+        console.log('Policies fetched:', policiesRes.data);
+        
+      } catch (error) {
+        console.error('Error fetching policy data data:', error);
+      } finally {
+       
+      }
+    };
+
+    fetchData();
+    console.log(policies)
+  }, [setPolicies,user?.userVerified]);
+
+  // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   setForm({ ...form, [e.target.name]: e.target.value })
+  // }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
-
-    const { name, cardNumber, expiry, cvv } = form
-    if (!name || !cardNumber || !expiry || !cvv) {
-      toast.error('Please fill in all fields')
-      setLoading(false)
-      return
-    }
+  
 
     setLoading(true)
     toast.loading('Processing payment...')
@@ -42,10 +115,10 @@ export default function PaymentPage() {
         "amount":"100.00",
         "currency":"ETB",
         "email":"asfawfanual2003@gmail.com",
-        "first_name":"Fanual",
-        "last_name":"Asfaw",
+        "first_name":`${user?.fullname.split(' ')[0]}`,
+        "last_name":`${user?.fullname.split(' ')[1] || ''}`,
         "callback_url":"https://scbis-frontend-4p0p446l9-elham-mulugetas-projects.vercel.app/",
-        "return_url":"https://scbis-frontend-4p0p446l9-elham-mulugetas-projects.vercel.app/?pid=9559049540954095"
+        "return_url":`https://2803-196-188-252-125.ngrok-free.app/payment/${pID}?tx_ref=true`
     })
 
     console.log(serverResponse)
@@ -54,6 +127,7 @@ export default function PaymentPage() {
       toast.success('Payment initialized successfully!')
       // Redirect to payment gateway or handle further logic
       window.location.href = serverResponse.data.data.checkout_url
+      localStorage.setItem('tx_ref', serverResponse.data.data.tx_ref)
     }
 
     setLoading(false)
@@ -65,62 +139,11 @@ export default function PaymentPage() {
         <h1 className="text-3xl text-white font-bold mb-6 text-center">Policy Payment</h1>
 
         <div className="mb-4 text-sm text-slate-400 text-center">
-          <p className='text-white text-lg'>Policy Type: <span className="text-base text-white">{currentPolicy?.policyType}</span></p>
-          <p className='text-white text-lg'>Amount Due: <span className="text-base text-green-400">{currentPolicy?.policyType}</span></p>
+          <p className='text-white text-lg'>Policy Type: <span className="text-base text-white">{policies?.policyType}</span></p>
+          <p className='text-white text-lg'>Amount Due: <span className="text-base text-green-400">{policies?.premiumAmount}</span></p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label className="block mb-1 text-sm">Cardholder Name</label>
-            <input
-              type="text"
-              name="name"
-              value={form.name}
-              onChange={handleChange}
-              placeholder="John Doe"
-              className="w-full px-4 py-2 rounded-md bg-slate-800 border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div>
-            <label className="block mb-1 text-sm">Card Number</label>
-            <input
-              type="text"
-              name="cardNumber"
-              maxLength={19}
-              value={currentPolicy?._id || form.cardNumber}
-              onChange={handleChange}
-              placeholder="1234 5678 9012 3456"
-              className="w-full px-4 py-2 rounded-md bg-slate-800 border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block mb-1 text-sm">Expiry</label>
-              <input
-                type="text"
-                name="expiry"
-                maxLength={5}
-                value={form.expiry}
-                onChange={handleChange}
-                placeholder="MM/YY"
-                className="w-full px-4 py-2 rounded-md bg-slate-800 border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block mb-1 text-sm">CVV</label>
-              <input
-                type="password"
-                name="cvv"
-                maxLength={4}
-                value={form.cvv}
-                onChange={handleChange}
-                placeholder="123"
-                className="w-full px-4 py-2 rounded-md bg-slate-800 border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          </div>
 
           <button
             type="submit"
