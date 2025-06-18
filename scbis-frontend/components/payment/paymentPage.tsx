@@ -107,7 +107,7 @@ export default function PaymentPage() {
         // const approved = await baseAPI.get(`https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/payment/verify/${txValue}`)
 
         
-          toast.success('Payment Successful')
+          const toastId = toast.success('Payment Successful')
 
           const blockchainData = {
               user: walletAddress,
@@ -121,7 +121,7 @@ export default function PaymentPage() {
               durationInDays:duration
           }
 
-          toast.loading('Policy issue in progress')
+          toast.loading('Policy issue in progress',{id:toastId})
           
           console.log(blockchainData,"blockchainData")
           const issuedPOlicy = await axios.post('https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/blockchain/issue-policy',blockchainData)
@@ -150,7 +150,7 @@ export default function PaymentPage() {
           }
 
           else{
-            toast.error(`policy not issued successfully. ${issuedPOlicy.data.message}`)
+            toast.error(`policy not issued successfully. ${issuedPOlicy.data.message}`,{id:toastId})
           }
 
           

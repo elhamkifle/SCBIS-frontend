@@ -150,7 +150,7 @@ export default function ClaimPreview() {
   };
 
   const handleSubmit = async () => {
-    toast.loading('Claim submission in progress')
+    const toastID = toast.loading('Claim submission in progress')
     const claimData = {
       policyId: selectedPolicyObj._id,
       isDriverSameAsInsured,
@@ -266,11 +266,11 @@ export default function ClaimPreview() {
 
         const res = await axios.post("https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/blockchain/add-claim",blokchainData)
         if (res.status===201){
-          toast.success('Claim Added Successfully to the blockchain')
+          toast.success('Claim Added Successfully to the blockchain',{id:toastID})
         }
 
         else{
-          toast.error(`${res.data.message}`)
+          toast.error(`${res.data.message}`,{id:toastID})
         }
         }
       }
