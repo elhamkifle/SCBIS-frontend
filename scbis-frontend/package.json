@@ -27,6 +27,7 @@
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.55.0",
     "socket.io-client": "^4.8.1",
+    "sonner": "^2.0.5",
     "ui": "^0.2.4",
     "zod": "^3.24.4",
     "zustand": "^5.0.3"
