@@ -5,6 +5,7 @@ import "@fontsource/syne/600.css"; // Specific weight (600)
 import "@fontsource/inter"; // Default weight (400)
 import "@fontsource/inter/600.css"; // Specific weight (600)
 import { WalletProvider } from "@/lib/blockchain/context/WalletContext";
+import Chatbot from "@/components/Chatbot/Chatbot";
 
 import "./globals.css";
 
@@ -35,6 +36,7 @@ export default function RootLayout({
       >
         <WalletProvider>
           {children}
+          <Chatbot />
         </WalletProvider>
       </body>
     </html>
