@@ -218,8 +218,6 @@ export default function ClaimPreview() {
       thirdPartyDamageFiles,
     }
 
-    console.log(claimData);
-
     const getAuthTokenFromCookie = (): string | null => {
       const match = document.cookie.match(/(?:^|;\s*)auth_token=([^;]*)/);
       return match ? decodeURIComponent(match[1]) : null;
@@ -267,6 +265,10 @@ export default function ClaimPreview() {
 
         if (res.status===201){
           toast.success('Claim Added Successfully to the blockchain')
+        }
+
+        else{
+          toast.error(`${res.data.message}`)
         }
         }
       }
