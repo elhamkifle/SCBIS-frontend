@@ -108,7 +108,7 @@ export default function PaymentPage() {
     };
 
 
-    const PolicyIssue = async(policyId:string,policyType:string,coverageArea:string,duration:number,amount:number,userId:string)=>{
+    const PolicyIssue = async(policyId:string,policyType:string,coverageArea:string,duration:number,amount:number)=>{
       if (tx_ref && isConnected){
         // const approved = await baseAPI.get(`https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/payment/verify/${txValue}`)
 
