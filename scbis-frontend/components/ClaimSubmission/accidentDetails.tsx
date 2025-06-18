@@ -125,8 +125,12 @@ export default function AccidentDetails() {
     if (!positionOnRoad || !roadSurface || !trafficCondition) {
       setError('Please fill all required fields');
       return;
+    } else{
+      router.push('/claim-submission/liability-information');
     }
+
     
+
   }
 
   const handleDeleteFile = () => {
