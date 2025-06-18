@@ -117,7 +117,7 @@ export default function PaymentPage() {
 
           const blockchainData = {
               user: walletAddress,
-              policyId:"POL-694548",
+              policyId:"POL-644448",
               policyType,
               issuerName: user?.fullname,
               plateNumber: policyId.slice(2),
@@ -136,9 +136,18 @@ export default function PaymentPage() {
           if (issuedPOlicy.data.success){
             toast.success(`Policy issued successfully ${issuedPOlicy.data.message}`)
             const accessToken = getAuthTokenFromCookie();
-            const updatedPolicy = await axios.put(`https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/policy/update-policy-status/${pID}`,{userId,statusValue:"active"},{
-            headers: { Authorization: `Bearer ${accessToken}` },
-          })
+
+            const updatedPolicy = await axios.put(
+                `https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/policy/update-policy-status/${pID}`,
+                {
+                  status: { value: 'active' },
+                },
+                {
+                  headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                  },
+                }
+              );
             if (updatedPolicy.status===200){
               window.location.href = "/dashboard"
             }
