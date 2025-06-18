@@ -63,7 +63,7 @@ export default function DamageDetails() {
     }
 
     setError('');
-    setLoading(true);
+    // setLoading(true);
 
     // if (vehicleDamageFiles.length > 0) {
     //   const url = await uploadToCloudinary(vehicleFiles);
@@ -74,14 +74,14 @@ export default function DamageDetails() {
 
 
     // Upload third-party file (only one expected now)
-    if (thirdPartyFiles.length > 0) {
-      const url = await uploadToCloudinary(thirdPartyFiles[0]);
-      if (url) {
-        addThirdPartyDamageFile(url);
-      }
-    }
+    // if (thirdPartyFiles.length > 0) {
+    //   const url = await uploadToCloudinary(thirdPartyFiles[0]);
+    //   if (url) {
+    //     addThirdPartyDamageFile(url);
+    //   }
+    // }
 
-    setLoading(false);
+    // setLoading(false);
     router.push('/claim-submission/declaration');
   };
 
