@@ -111,7 +111,7 @@ class PurchaseRequestsSocketService {
         });
 
         this.socket.on('connect', () => {
-          console.log('Connected to purchase requests WebSocket');
+          // console.log('Connected to purchase requests WebSocket');
           this.isConnected = true;
           
           // Join admin room with user data
@@ -122,7 +122,7 @@ class PurchaseRequestsSocketService {
         });
 
         this.socket.on('disconnect', () => {
-          console.log('Disconnected from purchase requests WebSocket');
+          // console.log('Disconnected from purchase requests WebSocket');
           this.isConnected = false;
         });
 
@@ -134,7 +134,7 @@ class PurchaseRequestsSocketService {
 
         // Handle successful room join
         this.socket.on('joined-admin-room', (data) => {
-          console.log('Successfully joined admin room:', data);
+          // console.log('Successfully joined admin room:', data);
         });
 
       } catch (error) {

@@ -822,7 +822,7 @@ export const claimsApi = {
     try {
       const response = await apiRequest<ClaimsResponse>(endpoint);
       
-      console.log('Raw claims API response:', response);
+      // console.log('Raw claims API response:', response);
       
       // Map backend response structure to our expected format
       return {
