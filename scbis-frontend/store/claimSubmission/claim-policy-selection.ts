@@ -44,6 +44,7 @@ interface Policy {
   coverageEndDate: string;
   territory: string;
   duration: string;
+  policyId: string;
   privateVehicle?: PrivateVehicle;
   commercialVehicle?: CommercialVehicle;
 }
