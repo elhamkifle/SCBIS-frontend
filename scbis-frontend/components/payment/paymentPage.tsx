@@ -4,9 +4,10 @@ import { baseAPI } from '@/utils/axiosInstance'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { useUserStore } from '@/store/authStore/useUserStore'
-import { useParams } from 'next/navigation'
+import { useParams, useSearchParams } from 'next/navigation'
 import { fetchUserData } from '@/utils/userUtils'
 import axios from 'axios'
+import { useWallet } from "@/lib/blockchain/context/WalletContext";
 
 interface Policy {
     _id: string;
@@ -37,9 +38,13 @@ export default function PaymentPage() {
     cvv: '',
   })
 
+  const { walletAddress, connectWallet, isConnected } = useWallet();
+
   const [loading, setLoading] = useState(false)
   const [ policies, setPolicies ] = useState<Policy>();
   const pID = useParams().id as string;
+  const txValue = localStorage.getItem('tx_ref')
+  const tx_ref = useSearchParams().get('tx_ref')
 
   // const currentPolicy = policies.find(policy => policy._id ===  pID);
   const user = useUserStore((state) => state.user);
@@ -100,6 +105,11 @@ export default function PaymentPage() {
     console.log(policies)
   }, [setPolicies,user?.userVerified]);
 
+
+  useEffect(()=>{
+    
+  },[tx_ref,txValue])
+
   // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   //   setForm({ ...form, [e.target.name]: e.target.value })
   // }
@@ -144,6 +154,17 @@ export default function PaymentPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
+
+          { !isConnected ? (
+            <div className="mt-4">
+              <p className="text-red-500">Wallet not connected. To access this page you need to connect your Metamask account.</p>
+              <button
+                className="bg-blue-600 text-white px-4 py-2 rounded mt-2"
+                onClick={connectWallet}
+              >
+                Connect Wallet
+              </button></div>):''
+          }
 
           <button
             type="submit"
