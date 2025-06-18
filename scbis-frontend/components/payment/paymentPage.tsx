@@ -9,6 +9,7 @@ import { fetchUserData } from '@/utils/userUtils'
 import axios from 'axios'
 import { useWallet } from "@/lib/blockchain/context/WalletContext";
 
+
 interface Policy {
     _id: string;
     policyType: string;
@@ -43,7 +44,6 @@ export default function PaymentPage() {
   const [loading, setLoading] = useState(false)
   const [ policies, setPolicies ] = useState<Policy>();
   const pID = useParams().id as string;
-  const txValue = localStorage.getItem('tx_ref')
   const tx_ref = useSearchParams().get('tx_ref')
 
   // const currentPolicy = policies.find(policy => policy._id ===  pID);
@@ -91,7 +91,13 @@ export default function PaymentPage() {
       
         ]);
 
-        setPolicies(policiesRes.data.find((policy: Policy) => policy._id === pID));
+        const policyData = policiesRes.data.find((policy: Policy) => policy._id === pID)
+
+        setPolicies(policyData);
+        if (policiesRes.status==200) {
+          
+          PolicyIssue(policyData?.policyId, policyData?.policyType, policyData?.coverageArea,policyData?.duration)
+        }
         console.log('Policies fetched:', policiesRes.data);
         
       } catch (error) {
@@ -101,18 +107,54 @@ export default function PaymentPage() {
       }
     };
 
+
+    const PolicyIssue = async(policyId:string,policyType:string,coverageArea:string,duration:number)=>{
+      if (tx_ref && isConnected){
+        // const approved = await baseAPI.get(`https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/payment/verify/${txValue}`)
+
+        
+          toast.success('Payment Successful')
+
+          const blockchainData = {
+              user: walletAddress,
+              policyId,
+              policyType,
+              issuerName: user?.fullname,
+              plateNumber: policyId.slice(2),
+              vehicleType: "private",
+              premiumAmount: 1200,
+              coverageArea,
+              durationInDays:duration
+          }
+
+          toast.loading('Policy issue in progress')
+          
+          console.log(blockchainData,"blockchainData")
+          const issuedPOlicy = await axios.post('https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/blockchain/issue-policy',blockchainData)
+          
+          setTimeout(() => { toast.dismiss() }, 5000)
+          if (issuedPOlicy.data.success){
+            toast.success(`Policy issued successfully ${issuedPOlicy.data.message}`)
+            window.location.href = "/dashboard"
+
+          }
+
+          else{
+            toast.error(`policy not issued successfully. ${issuedPOlicy.data.message}`)
+          }
+
+          
+        }
+
+        
+      
+    }
+
     fetchData();
+
     console.log(policies)
-  }, [setPolicies,user?.userVerified]);
+  }, [setPolicies,user?.userVerified,tx_ref,isConnected]);
 
-
-  useEffect(()=>{
-    
-  },[tx_ref,txValue])
-
-  // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   setForm({ ...form, [e.target.name]: e.target.value })
-  // }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -124,7 +166,7 @@ export default function PaymentPage() {
     const serverResponse = await baseAPI.post('/payment/initialize',{
         "amount":"100.00",
         "currency":"ETB",
-        "email":"asfawfanual2003@gmail.com",
+        "email":user?.email,
         "first_name":`${user?.fullname.split(' ')[0]}`,
         "last_name":`${user?.fullname.split(' ')[1] || ''}`,
         "callback_url":"https://scbis-frontend-4p0p446l9-elham-mulugetas-projects.vercel.app/",
@@ -137,7 +179,8 @@ export default function PaymentPage() {
       toast.success('Payment initialized successfully!')
       // Redirect to payment gateway or handle further logic
       window.location.href = serverResponse.data.data.checkout_url
-      localStorage.setItem('tx_ref', serverResponse.data.data.tx_ref)
+      console.log(serverResponse.data.tx_ref)
+      localStorage.setItem('tx_ref', serverResponse.data.tx_ref)
     }
 
     setLoading(false)
@@ -146,17 +189,17 @@ export default function PaymentPage() {
   return (
     <div className="min-h-screen flex items-center justify-center   text-white px-4">
       <div className="bg-slate-950 border border-slate-800 rounded-2xl shadow-xl w-full max-w-lg p-8">
-        <h1 className="text-3xl text-white font-bold mb-6 text-center">Policy Payment</h1>
+        <h1 className="text-3xl text-white font-bold mb-6 text-center">Payment Page</h1>
 
         <div className="mb-4 text-sm text-slate-400 text-center">
-          <p className='text-white text-lg'>Policy Type: <span className="text-base text-white">{policies?.policyType}</span></p>
-          <p className='text-white text-lg'>Amount Due: <span className="text-base text-green-400">{policies?.premiumAmount}</span></p>
+          <p className='text-white text-base'>Policy Type: <span className="text-sm text-white">{policies?.policyType || "N/A"}</span></p>
+          <p className='text-white text-base'>Amount Due: <span className="text-sm text-green-400">{policies?.premiumAmount || "N/A"}</span></p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form  className="space-y-5">
 
           { !isConnected ? (
-            <div className="mt-4">
+            <div className="mt-4 mx-auto">
               <p className="text-red-500">Wallet not connected. To access this page you need to connect your Metamask account.</p>
               <button
                 className="bg-blue-600 text-white px-4 py-2 rounded mt-2"
@@ -166,12 +209,14 @@ export default function PaymentPage() {
               </button></div>):''
           }
 
-          <button
+          {isConnected && <button
             type="submit"
+            onClick={handleSubmit}
+            disabled={tx_ref==="true"}
             className="w-full bg-blue-600 hover:bg-blue-700 transition-colors text-white font-semibold py-2 rounded-md mt-4"
           >
-            {loading ? <span className='loading loading-dots loading-xl'>Processing...</span> : 'Pay Now'}
-          </button>
+            {tx_ref? "Payment successful": (loading ? <span className='loading loading-dots loading-xl'>Processing...</span> : 'Pay Now')}
+          </button>}
         </form>
       </div>
     </div>
