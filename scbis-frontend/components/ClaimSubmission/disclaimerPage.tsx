@@ -1,16 +1,56 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useClaimPolicyStore } from '@/store/claimSubmission/claim-policy-selection';
+import { useUserStore } from '@/store/authStore/useUserStore';
+
+type InsuredInfo = {
+  fullName: string;
+  email: string;
+  // phone: string;
+  country?: string;
+};
 
 export default function ClaimDisclaimer() {
+  const user = useUserStore((state) => state.user);
+  const [insuredInfo, setInsuredInfo] = useState<InsuredInfo | null>(null);
   const [agreed, setAgreed] = useState(false);
   const [error, setError] = useState('');
-
   const router = useRouter();
 
-  const handlePrevious = () => router.push('/claim-submission//claim-policy-selection');
+  useEffect(() => {
+    const loadData = async () => {
+      if (!user) return;
 
+      const insured: InsuredInfo = {
+        fullName: user.fullname,
+        email: user.email ?? '',
+        country: user.country ?? '',
+      };
+
+      setInsuredInfo(insured);
+    };
+
+    if (user?._id) {
+      loadData();
+    }
+  }, [user?._id]);
+
+
+  if (!insuredInfo) {
+    return <p className="text-center text-gray-500 mt-10">Loading insured information...</p>;
+  }
+
+  const { selectedPolicy, policies } = useClaimPolicyStore.getState();
+  const selectedPolicyObj = policies.find(p => p._id === selectedPolicy);
+
+  const generalDetails =
+    selectedPolicyObj?.privateVehicle?.generalDetails ||
+    selectedPolicyObj?.commercialVehicle?.generalDetails;
+
+
+  const handlePrevious = () => router.push('/claim-submission/claim-policy-selection');
   const handleNext = () => {
     if (!agreed) {
       setError('You must agree to the disclaimer to proceed.');
@@ -36,43 +76,30 @@ export default function ClaimDisclaimer() {
       <div className={`bg-white px-8 py-4 rounded-2xl shadow-lg flex flex-col justify-around`} style={{ boxShadow: '0px 10px 20px rgba(0, 123, 255, 0.4), 0px 4px 8px rgba(0, 0, 0, 0.1)' }}>
         <h3 className="text-lg font-semibold text-blue-600">Personal Information of the Insured</h3>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-2 border-b border-b-[#3E99E7] py-6">
-          <p><strong>First Name:</strong> John Doe</p>
-          <p><strong>Last Name:</strong> Robert</p>
-          <p><strong>City:</strong> Addis Ababa</p>
-          <p><strong>Sub-City:</strong> Arada</p>
-          <p><strong>Kebele:</strong> 10</p>
-          <p><strong>Sefer:</strong> Teklehaymanot</p>
-        </div>
-
-        <h3 className="text-lg font-semibold text-blue-600 py-6">Insured Vehicle Detail: Toyota </h3>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-2 ">
-          <p><strong>Make:</strong> Toyota</p>
-          <p><strong>Mfg. Year:</strong> 2003</p>
-          <p><strong>Plate No.:</strong> A-10345</p>
-          <p><strong>CC:</strong> 10000</p>
-          <p><strong>Purpose:</strong> Private</p>
-          <p><strong>Seating Capacity:</strong> 5</p>
+          <p><strong>Full Name:</strong> {insuredInfo.fullName}</p>
+          <p><strong>Email:</strong> {insuredInfo.email}</p>
+          <p><strong>City:</strong> {insuredInfo.country}</p>
         </div>
       </div>
 
       <div className="mt-6 flex items-center">
-        <input 
-          type="checkbox" 
-          id="agree" 
-          checked={agreed} 
+        <input
+          type="checkbox"
+          id="agree"
+          checked={agreed}
           onChange={() => {
             setAgreed(!agreed);
             setError(''); // Clear error when user checks the box
-          }} 
-          className="mr-2" 
+          }}
+          className="mr-2"
         />
         <label htmlFor="agree" className="text-gray-700">I Agree and Continue</label>
       </div>
 
       {error && <p className="text-red-500 mt-2">{error}</p>}
 
-        {/* Navigation Buttons */}
-        <div className="w-full max-w-5xl flex justify-between items-center mt-8">
+      {/* Navigation Buttons */}
+      <div className="w-full max-w-5xl flex justify-between items-center mt-8">
         <button
           type="button"
           className="bg-[#3AA4FF] text-white p-7 py-2 rounded"

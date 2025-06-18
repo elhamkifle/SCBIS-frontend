@@ -13,13 +13,30 @@ import { useLiabilityInformationStore } from '@/store/claimSubmission/liability-
 import { useWitnessInformationStore } from '@/store/claimSubmission/witness-information';
 import { useDeclarationStore } from '@/store/claimSubmission/declaration';
 import { useDamageDetailsStore } from '@/store/claimSubmission/damage-details';
+import { useWallet } from "@/lib/blockchain/context/WalletContext";
+import { toast } from 'sonner';
 
 export default function ClaimPreview() {
   const router = useRouter();
+  const { selectedPolicy, policies } = useClaimPolicyStore.getState();
 
-  // Get all data from stores and their update functions
-  const { selectedVehicle } = useVehicleSelectionStore();
-  const { selectedPolicy } = useClaimPolicyStore();
+  const selectedPolicyObj = policies.find(p => p._id === selectedPolicy);
+  const { walletAddress, connectWallet, isConnected } = useWallet();
+
+  if (!selectedPolicyObj?._id) {
+    console.error('No policy selected or policy not found');
+    return;
+  }
+
+  const generalDetails =
+    selectedPolicyObj?.privateVehicle?.generalDetails ||
+    selectedPolicyObj?.commercialVehicle?.generalDetails;
+
+  const selectedVehicle = generalDetails
+    ? `${generalDetails.make} ${generalDetails.model}`
+    : '';
+
+
   const {
     isDriverSameAsInsured,
     formData: driver,
@@ -134,7 +151,7 @@ export default function ClaimPreview() {
 
   const handleSubmit = async () => {
     const claimData = {
-      policyId: "67fd5e03c2f1bd131f38a8ab",
+      policyId: selectedPolicyObj._id,
       isDriverSameAsInsured,
       driver: {
         ...driver
@@ -195,21 +212,64 @@ export default function ClaimPreview() {
         thirdPartyDamageDesc,
         injuriesAny,
         injuredPersons: [injuredPersons],
-      }
+      },
+      sketchFiles,
+      vehicleDamageFiles,
+      thirdPartyDamageFiles,
     }
 
     console.log(claimData);
 
-    const accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2N2ZkNTRlY2QzZGM1MzIxYTkwOWIyNDYiLCJyb2xlcyI6WyJ1c2VyIl0sImlhdCI6MTc0Njg5NDgzMSwiZXhwIjoxNzQ2ODk4NDMxfQ.oAQyZ5boJnsWWvFZm3aSehnD9JFaamufPIaoVmLU0CA"; // Provided accessToken
+    const getAuthTokenFromCookie = (): string | null => {
+      const match = document.cookie.match(/(?:^|;\s*)auth_token=([^;]*)/);
+      return match ? decodeURIComponent(match[1]) : null;
+    };
+
 
     try {
-      // Sending the claim data using Axios
+      const accessToken = getAuthTokenFromCookie();
+      if (!accessToken) {
+        console.warn('No auth token found in cookies.');
+        return;
+      }
+
       const response = await axios.post("https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/claims", claimData, {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
         }
       });
+
+      if (response.status===201){
+        const fetchedPolicy = await axios.get(`https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/policy/policy-details/${claimData.policyId}`, {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          }
+        });
+
+        if (fetchedPolicy.status===200){
+          const blokchainData = {
+          claimOwner:walletAddress,
+          policyId:fetchedPolicy.data?.policyId || "POL-12345678",
+          claimId:response.data._id,
+          amountClaimed:response.data?.coverageAmount || 0,
+          insuredName:response.data.insuredFullName,
+          driverName:response.data?.driverFullName || "",
+          description:response.data?.additionalDescription || "The car Was hit by another car",
+          plateNumber:response.data.policyId.splice(2) || "01123432",
+          proforma:response.data?.policeReport || "",
+          medicalRecords:"kjskdjsjdksjds",
+          accidentType:response.data?.intersectionType || "Car to Car"
+        }
+
+        const res = await axios.post("https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/blockchain/add-claim",blokchainData)
+
+        if (res.status===201){
+          toast.success('Claim Added Successfully to the blockchain')
+        }
+        }
+      }
 
       console.log(response);
 
@@ -238,6 +298,7 @@ export default function ClaimPreview() {
       useDeclarationStore.getState().clearAllData();
 
       alert("Claim submitted successfully!")
+      router.push("/dashboard")
 
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
@@ -298,6 +359,16 @@ export default function ClaimPreview() {
 
   return (
     <div className="max-w-5xl mx-auto p-6 bg-white">
+       { !isConnected ? (
+            <div className="mt-4 mx-auto">
+              <p className="text-red-500">Wallet not connected. To add your claim to blockchain  you need to connect your Metamask account.</p>
+              <button
+                className="bg-blue-600 text-white px-4 py-2 rounded mt-2"
+                onClick={connectWallet}
+              >
+                Connect Wallet
+              </button></div>):''
+        }
       <div className="w-full flex justify-between items-center mt-2 mb-10">
         <h2 className="md:text-xl sm:text-lg font-bold">Claim Submission Preview</h2>
         <div className="flex gap-2">
@@ -1205,6 +1276,7 @@ export default function ClaimPreview() {
             <div>
               <strong>Alone in Vehicle:</strong> {aloneInVehicle}
             </div>
+            {/* <div> {sketchFiles}, {vehicleDamageFiles}, {thirdPartyDamageFiles}</div> */}
 
             {aloneInVehicle === 'No I wasn\'t alone' && vehicleOccupants.length > 0 && (
               <div className="col-span-2">

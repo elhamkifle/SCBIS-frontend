@@ -2,12 +2,50 @@
 
 import { useRouter } from 'next/navigation';
 import { useOwnershipUsageStore } from '@/store/vehicleDetails/ownershipAndUsage';
+import { useVehicleSelectionStore } from '@/store/vehicleSelection/vehicleSelectionStore';
+import { useEffect } from 'react';
 
 export default function OwnershipAndUsageForm() {
     const router = useRouter();
     const { formData, setFormData, logFormData } = useOwnershipUsageStore();
+    const { isExistingVehicle, vehicleData } = useVehicleSelectionStore();
+
+    // Pre-fill form based on selected vehicle data
+    useEffect(() => {
+        console.log('🔍 Checking for pre-selected vehicle data in ownership page...');
+        console.log('📋 Vehicle selection state:', { isExistingVehicle, vehicleData });
+        
+        if (isExistingVehicle && vehicleData?.privateVehicle?.ownershipUsage) {
+            console.log('✅ Pre-filling ownership form with existing vehicle data');
+            
+            const { ownershipUsage } = vehicleData.privateVehicle;
+            
+            // Map the API data to form fields
+            const preFilledData = {
+                ownerType: ownershipUsage.ownerType || '',
+                driverType: ownershipUsage.driverType || '',
+                seatingCapacity: ownershipUsage.seatingCapacity?.toString() || '',
+                purchasedValue: ownershipUsage.purchasedValue?.toString() || '',
+                dutyFree: ownershipUsage.dutyFree ? 'Yes' : 'No',
+            };
+            
+            setFormData(preFilledData);
+            console.log('✅ Ownership details pre-filled:', preFilledData);
+        } else {
+            console.log('🆕 New vehicle creation - form will remain empty');
+            // Clear form for new vehicle
+            setFormData({
+                ownerType: '',
+                driverType: '',
+                seatingCapacity: '',
+                purchasedValue: '',
+                dutyFree: '',
+            });
+        }
+    }, [isExistingVehicle, vehicleData, setFormData]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        console.log(`👆 User manually updated ${e.target.name}: ${e.target.value}`);
         setFormData({ [e.target.name]: e.target.value });
     };
 

@@ -9,7 +9,7 @@ export default function AccessDenied() {
     // Use window.location.href instead of router.push to ensure 
     // we fully reload the page and bypass any middleware caching
     // window.location.href = '/';
-    router.push('/')
+    router.push('/login')
   };
 
   return (

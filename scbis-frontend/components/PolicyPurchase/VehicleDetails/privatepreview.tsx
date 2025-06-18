@@ -1,22 +1,15 @@
 'use client';
 
-import { Edit, Check } from 'lucide-react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Edit, Check } from 'lucide-react';
 import { useVehiclePurposeStore } from '@/store/vehicleDetails/purpose';
 import { usePrivateVehicleCategoryStore } from '@/store/vehicleDetails/privateVehicleCategory';
 import { useGeneralVehicleStore } from '@/store/vehicleDetails/generalVehicle';
 import { useOwnershipUsageStore } from '@/store/vehicleDetails/ownershipAndUsage';
-import { useState } from 'react';
-import { useUserStore } from '@/store/authStore/useUserStore';
-import { baseAPI } from '@/utils/axiosInstance';
-// import { set } from 'zod';
-
-// type VehicleDetails = {
-//   make: string;
-//   model: string;
-//   mfgYear: string;
-//   [key: string]: any;
-// };
+import { useVehicleSelectionStore } from '@/store/vehicleSelection/vehicleSelectionStore';
+import { useVehicleDocumentsStore } from '@/store/vehicleDetails/vehicleDocuments';
+import { vehiclePersistenceService } from '@/utils/vehicleApi';
 
 // type OwnershipUsageData = {
 //   isOwned: boolean;
@@ -26,11 +19,12 @@ import { baseAPI } from '@/utils/axiosInstance';
 
 export default function PolicyPreview() {
   const router = useRouter();
-  const user = useUserStore((state) => state.user);
   const { selectedType, setSelectedType } = useVehiclePurposeStore();
   const { carType, usageType, setCarType, setUsageType } = usePrivateVehicleCategoryStore();
   const { formData: vehicleData, setFormData: setVehicleData } = useGeneralVehicleStore();
   const { formData: ownershipData, setFormData: setOwnershipData } = useOwnershipUsageStore();
+  const { isExistingVehicle, selectedVehicleId, vehicleData: selectedVehicleData } = useVehicleSelectionStore();
+  const { driversLicense, vehicleLibre } = useVehicleDocumentsStore();
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -46,47 +40,109 @@ export default function PolicyPreview() {
   };
 
   const handleSubmit = async () => {
+    console.log('🚀 Starting vehicle submission process...');
+    console.log('📋 Vehicle selection context:', {
+      isExistingVehicle,
+      selectedVehicleId,
+      hasSelectedVehicleData: !!selectedVehicleData
+    });
+    console.log('🔍 Vehicle selection store state:', {
+      isExistingVehicle,
+      selectedVehicleId,
+      vehicleData: selectedVehicleData
+    });
+
+    // Check if documents are uploaded
+    if (!driversLicense || !vehicleLibre) {
+      const missingDocs = [];
+      if (!driversLicense) missingDocs.push("Driver's License");
+      if (!vehicleLibre) missingDocs.push("Vehicle Libre");
+      
+      const shouldContinue = confirm(
+        `⚠️ Warning: You haven't uploaded the following required documents: ${missingDocs.join(', ')}.\n\nDo you want to continue without these documents? (Not recommended)`
+      );
+      
+      if (!shouldContinue) {
+        return;
+      }
+    }
 
     setError('');
     setIsLoading(true);
 
-    const vehicleName = selectedType === 'private' ? 'PrivateVehicle' : 'CommercialVehicle';
+    try {
+      // Step 1: Build vehicle payload from form data
+      const formData = {
+        selectedType,
+        carType,
+        usageType,
+        vehicleData,
+        ownershipData,
+        documents: {
+          driversLicense: driversLicense || undefined,
+          vehicleLibre: vehicleLibre || undefined
+        }
+      };
 
-    const serverResponse = await baseAPI.post('/policy/vehicle-details', {
-      VehicleType: selectedType === 'private' ? "Private" : "Commercial",
-      [vehicleName]: {
-        vehicleCategory: "Passanger Car",
-        usageType: ["Personal Use"],
-        generalDetails: { ...vehicleData, engineNumber: vehicleData.engineNo, plateNumber: vehicleData.plateNo },
-        ownershipUsage: { ...ownershipData, dutyFree: ownershipData.dutyFree === "Yes" ? true : false }
-      },
+      const vehiclePayload = vehiclePersistenceService.buildVehiclePayload(formData);
+      console.log('🏗️ Built vehicle payload:', vehiclePayload);
 
-    }, {
-      headers: {
-        Authorization: `Bearer ${user?.accessToken}`
+      // Step 2: Save or update vehicle data
+      let vehiclePersistenceResult;
+      
+      if (isExistingVehicle && selectedVehicleId) {
+        console.log('🔄 Updating existing vehicle...');
+        vehiclePersistenceResult = await vehiclePersistenceService.saveVehicleData(
+          vehiclePayload,
+          true,
+          selectedVehicleId
+        );
+      } else {
+        console.log('🆕 Creating new vehicle...');
+        vehiclePersistenceResult = await vehiclePersistenceService.saveVehicleData(
+          vehiclePayload,
+          false
+        );
       }
-    });
 
-    if (serverResponse.status === 201) {
-      console.log('Policy submitted successfully:', serverResponse.data);
+      console.log('✅ Vehicle persistence completed:', vehiclePersistenceResult);
+
+      // Step 3: Continue with policy submission using the vehicle ID from persistence result
+      const vehicleId = vehiclePersistenceResult.data._id || selectedVehicleId;
+      
+      if (!vehicleId) {
+        throw new Error('Vehicle ID not found after persistence operation');
+      }
+
+      console.log('📋 Using vehicle ID for policy submission:', vehicleId);
+
+      // Navigate to policy selection page with the vehicle ID
+      console.log('✅ Vehicle saved/updated successfully!');
+      
+      // Show success message with context
+      const successMessage = vehiclePersistenceResult.isUpdate 
+        ? 'Vehicle updated successfully!' 
+        : 'New vehicle created successfully!';
+      
+      alert(successMessage);
+      
+      // Clear form data
       localStorage.removeItem('insurance-storage');
       localStorage.removeItem('private-vehicle-storage');
       localStorage.removeItem('general-vehicle-storage');
       localStorage.removeItem('ownership-usage-storage');
-      router.push('/policy-purchase/purchase/policySelection');
-      alert('Policy submitted successfully!');
+      localStorage.removeItem('vehicle-selection-storage');
+      localStorage.removeItem('vehicle-documents-storage');
+      
+      console.log('🧹 Cleared form storage');
+      router.push('/dashboard');
 
-    } else {
-      console.error('Error submitting policy:', serverResponse.data);
-      setError('❌ Some error occurred. Please try again.');
+    } catch (error) {
+      console.error('❌ Vehicle submission failed:', error);
+      setError(`❌ Failed to save vehicle data: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
-
-
-
-
-
   };
 
   // const handlePrevious = () => {
@@ -147,20 +203,20 @@ export default function PolicyPreview() {
           {isEditing.purpose ? (
             <div className="mt-4">
               <div className="relative">
-                <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Insurance Type</label>
+                <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Vehicle Type</label>
                 <select
                   value={selectedType}
                   onChange={(e) => setSelectedType(e.target.value)}
                   className="w-full p-2 border border-black rounded"
                 >
-                  <option value="known">Known Driver</option>
-                  <option value="any">Any Driver </option>
+                  <option value="private">Private</option>
+                  <option value="commercial">Commercial</option>
                 </select>
               </div>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 px-4">
-              <div><strong>Selected Insurance Type:</strong> <p> {selectedType === 'private' ? 'Private' : 'Commercial'}  </p> </div>
+              <div><strong>Selected Vehicle Type:</strong> <p> {selectedType === 'private' ? 'Private' : 'Commercial'}  </p> </div>
             </div>
           )}
         </div>
@@ -433,6 +489,50 @@ export default function PolicyPreview() {
               <div><strong>Duty Free:</strong> <p>{ownershipData.dutyFree}</p></div>
             </div>
           )}
+        </div>
+
+        {/* Documents Section */}
+        <div className="border-b pb-4 mb-8">
+          <div className="flex justify-between items-center">
+            <h2 className="text-lg font-bold text-blue-600">5. Required Documents</h2>
+            <button 
+              onClick={() => router.push('/policy-purchase/vehicle-information/uploadDocs')} 
+              className="text-blue-500 hover:text-blue-700 text-sm"
+            >
+              Upload Documents
+            </button>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 px-4">
+            <div>
+              <strong>Driver&apos;s License:</strong>
+              <p className={`flex items-center gap-2 ${driversLicense ? 'text-green-600' : 'text-red-600'}`}>
+                {driversLicense ? '✅ Uploaded' : '❌ Not uploaded'}
+                {driversLicense && (
+                  <button 
+                    onClick={() => window.open(driversLicense, '_blank')} 
+                    className="text-blue-500 hover:text-blue-700 text-sm underline"
+                  >
+                    View
+                  </button>
+                )}
+              </p>
+            </div>
+            <div>
+              <strong>Vehicle Libre:</strong>
+              <p className={`flex items-center gap-2 ${vehicleLibre ? 'text-green-600' : 'text-red-600'}`}>
+                {vehicleLibre ? '✅ Uploaded' : '❌ Not uploaded'}
+                {vehicleLibre && (
+                  <button 
+                    onClick={() => window.open(vehicleLibre, '_blank')} 
+                    className="text-blue-500 hover:text-blue-700 text-sm underline"
+                  >
+                    View
+                  </button>
+                )}
+              </p>
+            </div>
+          </div>
         </div>
 
         {error && <p className="text-red-500 mt-4 text-center">{error}</p>}

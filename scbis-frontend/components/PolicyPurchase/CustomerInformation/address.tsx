@@ -1,17 +1,88 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
 import { useAddressStore } from '@/store/customerInformationStore/addressStore';
+import { useUserStore } from '@/store/authStore/useUserStore';
 
 export default function AddressForm() {
     const router = useRouter();
     const { 
         address, 
-        updateAddress, 
+        updateAddress,
+        setOriginalAddress,
+        isDataModified
     } = useAddressStore();
+    const user = useUserStore(state => state.user);
+    const setUser = useUserStore(state => state.setUser);
+    const dataLoadedRef = useRef(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    // Load user address data when the component mounts, but only once
+    useEffect(() => {
+        // Skip if we've already loaded data or if there's no user
+        if (dataLoadedRef.current || !user) return;
+
+        // Create address data object from backend response
+        const addressData = {
+            country: user.country || '',
+            state: user.regionOrState || user.state || '', // Map regionOrState to state
+            city: user.city || '',
+            subcity: user.subcity || '',
+            zone: user.zone || '',
+            wereda: user.wereda || '',
+            kebele: user.kebele || '',
+            houseNo: user.houseNumber || '', // Map houseNumber to houseNo
+        };
+        
+        // Set this as the original data and current address data
+        setOriginalAddress(addressData);
+        // Mark as loaded so we don't try again
+        dataLoadedRef.current = true;
+    }, [user, setOriginalAddress]);
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        
+        if (isDataModified) {
+            // If data is modified, submit to backend
+            setIsSubmitting(true);
+            try {
+                // Update user address data in backend
+                const updateData = {
+                    country: address.country,
+                    regionOrState: address.state, // Map state back to regionOrState
+                    city: address.city,
+                    subcity: address.subcity,
+                    zone: address.zone,
+                    wereda: address.wereda,
+                    kebele: address.kebele,
+                    houseNumber: address.houseNo, // Map houseNo back to houseNumber
+                };
+
+                // Here you would call your API to update user data
+                // For now, I'll update the local user store
+                if (user) {
+                    const updatedUser = {
+                        ...user,
+                        ...updateData,
+                    };
+                    setUser(updatedUser);
+                }
+
+                console.log('Address updated:', updateData);
+                
+                // Update the original data to reflect the new saved state
+                setOriginalAddress(address);
+                
+            } catch (error) {
+                console.error('Error updating address:', error);
+                // Handle error appropriately
+            } finally {
+                setIsSubmitting(false);
+            }
+        }
+        
         router.push('/policy-purchase/personal-information/uploadID');
     };
 
@@ -74,6 +145,7 @@ export default function AddressForm() {
                             onChange={handleChange}
                             className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                             required
+                            aria-label="Country"
                         >
                             <option value="">Select a country</option>
                             {countries.map((country, index) => (
@@ -89,6 +161,7 @@ export default function AddressForm() {
                             onChange={handleChange}
                             className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                             required
+                            aria-label="Region"
                         >
                             <option value="">State/Region</option>
                             {ethiopianRegions.map((region, index) => (
@@ -104,6 +177,7 @@ export default function AddressForm() {
                             onChange={handleChange}
                             className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                             required
+                            aria-label="City"
                         >
                             <option value="">Select a city</option>
                             {ethiopianCities.map((city, index) => (
@@ -120,6 +194,8 @@ export default function AddressForm() {
                             onChange={handleChange}
                             className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                             required
+                            aria-label="Subcity"
+                            placeholder="Enter subcity"
                         />
                     </div>
                     <div className="relative w-full">
@@ -131,6 +207,8 @@ export default function AddressForm() {
                             onChange={handleChange}
                             className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                             required
+                            aria-label="Zone"
+                            placeholder="Enter zone"
                         />
                     </div>
                     <div className="relative w-full">
@@ -142,6 +220,8 @@ export default function AddressForm() {
                             onChange={handleChange}
                             className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                             required
+                            aria-label="Wereda"
+                            placeholder="Enter wereda"
                         />
                     </div>
                     <div className="relative w-full">
@@ -153,6 +233,8 @@ export default function AddressForm() {
                             onChange={handleChange}
                             className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                             required
+                            aria-label="Kebele"
+                            placeholder="Enter kebele"
                         />
                     </div>
                     <div className="relative w-full">
@@ -163,11 +245,26 @@ export default function AddressForm() {
                             value={address.houseNo}
                             onChange={handleChange}
                             className="w-full p-2 border border-black rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            aria-label="House Number"
+                            placeholder="Enter house number"
                         />
                     </div>
                     <div className="col-span-1 md:col-span-3 flex justify-between mt-4">
                         <button type="button" onClick={handlePrevious} className="bg-[#3AA4FF] text-white p-7 py-2 rounded">Previous</button>
-                        <button type="submit" className="bg-blue-600 text-white p-7 py-2 rounded">Next</button>                    </div>
+                        <button 
+                            type="submit" 
+                            disabled={isSubmitting}
+                            className={`${
+                                isDataModified 
+                                    ? 'bg-green-600 hover:bg-green-700' 
+                                    : 'bg-blue-600 hover:bg-blue-700'
+                            } text-white p-7 py-2 rounded transition-colors ${
+                                isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
+                            }`}
+                        >
+                            {isSubmitting ? 'Submitting...' : (isDataModified ? 'Submit' : 'Next')}
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>    

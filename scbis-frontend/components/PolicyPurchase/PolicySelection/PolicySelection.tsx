@@ -191,9 +191,6 @@ export default function PolicySelection() {
       </Transition>
 
       <div className="flex justify-between w-full max-w-6xl mt-8">
-        <button className="border border-black px-4 py-2 rounded-lg text-black"
-        onClick={() => router.push('/policy-information')}
-        >Learn More</button>
         <button
           onClick={handleNext}
           className="bg-blue-500 text-white p-5 md:px-10 py-2 rounded"

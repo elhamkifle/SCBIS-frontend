@@ -4,6 +4,9 @@ import "@fontsource/syne"; // Default weight (400)
 import "@fontsource/syne/600.css"; // Specific weight (600)
 import "@fontsource/inter"; // Default weight (400)
 import "@fontsource/inter/600.css"; // Specific weight (600)
+import { WalletProvider } from "@/lib/blockchain/context/WalletContext";
+import Chatbot from "@/components/Chatbot/Chatbot";
+import { Toaster } from 'sonner'
 
 import "./globals.css";
 
@@ -32,7 +35,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <WalletProvider>
+          <Toaster richColors position="bottom-right" />
+          {children}
+          <Chatbot />
+        </WalletProvider>
       </body>
     </html>
   );

@@ -39,7 +39,7 @@ input[type="radio"] {
         color: black;
     }
 
-    h1, h2, h3, h4, h5, p, strong, label, li, ul {
+    h1, h2, h3, h4, h5, p, strong, label, li, ul, Link {
         color: black;
     }
   }

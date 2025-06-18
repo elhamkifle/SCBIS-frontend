@@ -6,7 +6,7 @@ import Image from 'next/image';
 export default function Hero() {
     const router = useRouter();
     const handleNext = () => {
-        router.push('/');
+        router.push('/login');
     }
 
     const covers = [
@@ -111,7 +111,7 @@ export default function Hero() {
                             </button>
 
                             <button
-                                onClick={() => router.push("/claim-submission/vehicle-selection")}
+                                onClick={() => router.push("/claim-submission/claim-policy-selection")}
                                 className="bg-[#7AC943] text-white font-semibold px-6 py-3 rounded-lg hover:bg-[#1F4878] transition"
                             >
                                 Start a New Claim
@@ -148,7 +148,7 @@ export default function Hero() {
 
                                 <ul className="text-left space-y-2 mb-6">
                                     {cover.benefits.map((benefit, i) => (
-                                        <li key={i} className="flex items-start space-x-2 block">
+                                        <li key={i} className="md:flex items-start space-x-2 block">
                                             ✅<span className='ml-3 text-black'>{benefit}</span>
                                         </li>
                                     ))}
@@ -229,7 +229,7 @@ export default function Hero() {
                         Sign up or log in to select and purchase your policies today.
                     </p>
 
-                    <button type="submit" onClick={handleNext} className="bg-green-500 text-white p-10 py-2 rounded font-semibold hover:bg-green-400">Sign Up </button>
+                    <button type="submit" onClick={handleNext} className="bg-green-500 text-white p-10 py-2 rounded font-semibold hover:bg-green-400">Log in </button>
 
                 </div>
             </section>

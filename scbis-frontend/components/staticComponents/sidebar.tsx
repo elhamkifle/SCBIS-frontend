@@ -7,6 +7,8 @@ import { useUserStore } from "@/store/authStore/useUserStore";
 
 export default function Sidebar() {
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const user = useUserStore((state) => state.user);
+    const profileName = user?.fullname.split(' ') || []; 
 
     const router = useRouter();
     const logout = useUserStore((state) => state.logout);
@@ -14,10 +16,16 @@ export default function Sidebar() {
         const confirmLogout = window.confirm("Are you sure you want to log out?");
         if (confirmLogout) {
             logout();
-            router.push('/');
+            router.push('/login');
         }
     };
 
+    // Safe function to get display name
+    const getDisplayName = () => {
+        if (!profileName || profileName.length === 0) return "User";
+        if (profileName.length === 1) return profileName[0];
+        return `${profileName[0]} ${profileName[1]?.[0] || ''}.`;
+    };
 
     return (
         <>
@@ -27,7 +35,7 @@ export default function Sidebar() {
                 {/* User Info Section */}
                 <div className="flex flex-col items-center py-6 transition-opacity duration-300">
                     <User size={40} className="mb-2" />
-                    {!isCollapsed && <span className="text-lg font-semibold text-center">UserName</span>}
+                    {!isCollapsed && <span className="font-syne font-semibold text-center">{getDisplayName()}</span>}
                 </div>
 
                 {/* Centered Navigation Sections */}
@@ -48,10 +56,10 @@ export default function Sidebar() {
                     {
                         !isCollapsed && (
                             <>
-                                <button className="p-2 bg-gray-700 rounded-full hover:bg-gray-600"><HelpCircle size={20} /></button>
-                                <button className="p-2 bg-gray-700 rounded-full hover:bg-gray-600"><Settings size={20} /></button>
-                                {/* <button className="p-2 bg-gray-700 rounded-full hover:bg-red-500"><LogOut size={20} /></button> */}
+                                <button aria-label="Help" className="p-2 bg-gray-700 rounded-full hover:bg-gray-600"><HelpCircle size={20} /></button>
+                                <button aria-label="Settings" className="p-2 bg-gray-700 rounded-full hover:bg-gray-600"><Settings size={20} /></button>
                                 <button
+                                    aria-label="Logout"
                                     className="p-2 bg-gray-700 rounded-full hover:bg-red-500"
                                     onClick={handleLogout}
                                 >

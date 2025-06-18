@@ -4,6 +4,25 @@ import { useUserStore } from '@/store/authStore/useUserStore';
 import { usePathname } from 'next/navigation';
 import { fetchUserData } from './userUtils';
 
+// Routes that require user verification
+const verifiedUserRoutes = [
+  '/policy-purchase/vehicle-information',
+  '/policy-purchase/purchase', 
+  '/policy-purchase/policy-selection',
+  '/policy-purchase/success',
+  '/claim-submission',
+  '/policydetails',
+  '/claim-details', 
+  '/my-policies',
+  '/policy-details',
+  '/policy-information',
+  '/purchaseRequestReview',
+  '/purchaseRequestApproved',
+  '/purchaseRequestDeclined', 
+  '/notifications',
+  '/test-policy-selection'
+];
+
 export function useAuth(requireAuth = true) {
   const router = useRouter();
   const pathname = usePathname();
@@ -17,6 +36,12 @@ export function useAuth(requireAuth = true) {
   
   // User is authenticated if either the store has user data or cookie exists
   const isAuthenticated = !!user?.accessToken || hasCookieAuth;
+  const isVerified = user?.userVerified === true;
+  
+  // Check if current route requires verification
+  const currentRouteRequiresVerification = verifiedUserRoutes.some(route => 
+    pathname.startsWith(route)
+  );
 
   useEffect(() => {
     // Set a small delay to allow store hydration
@@ -32,14 +57,23 @@ export function useAuth(requireAuth = true) {
         router.push('/access-denied');
       } else if (!requireAuth && isAuthenticated) {
         // If user is authenticated but trying to access auth pages
-        router.push('/policy-purchase/personal-information/personalDetails');
+        router.push('/dashboard');
       } else if (isAuthenticated && user?._id) {
         // If user is authenticated, refresh user data from the backend
         try {
-          await fetchUserData();
+          const userData = await fetchUserData();
+          if (userData === null) {
+            // User is no longer authenticated, handle gracefully
+            console.log("User authentication has expired");
+          }
         } catch (err) {
           console.error("Failed to refresh user data:", err);
           setError("Failed to refresh user data. Some information may be outdated.");
+        }
+        
+        // Check verification status for routes that require it
+        if (currentRouteRequiresVerification && !isVerified) {
+          router.push('/dashboard'); // Redirect to dashboard where they'll see verification status
         }
       }
       
@@ -47,9 +81,9 @@ export function useAuth(requireAuth = true) {
     }, 100); // Small delay to allow store hydration
     
     return () => clearTimeout(timer);
-  }, [requireAuth, isAuthenticated, router, pathname, user]);
+  }, [requireAuth, isAuthenticated, router, pathname, user, isVerified, currentRouteRequiresVerification]);
 
-  return { isAuthenticated, user, isLoading, error };
+  return { isAuthenticated, user, isLoading, error, isVerified };
 }
 
 // Additional auth utilities

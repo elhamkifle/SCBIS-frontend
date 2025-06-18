@@ -3,6 +3,9 @@
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import useSignupStore from "@/store/authStore/useSignupStore"
+// import { span } from "framer-motion/client"
+
+
 export default function SignupStep2() {
   const router = useRouter()
   const {

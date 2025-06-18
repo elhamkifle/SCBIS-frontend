@@ -1,21 +1,21 @@
 'use client'
-import React, { Suspense, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import verificationNumSchema from '@/schema/VerificationNum'
 import { VerificationNumSchemaType } from '@/schema/VerificationNum'
 import { useRouter, useSearchParams } from 'next/navigation'
 
-const VerificationComponent = () => {
+const Verification = () => {
 
     const naivgate = useRouter()
-    const [iseResending, setIsResending] = useState<boolean>(false)
-    const [timeLeft, setTimeLeft] = React.useState<number>(60 * 1)
+    const [iseResending,setIsResending] = useState<boolean>(false)
+    const [timeLeft,setTimeLeft] = React.useState<number>(60*10)
     const searchParams = useSearchParams()
     const page = searchParams.get('page')
     const email = searchParams.get('email') || 'asfawfanual2003@gmail.com'
     const phone = searchParams.get('phone') || '0965168741'
 
-    useEffect(() => {
+    useEffect(()=>{
         const interval = setInterval(() => {
             if (timeLeft > 0) {
                 setTimeLeft((prev) => prev - 1)
@@ -25,25 +25,25 @@ const VerificationComponent = () => {
             }
         }, 1000)
 
-        return () => clearInterval(interval)
-    }, [timeLeft])
+        return () => clearInterval(interval)    
+    },[timeLeft])
 
-    const formatTime = (seconds: number) => {
+    const formatTime = (seconds:number) => {
         const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
         const secs = (seconds % 60).toString().padStart(2, '0');
         return `${mins}:${secs}`;
-    };
-
-    const [verifcationNumbers, setVerifcationNumbers] = React.useState<Record<string, string | number>>({
+      };
+    
+    const [verifcationNumbers, setVerifcationNumbers] = React.useState<Record<string, string|number>>({
         one: '',
         two: '',
         three: '',
         four: '',
         five: '',
-        six: ''
+        six: ''    
     })
 
-    const numArray = ['one', 'two', 'three', 'four', 'five', 'six']
+    const numArray = ['one','two','three','four','five','six']
 
     const [errors, setErrors] = React.useState<VerificationNumSchemaType>({
         verificationNum: ''
@@ -53,13 +53,13 @@ const VerificationComponent = () => {
     // const [isSuccess, setIsSuccess] = React.useState(false)
 
     const HandleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value, id } = e.target
+        const { name, value,id } = e.target
         setVerifcationNumbers((prev) => ({
             ...prev,
             [name]: value
         }))
 
-        if (id < '5' && value.length === 1) {
+        if (id<'5' && value.length === 1) {
             const nextInput = numArray[numArray.indexOf(name) + 1]
             if (nextInput) {
                 const nextInputElement = document.querySelector(`input[name="${nextInput}"]`) as HTMLInputElement
@@ -68,22 +68,22 @@ const VerificationComponent = () => {
         }
     }
 
-    const ResendCode = async () => {
+    const ResendCode = async()=>{
         setIsResending(true)
-        const serverResponse = await fetch('https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/otp/send', {
-            method: 'POST',
-            body: JSON.stringify({ phoneNumber: phone }),
-            headers: {
-                'Content-Type': 'application/json'
+        const serverResponse = await fetch('https://localhost:3001/auth/request-password-reset',{
+            method:'POST',
+            body:JSON.stringify({ email,phoneNumber:phone }),
+            headers:{
+                'Content-Type':'application/json'
             }
         })
 
-        if (serverResponse.ok) {
+        if (serverResponse.ok){
             window.location.reload()
         }
 
         setIsResending(false)
-        console.log(await serverResponse.json(), "here is the server Response")
+        console.log(await serverResponse.json(),"here is the server Response")
     }
 
     const HandleSubmit = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -106,14 +106,25 @@ const VerificationComponent = () => {
             setIsSubmitting(false)
             return
         }
+        console.log(verificationNum, "here is the verification number",  email);
 
-        const serverResponse = await fetch('https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/otp/verify', {
+        // const formattedPhone = phone.startsWith('+') ? phone : `+${phone}`;
+        // console.log(formattedPhone, "here is the formatted phone number")
+        const serverResponse = await fetch('https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/auth/verify-email', {
             method: 'POST',
-            body: JSON.stringify({ otp: verificationNum, phoneNumber: phone }),
+            body: JSON.stringify({ 
+                identifier: email,
+                otp: verificationNum
+            }),
             headers: {
                 'Content-Type': 'application/json'
             }
-        })
+        });
+
+        if (!serverResponse.ok) {
+            const errorText = await serverResponse.text();
+            console.error('Server response:', errorText);
+        }
 
 
 
@@ -126,10 +137,10 @@ const VerificationComponent = () => {
             //     setIsSuccess(false)
             // }, 3000
           
-            if (page && page==="page2"){naivgate.push('/')}
+            if (page && page==="page2"){naivgate.push('/login')}
             else if (page && page==="forgot-password") {naivgate.push(`/reset-password?otp=${verificationNum}&email=${email}`)}
 
-
+        
         } else {
             setErrors({
                 verificationNum: 'Invalid verification code'
@@ -139,11 +150,11 @@ const VerificationComponent = () => {
 
 
 
-
+        
     }
 
 
-
+    
 
     return (
         <div className="w-full h-full flex flex-col justify-center items-center md:flex-row bg-gradient-to-r from-[#0F1D3F] to-[#3E99E7]">
@@ -154,15 +165,14 @@ const VerificationComponent = () => {
 
             <div className="w-full border-none md:rounded-tl-[35px] md:rounded-bl-[35px] sm:w-3/4 lg:2/3 h-full flex justify-center items-center bg-gradient-to-b from-[#9ECCF3] to-[#3E99E7]">
                 <div className="w-full md:w-5/6 xl:w-3/5 flex flex-col gap-8 p-3 xl:p-8 " style={{background:'linear-gradient(to top,rgba(197, 191, 191, 0.65), rgba(215, 209, 209, 0.3))'}}>
-
                     <div className='flex justify-center py-5'>
                         <form action="" className='flex flex-col gap-5 items-center justify-center w-full  p-5'>
                             <h1 className='text-black text-3xl font-bold'>Verification</h1>
                             <p className='text-black text-sm font-semibold'>Please enter the verification code sent to your email.</p>
                             <div className='grid grid-cols-6 gap-3 md:gap-10   justify-center  w-full md: lg:p-5'>
 
-                                {numArray.map((item, index) => (
-
+                                {numArray.map((item,index) => (
+                                    
                                     <input
                                         type="text"
                                         key={index}
@@ -174,20 +184,20 @@ const VerificationComponent = () => {
                                         maxLength={1} 
                                         className='bg-gray-200 sm:w-12 sm:h-12  border-none rounded-md text-black text-center sm:text-2xl font-semibold p-2  sm:px-2 sm:py-3'
                                     />
-                                ))}
-
+                                ))}          
+                            
                             </div>
                             {errors.verificationNum && <span className='text-red-600 -mt-6  text-xs font-bold'>{errors.verificationNum}</span>}
 
                             {timeLeft > 0 ? <span className='text-[#232323]  text-center font-semibold'>{formatTime(timeLeft)}</span> : <Link onClick={ResendCode} href='/verification' className='text-black p-3 bg-gray-200 shadow-gray-500 shadow-md rounded-md font-bold text-sm'>{iseResending ? 'Resending otp...' : 'Resend code?'}</Link>}
-
+                            
                             <button
                                 onClick={HandleSubmit}
                                 // disabled={isSubmitting}
-                                type="submit"
+                                type="submit" 
                                 className='text-base py-2  rounded-lg w-full sm:w-1/2 hover:bg-[#1e2d66] bg-[#1F2168] text-white mt-3 font-bold'
-                            >
-                                {isSubmitting ? <span className='loading loading-dots loading-lg'></span> : 'Verify'}
+                                >
+                                    {isSubmitting ? <span className='loading loading-dots loading-lg'></span> : 'Verify'}
                             </button>
 
                         </form>
@@ -198,10 +208,4 @@ const VerificationComponent = () => {
     );
 }
 
-export default function Verification() {
-    return (
-        <Suspense>
-            <VerificationComponent />
-        </Suspense>
-    )
-}
+export default Verification

@@ -2,7 +2,8 @@ import axios from "axios";
 import { useUserStore } from "@/store/authStore/useUserStore";
 
 export const baseAPI = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "https://scbis-git-dev-hailes-projects-a12464a1.vercel.app",
+  // baseURL: process.env.NEXT_PUBLIC_API_URL || "https://scbis-git-dev-hailes-projects-a12464a1.vercel.app",
+  baseURL: 'https://scbis-git-dev-hailes-projects-a12464a1.vercel.app',
   headers: {
     "Content-Type": "application/json",
     "Accept": "application/json"
@@ -32,7 +33,7 @@ export const refreshToken = async () => {
   }
 
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://scbis-git-dev-hailes-projects-a12464a1.vercel.app"}/auth/refresh-token`, {
+    const response = await fetch(`https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/auth/refresh-token`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
