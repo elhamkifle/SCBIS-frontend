@@ -43,7 +43,6 @@ export default function ClaimDisclaimer() {
   }
 
   const { selectedPolicy, policies } = useClaimPolicyStore.getState();
-  const selectedPolicyObj = policies.find(p => p._id === selectedPolicy);
 
 
   const handlePrevious = () => router.push('/claim-submission/claim-policy-selection');

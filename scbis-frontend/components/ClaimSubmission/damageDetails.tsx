@@ -14,7 +14,6 @@ export default function DamageDetails() {
     injuredPersons,
     error,
     vehicleDamageFiles,
-    thirdPartyDamageFiles,
     setvehicleDamageDesc,
     setthirdPartyDamageDesc,
     setinjuriesAny,
@@ -25,8 +24,8 @@ export default function DamageDetails() {
     // clearAllData
   } = useDamageDetailsStore();
 
-  const [vehicleFiles, setVehicleFiles] = useState<File[]>([]);
-  const [thirdPartyFiles, setThirdPartyFiles] = useState<File[]>([]);
+  // const [vehicleFiles, setVehicleFiles] = useState<File[]>([]);
+  // const [thirdPartyFiles, setThirdPartyFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
 
   const uploadToCloudinary = async (file: File) => {
@@ -66,12 +65,12 @@ export default function DamageDetails() {
     setError('');
     setLoading(true);
 
-    if (vehicleDamageFiles.length > 0) {
-      const url = await uploadToCloudinary(vehicleFiles);
-      if (url) {
-        addVehicleDamageFile(url);
-      }
-    }
+    // if (vehicleDamageFiles.length > 0) {
+    //   const url = await uploadToCloudinary(vehicleFiles);
+    //   if (url) {
+    //     addVehicleDamageFile(url);
+    //   }
+    // }
 
 
     // Upload third-party file (only one expected now)
@@ -83,8 +82,6 @@ export default function DamageDetails() {
     }
 
     setLoading(false);
-    console.log(useDamageDetailsStore.getState().thirdPartyDamageFiles)
-    console.log(useDamageDetailsStore.getState().vehicleDamageFiles)
     router.push('/claim-submission/declaration');
   };
 

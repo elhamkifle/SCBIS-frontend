@@ -3,7 +3,6 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useAccidentDetailsStore } from '@/store/claimSubmission/accident-details';
-import axios from 'axios';
 
 export default function AccidentDetails() {
   const router = useRouter();
@@ -71,20 +70,19 @@ export default function AccidentDetails() {
 
 
   // Local state for file handling (not persisted in Zustand)
-  const [files, setFiles] = useState<File[]>([]);
-  const [fileError, setFileError] = useState('');
+  // const [fileError, setFileError] = useState('');
 
-  const validateFile = (file: File) => {
-    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
-    const maxSize = 5 * 1024 * 1024;
+  // const validateFile = (file: File) => {
+  //   const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
+  //   const maxSize = 5 * 1024 * 1024;
 
-    if (!allowedTypes.includes(file.type)) {
-      return '❌ Invalid file type. Please upload a valid National ID or Passport in PDF, JPG, or PNG format.';
-    } else if (file.size > maxSize) {
-      return '❌ File too large. The maximum file size allowed is 5MB.';
-    }
-    return '';
-  };
+  //   if (!allowedTypes.includes(file.type)) {
+  //     return '❌ Invalid file type. Please upload a valid National ID or Passport in PDF, JPG, or PNG format.';
+  //   } else if (file.size > maxSize) {
+  //     return '❌ File too large. The maximum file size allowed is 5MB.';
+  //   }
+  //   return '';
+  // };
 
   // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   //   const selectedFile = e.target.files?.[0];

@@ -8,7 +8,7 @@ export default function MyPoliciesPage() {
     
     
     
-    const { walletAddress, connectWallet, isConnected } = useWallet();
+    const { connectWallet, isConnected } = useWallet();
     const { policies, loading } = useUserPolicies();
     // const [loading, setLoading] = useState<boolean>(true);
 
