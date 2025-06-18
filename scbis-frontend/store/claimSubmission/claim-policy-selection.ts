@@ -46,7 +46,6 @@ interface Policy {
   duration: string;
   policyId: string;
   policyType: string;
-  duration: string;
   privateVehicle?: PrivateVehicle;
   commercialVehicle?: CommercialVehicle;
 }
