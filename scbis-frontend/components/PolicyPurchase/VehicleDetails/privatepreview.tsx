@@ -135,7 +135,7 @@ export default function PolicyPreview() {
       localStorage.removeItem('vehicle-documents-storage');
       
       console.log('🧹 Cleared form storage');
-      router.push('/policy-purchase/purchase/policySelection');
+      router.push('/dashboard');
 
     } catch (error) {
       console.error('❌ Vehicle submission failed:', error);

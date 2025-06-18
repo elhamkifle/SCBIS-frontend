@@ -48,7 +48,7 @@ interface Policy {
     policyPeriodFrom: string;
     policyPeriodTo: string;
     status: {
-        value: "Active" | "Renewal" | "Expired" | string;
+        value: "Active" | "Renewal" | "Expired" | "premiumDecided" | string;
         _id: string;
     };
     createdAt: string;

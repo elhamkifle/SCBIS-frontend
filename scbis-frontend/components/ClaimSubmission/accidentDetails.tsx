@@ -121,55 +121,12 @@ export default function AccidentDetails() {
   const handlePrevious = () => router.push('/claim-submission/driver-details');
 
   const handleNext = async () => {
-    if (files.length < 1) {
-      setFileError('❌ Please upload an ID before proceeding.');
-      return;
-    }
-
     // Validate required fields
     if (!positionOnRoad || !roadSurface || !trafficCondition) {
       setError('Please fill all required fields');
       return;
     }
-
-    try {
-      setError('');
-      setFileError('');
-
-      const uploadedUrls: string[] = [];
-
-      for (const file of files) {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('upload_preset', 'docuploads'); // your Cloudinary preset
-
-        const res = await axios.post(
-          'https://api.cloudinary.com/v1_1/dmzvqehan/upload',
-          formData
-        );
-
-        if (res.status === 200) {
-          const sketchFile = res.data.secure_url;
-
-          // Save to Zustand
-          const { addSketchFile } = useAccidentDetailsStore.getState();
-          addSketchFile(sketchFile);
-           const currentSketchFile = useAccidentDetailsStore.getState().sketchFiles;
-    console.log("✅ Stored sketchFile in Zustand:", currentSketchFile);
-        } else {
-          throw new Error('Upload failed');
-        }
-      }
-
-      // Save uploaded URLs in Zustand
-      const { addSketchFile } = useAccidentDetailsStore.getState();
-      uploadedUrls.forEach((url) => addSketchFile(url));
-
-      router.push('/claim-submission/liability-information');
-    } catch (error) {
-      console.error('Upload error:', error);
-      setFileError('❌ Upload failed. Please try again.');
-    }
+    
   }
 
   const handleDeleteFile = () => {
@@ -545,7 +502,7 @@ export default function AccidentDetails() {
         ></textarea>
       </div>
 
-      <div className='mt-6'>
+      {/* <div className='mt-6'>
         <p className="text-lg font-semibold mb-4">Upload the Sketch of accident (a photo or a simple sketch)</p>
 
         <div
@@ -578,7 +535,7 @@ export default function AccidentDetails() {
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
 
       {error && <p className="mt-4 text-red-500">{error}</p>}
 

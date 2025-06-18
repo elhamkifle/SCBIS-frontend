@@ -338,7 +338,7 @@ export default function ClaimDetailsPage() {
                                             <p className="mb-4">Pick your spare parts from: {backendClaim.sparePartsFrom}</p>
                                             <p className="mb-2">Location: </p>
                                             <p className="ml-8"> City: {backendClaim.sparePartsFromLocation?.city}</p>
-                                            <p className="ml-8"> City: {backendClaim.sparePartsFromLocation?.subCity}</p>
+                                            <p className="ml-8"> SubCity: {backendClaim.sparePartsFromLocation?.subCity}</p>
                                             <p className="ml-8"> Kebele: {backendClaim.sparePartsFromLocation?.kebele}</p>
 
                                             <a href="/dashboard">

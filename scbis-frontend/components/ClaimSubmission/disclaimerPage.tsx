@@ -80,16 +80,6 @@ export default function ClaimDisclaimer() {
           <p><strong>Email:</strong> {insuredInfo.email}</p>
           <p><strong>City:</strong> {insuredInfo.country}</p>
         </div>
-
-        <h3 className="text-lg font-semibold text-blue-600 py-6">
-          Insured Vehicle Detail: {generalDetails?.make || '-'}
-        </h3>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-2">
-          <p><strong>Make:</strong> {generalDetails?.make || '-'}</p>
-          <p><strong>Model:</strong> {generalDetails?.model || '-'}</p>
-          <p><strong>Plate No.:</strong> {generalDetails?.plateNumber || '-'}</p>
-          <p><strong>CC:</strong> {generalDetails?.engineCapacity || '-'}</p>
-        </div>
       </div>
 
       <div className="mt-6 flex items-center">

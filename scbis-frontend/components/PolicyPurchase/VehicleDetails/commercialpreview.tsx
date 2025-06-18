@@ -143,7 +143,7 @@ export default function CommercialVehiclePreview() {
       localStorage.removeItem('vehicle-documents-storage');
       
       console.log('🧹 Cleared form storage');
-      router.push('/policy-purchase/purchase/policySelection');
+      router.push('/dashboard');
 
     } catch (error) {
       console.error('❌ Commercial vehicle submission failed:', error);
