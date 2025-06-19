@@ -23,8 +23,6 @@ export default function ClaimPolicySelection() {
         setError('');
     };
 
-
-
     const handleNext = () => {
         if (!selectedPolicy) {
             setError('Please select an insurance coverage to continue.');
@@ -34,7 +32,6 @@ export default function ClaimPolicySelection() {
     };
 
     const selectedPolicyDetails = policies.find(p => p.title === selectedPolicy);
-
 
     const getAuthTokenFromCookie = (): string | null => {
         const match = document.cookie.match(/(?:^|;\s*)auth_token=([^;]*)/);
@@ -67,11 +64,6 @@ export default function ClaimPolicySelection() {
         <div className="flex flex-col items-center px-4 mb-10">
             <div className="w-full flex justify-between items-center mt-2 mb-10">
                 <h2 className="md:text-xl sm:text-lg font-bold">Claim Submission</h2>
-                <div className="flex gap-2">
-                    <button className="bg-[#0F1D3F] sm:text-xs md:text-lg text-white px-4 py-2 rounded">
-                        Save as draft
-                    </button>
-                </div>
             </div>
 
             <div className="w-full flex-col justify-between items-center mt-2 md:ml-12 md:mb-12">
@@ -92,8 +84,8 @@ export default function ClaimPolicySelection() {
                             <div
                                 key={policy._id}
                                 className={`bg-white px-16 py-8 rounded-2xl shadow-lg flex flex-col justify-around space-y-4 text-center md:mb-[20px] cursor-pointer ${selectedPolicy === policy._id
-                                        ? 'border-2 border-green-500'
-                                        : 'border border-gray-300'
+                                    ? 'border-2 border-green-500'
+                                    : 'border border-gray-300'
                                     }`}
                                 style={{
                                     boxShadow:
@@ -131,8 +123,6 @@ export default function ClaimPolicySelection() {
                             </div>
                         );
                     })}
-
-
                 </div>
             </div>
 

@@ -68,11 +68,6 @@ export default function ClaimDriverDetails() {
     <div className="max-w-5xl mx-auto p-6 bg-white">
       <div className="w-full flex justify-between items-center mt-2 mb-10">
         <h2 className="md:text-xl sm:text-lg font-bold">Claim Submission</h2>
-        <div className="flex gap-2">
-          <button className="bg-[#0F1D3F] sm:text-xs md:text-lg text-white px-4 py-2 rounded">
-            Save as draft
-          </button>
-        </div>
       </div>
 
       {/* Progress Bar */}
@@ -127,7 +122,7 @@ export default function ClaimDriverDetails() {
           <p className="text-lg">Please State the Driver&rsquo;s</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
             <div className="relative w-full">
-              <label htmlFor="firstName"  aria-label="First Name" className="absolute left-4 -top-2 text-black text-md bg-white px-1">First Name</label>
+              <label htmlFor="firstName" aria-label="First Name" className="absolute left-4 -top-2 text-black text-md bg-white px-1">First Name</label>
               <input
                 type="text"
                 name="firstName"
@@ -138,7 +133,7 @@ export default function ClaimDriverDetails() {
               />
             </div>
             <div className="relative w-full">
-              <label aria-label="Last Name"  className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Last Name</label>
+              <label aria-label="Last Name" className="absolute left-4 -top-2 text-black text-sm bg-white px-1">Last Name</label>
               <input
                 type="text"
                 name="lastName"

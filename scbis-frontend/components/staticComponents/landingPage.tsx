@@ -104,14 +104,14 @@ export default function Hero() {
                         <p className='mb-8'> Blockchain backed. Secure. Easy. </p>
                         <div className="flex flex-col justify-start sm:flex-row gap-4 md:gap-8">
                             <button
-                                onClick={ () => router.push("/policy-purchase/personal-information/personalDetails")}
+                                onClick={ () => router.push("/login")}
                                 className="bg-[#7AC943] text-white font-semibold px-6 py-3 rounded-lg hover:bg-[#1F4878] transition"
                             >
                                 Purchase a Policy
                             </button>
 
                             <button
-                                onClick={() => router.push("/claim-submission/claim-policy-selection")}
+                                onClick={() => router.push("/login")}
                                 className="bg-[#7AC943] text-white font-semibold px-6 py-3 rounded-lg hover:bg-[#1F4878] transition"
                             >
                                 Start a New Claim

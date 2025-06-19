@@ -3,6 +3,8 @@
 import { useEffect } from "react";
 import { useRouter } from 'next/navigation';
 import { usePolicyDurationStore } from "@/store/policyPurchase/policyDurationAndJurisdiction";
+import { useSnackbar } from '@/hooks/useSnackbar';
+import Snackbar from '@/components/ui/Snackbar';
 
 const policyDurations = [
   "3 Days",
@@ -31,13 +33,14 @@ const coverageAreas = [
 ];
 
 export default function PolicyDuration() {
-  const { 
-    policyDuration, 
+  const {
+    policyDuration,
     jurisdiction,
-    updateFormData 
+    updateFormData
   } = usePolicyDurationStore();
-  
+
   const router = useRouter();
+  const { snackbar, showWarning, hideSnackbar } = useSnackbar();
 
   // No need for manual localStorage handling - Zustand persist middleware handles it
   useEffect(() => {
@@ -58,7 +61,7 @@ export default function PolicyDuration() {
 
   const handleNext = () => {
     if (!policyDuration || !jurisdiction) {
-      alert("Please select a policy duration and coverage area.");
+      showWarning("Please select a policy duration and coverage area.");
       return;
     }
     router.push('/policy-purchase/purchase/vehicleInformation');
@@ -68,9 +71,6 @@ export default function PolicyDuration() {
     <div className="flex flex-col items-center px-4 mb-6">
       <div className="w-full flex justify-between items-center mt-2">
         <h2 className="md:text-xl sm:text-lg font-bold">Policy Purchase</h2>
-        <button className="bg-[#0F1D3F] sm:text-xs md:text-lg text-white px-4 py-2 rounded">
-          Save as draft
-        </button>
       </div>
 
       {/* Progress Bar - unchanged */}
@@ -186,6 +186,12 @@ export default function PolicyDuration() {
           Next
         </button>
       </div>
+      <Snackbar
+        message={snackbar.message}
+        type={snackbar.type}
+        isOpen={snackbar.isOpen}
+        onClose={hideSnackbar}
+      />
     </div>
   );
 }

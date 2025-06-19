@@ -9,6 +9,8 @@ import { useVehicleInfoStore } from '@/store/policyPurchase/vehicleDetails';
 import { useDriverInformationStore } from '@/store/policyPurchase/driverInformation';
 import { useVehicleSelectionStore } from '@/store/vehicleSelection/vehicleSelectionStore';
 import { policySelectionService, buildPolicySelectionPayload } from '@/utils/policyApi';
+import { useSnackbar } from '@/hooks/useSnackbar';
+import Snackbar from '@/components/ui/Snackbar';
 
 export default function PolicyPreview() {
   const router = useRouter();
@@ -48,6 +50,8 @@ export default function PolicyPreview() {
     vehicle: false,
     driver: false
   });
+
+  const { snackbar, showError, showSuccess, hideSnackbar } = useSnackbar();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
@@ -140,22 +144,22 @@ export default function PolicyPreview() {
   const handleSubmit = async () => {
     // Validation checks
     if (!selectedVehicleId && !selectedVehicleData?._id) {
-      alert('Error: No vehicle selected. Please go back and select a vehicle.');
+      showError('Error: No vehicle selected. Please go back and select a vehicle.');
       return;
     }
 
     if (!selectedPolicy) {
-      alert('Error: No policy selected. Please select a policy type.');
+      showError('Error: No policy selected. Please select a policy type.');
       return;
     }
 
     if (!formData.policyDuration || !formData.jurisdiction) {
-      alert('Error: Please complete policy duration and jurisdiction information.');
+      showError('Error: Please complete policy duration and jurisdiction information.');
       return;
     }
 
     if (!formData.acceptTerms) {
-      alert('Error: Please accept the terms and conditions to continue.');
+      showError('Error: Please accept the terms and conditions to continue.');
       return;
     }
 
@@ -164,7 +168,7 @@ export default function PolicyPreview() {
     try {
       // Get the vehicle ID (either from selected existing vehicle or newly created vehicle)
       const vehicleId = selectedVehicleId || selectedVehicleData?._id;
-      
+
       if (!vehicleId) {
         throw new Error('Vehicle ID not found. Please complete vehicle information first.');
       }
@@ -233,11 +237,11 @@ export default function PolicyPreview() {
       console.log('🔄 Policy selection payload:', policySelectionPayload);
       // Save policy selection
       const policyResponse = await policySelectionService.savePolicySelection(policySelectionPayload as any);
-      
+
       console.log('✅ Policy created successfully:', policyResponse);
-      
+
       // Show success message with policy details
-      alert(`Policy application submitted successfully! 
+      showSuccess(`Policy application submitted successfully! 
       
 Policy ID: ${policyResponse._id}
 Policy Type: ${policyResponse.policyType}
@@ -250,12 +254,12 @@ You will be redirected to the next step.`);
       // Navigate to next step (you can change this route as needed)
       // router.push('/claim-submission/vehicle-selection');
       router.push('/dashboard');
-      
+
     } catch (error) {
       console.error('❌ Error submitting policy application:', error);
-      
+
       const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
-      alert(`Failed to submit policy application: ${errorMessage}`);
+      showError(`Failed to submit policy application: ${errorMessage}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -938,17 +942,22 @@ You will be redirected to the next step.`);
           <button
             type="submit"
             disabled={isSubmitting}
-            className={`px-10 py-2 rounded text-white font-medium transition-colors ${
-              isSubmitting 
-                ? 'bg-gray-400 cursor-not-allowed' 
-                : 'bg-green-500 hover:bg-green-600'
-            }`}
+            className={`px-10 py-2 rounded text-white font-medium transition-colors ${isSubmitting
+              ? 'bg-gray-400 cursor-not-allowed'
+              : 'bg-green-500 hover:bg-green-600'
+              }`}
             onClick={handleSubmit}
           >
             {isSubmitting ? 'Submitting...' : 'Submit Application'}
           </button>
         </div>
       </div>
+      <Snackbar
+        message={snackbar.message}
+        type={snackbar.type}
+        isOpen={snackbar.isOpen}
+        onClose={hideSnackbar}
+      />
     </div>
   );
 }

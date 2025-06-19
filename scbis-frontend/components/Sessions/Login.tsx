@@ -6,6 +6,7 @@ import useLoginStore from "@/store/authStore/useLoginStore";
 import { AuthSchemaType } from "@/schema/zodSchema";
 import { useUserStore } from "@/store/authStore/useUserStore";
 import Link from "next/link";
+import { Eye, EyeOff } from "lucide-react";
 
 
 export default function Login() {
@@ -16,8 +17,9 @@ export default function Login() {
         password: ''
     });
     const [isLoading, setIsLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     const router = useRouter();
-    
+
     // Redirect already authenticated users away from login page
     // useAuth(false);
 
@@ -38,13 +40,13 @@ export default function Login() {
         //     });
 
         //     setIsLoading(false)
-            
+
         //     return;
         // }
 
         try {
             const serverResponse = await fetch(`https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/auth/login`, {
-            // const serverResponse = await fetch(`https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/auth/login`, {
+                // const serverResponse = await fetch(`https://scbis-git-dev-hailes-projects-a12464a1.vercel.app/auth/login`, {
                 method: "POST",
                 body: JSON.stringify({
                     identifier: email,
@@ -59,11 +61,11 @@ export default function Login() {
 
             if (serverResponse.ok) {
                 resetLogin();
-                
+
                 // Set authentication cookies
                 document.cookie = `auth_token=${data.accessToken}; path=/; max-age=3600; SameSite=Lax`;
                 document.cookie = `refresh_token=${data.refreshToken}; path=/; max-age=86400; SameSite=Lax`;
-                
+
                 setUser({
                     ...data.user,
                     accessToken: data.accessToken,
@@ -90,37 +92,47 @@ export default function Login() {
         <div className="w-full h-full flex flex-col md:flex-row bg-gradient-to-r from-[#0F1D3F] to-[#3E99E7]">
             <div className="w-full md:w-1/3">
                 <p className="text-white text-xl font-syne p-5 md:text-3xl md:p-10 text-center">SCBIS The Future of Insurance</p>
-                <img className="hidden lg:block" src="/hand.svg" alt="Hand Image"/>
+                <img className="hidden lg:block" src="/hand.svg" alt="Hand Image" />
             </div>
 
             <div className="w-full border-none md:rounded-tl-[35px] md:rounded-bl-[35px] md:w-2/3 h-full flex justify-center items-center bg-gradient-to-b from-[#9ECCF3] to-[#3E99E7]">
-                <div className="w-full md:w-3/5 flex flex-col gap-8 p-3 md:p-8 " style={{background:'linear-gradient(to top,rgba(197, 191, 191, 0.65), rgba(215, 209, 209, 0.3))'}}>
+                <div className="w-full md:w-3/5 flex flex-col gap-8 p-3 md:p-8 " style={{ background: 'linear-gradient(to top,rgba(197, 191, 191, 0.65), rgba(215, 209, 209, 0.3))' }}>
                     <p className="text-center text-black  text-2xl font-bold ">Login</p>
-                    
+
                     <div className="flex flex-col gap-3 md:gap-5">
                         <label htmlFor="email" className="text-black text-sm  italic font-bold font-inter">Email Address / Phone</label>
-                        <input 
+                        <input
                             value={email}
-                            onChange={(e) => setEmail(e.target.value)} 
-                            className="p-2 rounded placeholder:text-black placeholder:font-semibold placeholder:italic placeholder:text-xs" 
-                            type="text" 
-                            id="email" 
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="p-2 rounded placeholder:text-black placeholder:font-semibold placeholder:italic placeholder:text-xs"
+                            type="text"
+                            id="email"
                             name="email"
                             placeholder="Type email address"
                         />
 
                         {zodError.email && <p className="text-red-500 font-bold text-sm">{zodError.email}</p>}
-                        
+
                         <label htmlFor="password" className="text-black text-sm  italic  font-bold font-inter">Password</label>
-                        <input 
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)} 
-                            className="p-2 rounded placeholder:text-black placeholder:font-semibold placeholder:italic placeholder:text-xs"  
-                            type="password" 
-                            id="password" 
-                            name="password"
-                            placeholder="Type password"
-                        />
+                        <div className="relative">
+                            <input
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="p-2 rounded placeholder:text-black placeholder:font-semibold placeholder:italic placeholder:text-xs w-full pr-10"
+                                type={showPassword ? "text" : "password"}
+                                id="password"
+                                name="password"
+                                placeholder="Type password"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                                aria-label={showPassword ? "Hide password" : "Show password"}
+                            >
+                                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                            </button>
+                        </div>
 
                         {zodError.password && <p className="text-red-500 font-bold text-sm">{zodError.password}</p>}
                     </div>
@@ -129,21 +141,21 @@ export default function Login() {
                         <Link className="underline text-orange-600 hover:text-orange-700" href="/forgot-password">Forgot password?</Link>
                     </p>
 
-                    <button 
-                        onClick={handleSubmit} 
+                    <button
+                        onClick={handleSubmit}
                         className="bg-[#1F2168] hover:bg-[#1e2d66] font-bold font-inter text-lg text-white p-3 rounded"
                     >
                         {isLoading ? <span className="loading loading-dots loading-lg"></span> : 'Login'}
                     </button>
-                    
+
                     <p className="text-center text-sm text-slate-900 font-bold font-syne">
-                        Don&apos;t have an account yet? 
-                        <span 
-                            onClick={signUp} 
+                        Don&apos;t have an account yet?
+                        <span
+                            onClick={signUp}
                             className="text-orange-600 cursor-pointer hover:text-orange-700 underline"
                         >
                             Signup
-                        </span> 
+                        </span>
                         here
                     </p>
 

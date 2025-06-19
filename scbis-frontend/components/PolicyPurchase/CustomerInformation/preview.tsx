@@ -7,6 +7,8 @@ import { useRouter } from 'next/navigation';
 import { useUserStore } from '@/store/authStore/useUserStore';
 import { fetchUserData, updateUserData } from '@/utils/userUtils';
 import { useUploadIDStore } from '@/store/customerInformationStore/uploadID';
+import { useSnackbar } from '@/hooks/useSnackbar';
+import Snackbar from '@/components/ui/Snackbar';
 // import { baseAPI } from '@/utils/axiosInstance';
 // import { set } from 'zod';
 // import { span } from 'framer-motion/client';
@@ -46,6 +48,8 @@ export default function Preview() {
     // File Upload
     idFile: null as File | null,
   });
+
+  const { snackbar, showError, showSuccess, hideSnackbar } = useSnackbar();
 
   // Fetch latest user data on component mount
   useEffect(() => {
@@ -97,8 +101,23 @@ export default function Preview() {
 
   // Handle change in form fields
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type } = e.target;
+    const checked = (e.target as HTMLInputElement).checked;
+
+    // Update the appropriate store based on the field name
+    if (name.includes('country') || name.includes('state') || name.includes('city') ||
+      name.includes('subcity') || name.includes('zone') || name.includes('wereda') ||
+      name.includes('kebele') || name.includes('houseNo')) {
+      // This is an address field
+      useAddressStore.getState().updateAddressData({
+        [name]: type === 'checkbox' ? checked : value
+      });
+    } else {
+      // This is a personal detail field
+      usePersonalDetailStore.getState().updateFormData({
+        [name]: type === 'checkbox' ? checked : value
+      });
+    }
   };
 
   // Handle file change
@@ -115,22 +134,23 @@ export default function Preview() {
 
   // Handle form submission
   const handleSubmit = async () => {
-    console.log('Form Submitted:', formData);
-    console.log('Uploaded ID URLs from store:', uploadedUrls);
-    console.log('Uploaded ID URLs from localStorage:', JSON.parse(localStorage.getItem('uploaded-id-urls') || '[]'));
-    
+    console.log('🚀 Starting form submission...');
+    console.log('📋 Form data:', formData);
+    console.log('🏠 Address data:', addressData);
+    console.log('📄 Uploaded ID URLs from localStorage:', JSON.parse(localStorage.getItem('uploaded-id-urls') || '[]'));
+
     // Check if user is already verified - if so, don't allow updates
     if (user?.userVerified === true) {
-      alert('Your profile has already been verified. No updates are allowed.');
+      showError('Your profile has already been verified. No updates are allowed.');
       return;
     }
-    
+
     // Only allow updates if user is unverified (pending or rejected)
     if (user?.verificationStatus !== 'PENDING' && user?.verificationStatus !== 'REJECTED') {
-      alert('Profile updates are only allowed for pending or rejected verification status.');
+      showError('Profile updates are only allowed for pending or rejected verification status.');
       return;
     }
-    
+
     setLoading(true);
     setError(null);
 
@@ -174,12 +194,12 @@ export default function Preview() {
 
       // Use the updateUserData utility instead of direct API call
       await updateUserData(submissionData);
-      
+
       console.log('✅ Personal information submitted successfully!');
       console.log('➡️ Navigating to vehicle list page...');
-      alert('Application Submitted! Your Personal Information is under review');
+      showSuccess('Application Submitted! Your Personal Information is under review');
       router.push('/dashboard');
-      
+
       // Clear personal details and address from localStorage
       localStorage.removeItem('personal-details-storage');
       localStorage.removeItem('address-details-storage');

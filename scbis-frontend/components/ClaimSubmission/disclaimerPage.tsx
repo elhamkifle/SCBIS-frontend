@@ -63,7 +63,6 @@ export default function ClaimDisclaimer() {
     <div className="max-w-6xl p-4 mx-auto md:px-12 bg-white">
       <div className="w-full flex justify-between items-center mt-2 mb-10">
         <h2 className="md:text-xl sm:text-lg font-bold">Claim Submission </h2>
-        <button className="bg-[#0F1D3F] sm:text-xs md:text-lg text-white px-4 py-2 rounded">Save as draft</button>
       </div>
       <p className="mt-2">
         Dear Policy Holder:

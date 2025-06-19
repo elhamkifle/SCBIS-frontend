@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useNotificationStore } from "@/store/notificationStore/notifications";;
 import { useUserStore } from "@/store/authStore/useUserStore";
 import { fetchUserData } from '@/utils/userUtils';
+import ConfirmModal from "@/components/ui/ConfirmModal";
 
 const API_BASE_URL = "https://scbis-git-dev-hailes-projects-a12464a1.vercel.app";
 
@@ -15,6 +16,7 @@ const API_BASE_URL = "https://scbis-git-dev-hailes-projects-a12464a1.vercel.app"
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const {
     notifications,
@@ -98,14 +100,20 @@ export default function Header() {
   };
 
   const handleLogout = () => {
-    const confirmLogout = window.confirm("Are you sure you want to log out?");
-    if (confirmLogout) {
-      logout();
-      router.push('/login');
-    }
+    setShowLogoutModal(true);
   };
 
-   const handleMarkAllAsRead = async () => {
+  const confirmLogout = () => {
+    logout();
+    router.push('/login');
+    setShowLogoutModal(false);
+  };
+
+  const cancelLogout = () => {
+    setShowLogoutModal(false);
+  };
+
+  const handleMarkAllAsRead = async () => {
     if (!user?.accessToken) return;
     try {
       await fetch(`${API_BASE_URL}/notifications/read-all/${user._id}`, {
@@ -129,7 +137,7 @@ export default function Header() {
           Home
         </Link>
         <Link href="/policy-purchase/personal-information/personalDetails" className="text-white hover:text-green-400 font-syne">
-          Personal Information 
+          Personal Information
         </Link>
         <Link href="/policy-purchase/vehicle-information/vehicle-list" className="text-white hover:text-green-400 font-syne">
           Policy Purchase
@@ -137,7 +145,7 @@ export default function Header() {
         <Link href="/claim-submission/claim-policy-selection" className="text-white hover:text-green-400 font-syne">
           Claim Submission
         </Link>
-        
+
         <Link href="/about-us" className="text-white hover:text-green-400 font-syne">
           About Us
         </Link>
@@ -182,6 +190,22 @@ export default function Header() {
       <div className="lg:hidden absolute top-4 right-28">
         <User size={24} className="cursor-pointer" />
       </div>
+      <button
+        className="absolute right-4 bottom-4 bg-gray-700 text-white p-2 rounded-full hover:bg-red-500"
+        onClick={handleLogout}
+        aria-label="Logout"
+      >
+        <LogOut size={20} />
+      </button>
+      <ConfirmModal
+        isOpen={showLogoutModal}
+        title="Logout Confirmation"
+        message="Are you sure you want to log out?"
+        confirmText="Logout"
+        cancelText="Cancel"
+        onConfirm={confirmLogout}
+        onCancel={cancelLogout}
+      />
 
       {/* Mobile Menu with Animation */}
       <AnimatePresence>
@@ -298,13 +322,13 @@ export default function Header() {
                       {/* {notification.title} */}
                     </div>
 
-                     <div className="flex flex-col gap-4">
-                  {notification.message && (
-                    <div className="text-sm text-gray-600">
-                      {notification.message}
+                    <div className="flex flex-col gap-4">
+                      {notification.message && (
+                        <div className="text-sm text-gray-600">
+                          {notification.message}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
                     <div className="text-xs text-gray-400">
                       {new Date(notification.createdAt).toLocaleDateString()} |{" "}
                       {new Date(notification.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

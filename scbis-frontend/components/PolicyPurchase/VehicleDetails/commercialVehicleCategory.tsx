@@ -2,10 +2,13 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useCommercialVehicleCategoryStore } from '@/store/vehicleDetails/commercialVehicle';
+import { useSnackbar } from '@/hooks/useSnackbar';
+import Snackbar from '@/components/ui/Snackbar';
 
 export default function CommercialVehicleCategory() {
     const router = useRouter();
     const { selectedCategories, toggleCategory } = useCommercialVehicleCategoryStore();
+    const { snackbar, showWarning, hideSnackbar } = useSnackbar();
 
     const handlePrevious = () => {
         router.push('/policy-purchase/vehicle-information/purpose');
@@ -17,7 +20,7 @@ export default function CommercialVehicleCategory() {
         if (Object.values(selectedCategories).some(val => val)) {
             router.push('/policy-purchase/vehicle-information/generalVehicleDetails');
         } else {
-            alert('Please select at least one vehicle category');
+            showWarning('Please select at least one vehicle category');
         }
     };
 
@@ -27,7 +30,7 @@ export default function CommercialVehicleCategory() {
         if (Object.values(selectedCategories).some(val => val)) {
             router.push('/policy-purchase/vehicle-information/commercialVehicleCategory2');
         } else {
-            alert('Please select at least one vehicle category');
+            showWarning('Please select at least one vehicle category');
         }
     };
 
@@ -35,7 +38,6 @@ export default function CommercialVehicleCategory() {
         <div className="flex flex-col items-center px-4">
             <div className="w-full max-w-5xl flex justify-between items-center mt-8">
                 <h2 className="md:text-xl sm:text-lg font-bold">Policy Purchase</h2>
-                <button className="bg-[#0F1D3F] sm:text-xs md:text-lg text-white px-4 py-2 rounded">Save as draft</button>
             </div>
 
             {/* Progress Bar */}
@@ -79,26 +81,29 @@ export default function CommercialVehicleCategory() {
                                         <div className='p-2 flex flex-col gap-3'>
                                             <p className='font-syne text-sm font-semibold'>Taxi</p>
                                             <div className='flex gap-2 items-center'>
-                                                <input 
-                                                    type="checkbox" 
+                                                <input
+                                                    type="checkbox"
                                                     checked={selectedCategories['taxi_small_buses'] || false}
                                                     onChange={() => toggleCategory('taxi_small_buses')}
+                                                    className="bg-white border border-black rounded"
                                                 />
                                                 <label className='font-inter text-sm md:text-xs lg:text-xs'>Small Sized Buses</label>
                                             </div>
                                             <div className='flex gap-2 items-center'>
-                                                <input 
-                                                    type="checkbox" 
+                                                <input
+                                                    type="checkbox"
                                                     checked={selectedCategories['taxi_medium_buses'] || false}
                                                     onChange={() => toggleCategory('taxi_medium_buses')}
+                                                    className="bg-white border border-black rounded"
                                                 />
                                                 <label className='font-inter text-sm md:text-xs lg:text-xs'>Medium Sized Buses</label>
                                             </div>
                                             <div className='flex gap-2 items-center'>
-                                                <input 
-                                                    type="checkbox" 
+                                                <input
+                                                    type="checkbox"
                                                     checked={selectedCategories['taxi_large_buses'] || false}
                                                     onChange={() => toggleCategory('taxi_large_buses')}
+                                                    className="bg-white border border-black rounded"
                                                 />
                                                 <label className='font-inter text-sm md:text-xs lg:text-xs'>Large Sized Buses</label>
                                             </div>
@@ -106,18 +111,20 @@ export default function CommercialVehicleCategory() {
                                         <div className='p-2 flex flex-col gap-3'>
                                             <p className='font-syne text-sm font-semibold'>Minibus</p>
                                             <div className='flex gap-2 items-center'>
-                                                <input 
-                                                    type="checkbox" 
+                                                <input
+                                                    type="checkbox"
                                                     checked={selectedCategories['minibus_own_service'] || false}
                                                     onChange={() => toggleCategory('minibus_own_service')}
+                                                    className="bg-white border border-black rounded"
                                                 />
                                                 <label className='font-inter text-sm md:text-xs lg:text-xs'>Own Service</label>
                                             </div>
                                             <div className='flex gap-2 items-center'>
-                                                <input 
-                                                    type="checkbox" 
+                                                <input
+                                                    type="checkbox"
                                                     checked={selectedCategories['minibus_public_service'] || false}
                                                     onChange={() => toggleCategory('minibus_public_service')}
+                                                    className="bg-white border border-black rounded"
                                                 />
                                                 <label className='font-inter text-sm md:text-xs lg:text-xs'>Public Service</label>
                                             </div>
@@ -129,26 +136,29 @@ export default function CommercialVehicleCategory() {
                                             <p className='font-syne text-sm font-semibold'>Buses</p>
                                             <p className='font-syne text-xs font-semibold text-[#1A73E8]'>own service</p>
                                             <div className='flex gap-2 items-center'>
-                                                <input 
-                                                    type="checkbox" 
+                                                <input
+                                                    type="checkbox"
                                                     checked={selectedCategories['buses_own_small'] || false}
                                                     onChange={() => toggleCategory('buses_own_small')}
+                                                    className="bg-white border border-black rounded"
                                                 />
                                                 <label className='font-inter text-sm md:text-xs lg:text-xs'>Small Sized Buses</label>
                                             </div>
                                             <div className='flex gap-2 items-center'>
-                                                <input 
-                                                    type="checkbox" 
+                                                <input
+                                                    type="checkbox"
                                                     checked={selectedCategories['buses_own_medium'] || false}
                                                     onChange={() => toggleCategory('buses_own_medium')}
+                                                    className="bg-white border border-black rounded"
                                                 />
                                                 <label className='font-inter text-sm md:text-xs lg:text-xs'>Medium Sized Buses</label>
                                             </div>
                                             <div className='flex gap-2 items-center'>
-                                                <input 
-                                                    type="checkbox" 
+                                                <input
+                                                    type="checkbox"
                                                     checked={selectedCategories['buses_own_large'] || false}
                                                     onChange={() => toggleCategory('buses_own_large')}
+                                                    className="bg-white border border-black rounded"
                                                 />
                                                 <label className='font-inter text-sm md:text-xs lg:text-xs'>Large Sized Buses</label>
                                             </div>
@@ -156,26 +166,29 @@ export default function CommercialVehicleCategory() {
                                         <div className='p-2 flex flex-col gap-3'>
                                             <p className='font-syne text-xs font-semibold text-[#1A73E8]'>Public service</p>
                                             <div className='flex gap-2 items-center'>
-                                                <input 
-                                                    type="checkbox" 
+                                                <input
+                                                    type="checkbox"
                                                     checked={selectedCategories['buses_public_small'] || false}
                                                     onChange={() => toggleCategory('buses_public_small')}
+                                                    className="bg-white border border-black rounded"
                                                 />
                                                 <label className='font-inter text-sm md:text-xs lg:text-xs'>Small Sized Buses</label>
                                             </div>
                                             <div className='flex gap-2 items-center'>
-                                                <input 
-                                                    type="checkbox" 
+                                                <input
+                                                    type="checkbox"
                                                     checked={selectedCategories['buses_public_medium'] || false}
                                                     onChange={() => toggleCategory('buses_public_medium')}
+                                                    className="bg-white border border-black rounded"
                                                 />
                                                 <label className='font-inter text-sm md:text-xs lg:text-xs'>Medium Sized Buses</label>
                                             </div>
                                             <div className='flex gap-2 items-center'>
-                                                <input 
-                                                    type="checkbox" 
+                                                <input
+                                                    type="checkbox"
                                                     checked={selectedCategories['buses_public_large'] || false}
                                                     onChange={() => toggleCategory('buses_public_large')}
+                                                    className="bg-white border border-black rounded"
                                                 />
                                                 <label className='font-inter text-sm md:text-xs lg:text-xs'>Large Sized Buses</label>
                                             </div>
@@ -192,90 +205,88 @@ export default function CommercialVehicleCategory() {
                                         <div className='p-2 flex flex-col gap-3'>
                                             <p className='font-syne text-xs text-[#1A73E8] font-semibold'>own Goods</p>
                                             <div className='flex gap-2 items-center'>
-                                                <input 
-                                                    type="checkbox" 
+                                                <input
+                                                    type="checkbox"
                                                     checked={selectedCategories['own_goods_pickups'] || false}
                                                     onChange={() => toggleCategory('own_goods_pickups')}
+                                                    className="bg-white border border-black rounded"
                                                 />
                                                 <label className='font-inter text-sm md:text-xs lg:text-xs'>Pick-Ups</label>
                                             </div>
                                             <div className='flex gap-2 items-center'>
-                                                <input 
-                                                    type="checkbox" 
-                                                    checked={selectedCategories['own_goods_small'] || false}
-                                                    onChange={() => toggleCategory('own_goods_small')}
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedCategories['own_goods_trucks'] || false}
+                                                    onChange={() => toggleCategory('own_goods_trucks')}
+                                                    className="bg-white border border-black rounded"
                                                 />
-                                                <label className='font-inter text-sm md:text-xs lg:text-xs'>Small Goods Carrying</label>
+                                                <label className='font-inter text-sm md:text-xs lg:text-xs'>Trucks</label>
                                             </div>
                                             <div className='flex gap-2 items-center'>
-                                                <input 
-                                                    type="checkbox" 
-                                                    checked={selectedCategories['own_goods_medium'] || false}
-                                                    onChange={() => toggleCategory('own_goods_medium')}
-                                                />
-                                                <label className='font-inter text-sm md:text-xs lg:text-xs'>Medium Goods Carrying</label>
-                                            </div>
-                                            <div className='flex gap-2 items-center'>
-                                                <input 
-                                                    type="checkbox" 
-                                                    checked={selectedCategories['own_goods_large'] || false}
-                                                    onChange={() => toggleCategory('own_goods_large')}
-                                                />
-                                                <label className='font-inter text-sm md:text-xs lg:text-xs'>Large Goods Carrying</label>
-                                            </div>
-                                            <div className='flex gap-2 items-center'>
-                                                <input 
-                                                    type="checkbox" 
+                                                <input
+                                                    type="checkbox"
                                                     checked={selectedCategories['own_goods_trailers'] || false}
                                                     onChange={() => toggleCategory('own_goods_trailers')}
+                                                    className="bg-white border border-black rounded"
                                                 />
                                                 <label className='font-inter text-sm md:text-xs lg:text-xs'>Trailers</label>
                                             </div>
+                                        </div>
+                                        <div className='p-2 flex flex-col gap-3'>
+                                            <p className='font-syne text-xs text-[#1A73E8] font-semibold'>Hire Goods</p>
                                             <div className='flex gap-2 items-center'>
-                                                <input 
-                                                    type="checkbox" 
-                                                    checked={selectedCategories['own_goods_semi_trailers'] || false}
-                                                    onChange={() => toggleCategory('own_goods_semi_trailers')}
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedCategories['hire_goods_pickups'] || false}
+                                                    onChange={() => toggleCategory('hire_goods_pickups')}
+                                                    className="bg-white border border-black rounded"
                                                 />
-                                                <label className='font-inter text-sm md:text-xs lg:text-xs'>Semi Trailers</label>
+                                                <label className='font-inter text-sm md:text-xs lg:text-xs'>Pick-Ups</label>
+                                            </div>
+                                            <div className='flex gap-2 items-center'>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedCategories['hire_goods_trucks'] || false}
+                                                    onChange={() => toggleCategory('hire_goods_trucks')}
+                                                    className="bg-white border border-black rounded"
+                                                />
+                                                <label className='font-inter text-sm md:text-xs lg:text-xs'>Trucks</label>
+                                            </div>
+                                            <div className='flex gap-2 items-center'>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedCategories['hire_goods_trailers'] || false}
+                                                    onChange={() => toggleCategory('hire_goods_trailers')}
+                                                    className="bg-white border border-black rounded"
+                                                />
+                                                <label className='font-inter text-sm md:text-xs lg:text-xs'>Trailers</label>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div>
                                         <div className='p-2 flex flex-col gap-3'>
-                                            <p className='font-syne text-xs font-semibold text-[#1A73E8]'>General Cartage</p>
+                                            <p className='font-syne text-sm font-semibold'>Specialized Vehicles</p>
                                             <div className='flex gap-2 items-center'>
-                                                <input 
-                                                    type="checkbox" 
-                                                    checked={selectedCategories['cartage_pickups'] || false}
-                                                    onChange={() => toggleCategory('cartage_pickups')}
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedCategories['specialized_vehicles'] || false}
+                                                    onChange={() => toggleCategory('specialized_vehicles')}
+                                                    className="bg-white border border-black rounded"
                                                 />
-                                                <label className='font-inter text-sm md:text-xs lg:text-xs'>Pick-Ups</label>
+                                                <label className='font-inter text-sm md:text-xs lg:text-xs'>Specialized Vehicles</label>
                                             </div>
+                                        </div>
+                                        <div className='p-2 flex flex-col gap-3'>
+                                            <p className='font-syne text-sm font-semibold'>Construction Vehicles</p>
                                             <div className='flex gap-2 items-center'>
-                                                <input 
-                                                    type="checkbox" 
-                                                    checked={selectedCategories['cartage_small'] || false}
-                                                    onChange={() => toggleCategory('cartage_small')}
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedCategories['construction_vehicles'] || false}
+                                                    onChange={() => toggleCategory('construction_vehicles')}
+                                                    className="bg-white border border-black rounded"
                                                 />
-                                                <label className='font-inter text-sm md:text-xs lg:text-xs'>Small Goods Carrying</label>
-                                            </div>
-                                            <div className='flex gap-2 items-center'>
-                                                <input 
-                                                    type="checkbox" 
-                                                    checked={selectedCategories['cartage_medium'] || false}
-                                                    onChange={() => toggleCategory('cartage_medium')}
-                                                />
-                                                <label className='font-inter text-sm md:text-xs lg:text-xs'>Medium Goods Carrying</label>
-                                            </div>
-                                            <div className='flex gap-2 items-center'>
-                                                <input 
-                                                    type="checkbox" 
-                                                    checked={selectedCategories['cartage_large'] || false}
-                                                    onChange={() => toggleCategory('cartage_large')}
-                                                />
-                                                <label className='font-inter text-sm md:text-xs lg:text-xs'>Large Goods Carrying</label>
+                                                <label className='font-inter text-sm md:text-xs lg:text-xs'>Construction Vehicles</label>
                                             </div>
                                         </div>
                                     </div>
@@ -285,15 +296,38 @@ export default function CommercialVehicleCategory() {
                     </div>
 
                     <div className="col-span-1 md:col-span-3 flex justify-between">
-                        <button type="button" className="bg-[#3AA4FF] text-white p-3 md:px-7 py-2 rounded" onClick={handlePrevious}>Previous</button>
-                        <div className='flex gap-3'>
-                            <button><img src="/backward.svg" alt="" width={25} height={25} /></button>
-                            <button onClick={(e)=>handleForward(e)}><img src="/forward.svg" alt="" width={25} height={25} /></button>
+                        <button
+                            type="button"
+                            onClick={handlePrevious}
+                            className="bg-gray-500 hover:bg-gray-600 text-white p-2 rounded"
+                        >
+                            Previous
+                        </button>
+                        <div className="flex gap-4">
+                            <button
+                                type="button"
+                                onClick={handleNext}
+                                className="bg-[#1A73E8] hover:bg-blue-700 text-white p-2 rounded"
+                            >
+                                Next
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleForward}
+                                className="bg-[#23C140] hover:bg-green-700 text-white p-2 rounded"
+                            >
+                                Forward
+                            </button>
                         </div>
-                        <button type="submit" className="bg-blue-500 text-white p-5 md:px-10 py-2 rounded" onClick={(e)=>handleNext(e)}>Next</button>
                     </div>
                 </form>
             </div>
+            <Snackbar
+                message={snackbar.message}
+                type={snackbar.type}
+                isOpen={snackbar.isOpen}
+                onClose={hideSnackbar}
+            />
         </div>
     );
 }

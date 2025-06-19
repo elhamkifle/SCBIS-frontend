@@ -67,7 +67,7 @@ interface VehicleData {
 export default function VehicleList() {
   const router = useRouter();
   const user = useUserStore((state) => state.user);
-  
+
   const {
     vehicles,
     isLoading,
@@ -83,7 +83,7 @@ export default function VehicleList() {
 
   useEffect(() => {
     console.log('🚗 Vehicle List Page mounted');
-    
+
     // Only fetch vehicles if user is verified
     if (user?.userVerified === true) {
       fetchUserVehicles();
@@ -115,17 +115,17 @@ export default function VehicleList() {
 
   const handleSelectVehicle = async (vehicle: VehicleData) => {
     console.log('🎯 User selected vehicle:', vehicle);
-    
+
     try {
       setLocalLoading(true);
-      
+
       // Fetch detailed vehicle information
       console.log(`🔍 Fetching detailed info for vehicle ID: ${vehicle._id}`);
       const detailedVehicle = await vehicleApi.getVehicleDetails(vehicle._id);
-      
+
       // Store the selected vehicle
       setSelectedVehicle(vehicle._id, detailedVehicle);
-      
+
       console.log('✅ Vehicle selected successfully, navigating to purpose page...');
       router.push('/policy-purchase/purchase/policySelection');
     } catch (err) {
@@ -155,7 +155,7 @@ export default function VehicleList() {
         engineCapacity: `${generalDetails.engineCapacity}cc`,
       };
     }
-    
+
     if (vehicle.commercialVehicle) {
       const { generalDetails, usageType, vehicleCategory } = vehicle.commercialVehicle;
       return {
@@ -167,7 +167,7 @@ export default function VehicleList() {
         engineCapacity: `${generalDetails.engineCapacity}cc`,
       };
     }
-    
+
     // Fallback for unknown vehicle structure
     return {
       title: 'Unknown Vehicle',
@@ -193,12 +193,6 @@ export default function VehicleList() {
       {/* Header */}
       <div className="w-full flex justify-between items-center mt-2 mb-6">
         <h2 className="md:text-xl sm:text-lg font-bold">Select Vehicle</h2>
-        <button
-          className="bg-[#0F1D3F] sm:text-xs md:text-lg text-white px-4 py-2 rounded"
-          onClick={() => console.log('💾 Save as draft clicked')}
-        >
-          Save as draft
-        </button>
       </div>
 
       {/* Error Display */}
@@ -263,11 +257,11 @@ export default function VehicleList() {
                         {vehicle.vehicleType}
                       </span>
                     </div>
-                    
+
                     <h5 className="text-lg font-semibold text-gray-800 mb-2">
                       {vehicleInfo.title}
                     </h5>
-                    
+
                     <div className="space-y-2 text-sm text-gray-600">
                       <div className="flex justify-between">
                         <span>Plate:</span>
@@ -286,7 +280,7 @@ export default function VehicleList() {
                         <span className="font-medium">{vehicleInfo.engineCapacity}</span>
                       </div>
                     </div>
-                    
+
                     <div className="mt-4 pt-4 border-t border-gray-100">
                       <p className="text-xs text-gray-500">
                         Added: {new Date(vehicle.createdAt).toLocaleDateString()}

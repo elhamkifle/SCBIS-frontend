@@ -15,14 +15,14 @@ export default function ChoosePurposeForm() {
     useEffect(() => {
         console.log('🔍 Checking for pre-selected vehicle data...');
         console.log('📋 Vehicle selection state:', { isExistingVehicle, vehicleData });
-        
+
         if (isExistingVehicle && vehicleData) {
             console.log('✅ Pre-filling purpose form with existing vehicle data');
-            
+
             // Determine vehicle type from the selected vehicle
             const vehicleType = vehicleData.vehicleType?.toLowerCase();
             console.log(`🚗 Vehicle type from data: ${vehicleType}`);
-            
+
             if (vehicleType === 'private' || vehicleType === 'commercial') {
                 setSelectedType(vehicleType);
                 console.log(`✅ Purpose pre-filled: ${vehicleType}`);
@@ -50,16 +50,15 @@ export default function ChoosePurposeForm() {
         console.log('➡️ Proceeding with selected insurance type:', selectedType);
         router.push(
             selectedType === "private"
-              ? "/policy-purchase/vehicle-information/privateVehicleCategory"
-              : "/policy-purchase/vehicle-information/commercialVehicleCategory"
-          );
+                ? "/policy-purchase/vehicle-information/privateVehicleCategory"
+                : "/policy-purchase/vehicle-information/commercialVehicleCategory"
+        );
     };
 
     return (
         <div className="flex flex-col items-center px-4">
             <div className="w-full max-w-5xl flex justify-between items-center mt-8">
                 <h2 className="md:text-xl sm:text-lg font-bold">Policy Purchase</h2>
-                <button className="bg-[#0F1D3F] sm:text-xs md:text-lg text-white px-4 py-2 rounded">Save as draft</button>
             </div>
 
             {/* Progress Bar */}
@@ -108,7 +107,7 @@ export default function ChoosePurposeForm() {
                 </div>
                 <div className={`px-12 py-8 border rounded-xl cursor-pointer shadow-lg ${selectedType === 'commercial' ? 'border-green-500' : 'border-gray-300'}`} onClick={() => handleSelect('commercial')} style={{ boxShadow: '0px 10px 20px rgba(0, 123, 255, 0.4), 0px 4px 8px rgba(0, 0, 0, 0.1)' }} >
                     <h3 className="text-xl text-center font-bold text-blue-600 mb-6">Commercial</h3>
-                    <h4 className='font-bold'> What&apos;s Included</h4> 
+                    <h4 className='font-bold'> What&apos;s Included</h4>
                     <p className="mt-2">✅ Vehicles registered for business transport.</p>
                     <p className="mt-1">✅ Includes taxis, buses, and cargo trucks.</p> <br />
 

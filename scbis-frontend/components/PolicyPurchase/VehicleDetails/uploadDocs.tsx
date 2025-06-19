@@ -23,32 +23,32 @@ export default function UploadIDForm() {
     useEffect(() => {
         console.log('🔍 Checking for existing vehicle documents...');
         console.log('📋 Vehicle selection state:', { isExistingVehicle, vehicleData });
-        
+
         if (isExistingVehicle && vehicleData && !hasAutoFilled) {
             console.log('✅ Loading existing vehicle documents');
-            
+
             let documents;
-            
+
             // Handle both private and commercial vehicles
             if (vehicleData.privateVehicle?.documents) {
                 documents = vehicleData.privateVehicle.documents;
             } else if (vehicleData.commercialVehicle?.documents) {
                 documents = vehicleData.commercialVehicle.documents;
             }
-            
+
             if (documents) {
                 // Auto-fill the document store with existing URLs only if not manually cleared
                 if (documents.driversLicense && !driversLicense && !manuallyCleared.driversLicense) {
                     setDriversLicense(documents.driversLicense);
                     console.log('✅ Auto-filled driver\'s license:', documents.driversLicense);
                 }
-                
+
                 if (documents.vehicleLibre && !vehicleLibre && !manuallyCleared.vehicleLibre) {
                     setVehicleLibre(documents.vehicleLibre);
                     console.log('✅ Auto-filled vehicle libre:', documents.vehicleLibre);
                 }
             }
-            
+
             // Mark as auto-filled to prevent running again
             setHasAutoFilled(true);
         } else if (!isExistingVehicle) {
@@ -85,7 +85,7 @@ export default function UploadIDForm() {
             setError('❌ Please upload your driver\'s license.');
             return;
         }
-        
+
         if (!vehicleLibreFile && !vehicleLibre) {
             setError('❌ Please upload your vehicle libre document.');
             return;
@@ -114,13 +114,13 @@ export default function UploadIDForm() {
                 if (vehicleLibreUrl) {
                     setVehicleLibre(vehicleLibreUrl);
                     console.log('✅ Vehicle libre uploaded:', vehicleLibreUrl);
-        } else {
+                } else {
                     throw new Error('Failed to upload vehicle libre');
                 }
             }
 
             console.log('✅ All documents processed successfully');
-            
+
             // Navigate to preview page
             const type = selectedType?.toLowerCase();
             if (type === 'commercial') {
@@ -234,7 +234,6 @@ export default function UploadIDForm() {
             <div className="w-full max-w-5xl">
                 <div className="flex justify-between items-center">
                     <h2 className="md:text-xl sm:text-lg font-bold mt-8">Policy Purchase</h2>
-                    <button className="bg-[#0F1D3F] sm:text-xs md:text-lg text-white px-4 py-2 rounded">Save as draft</button>
                 </div>
 
                 {/* Progress Bar */}
@@ -253,7 +252,7 @@ export default function UploadIDForm() {
                 {/* Upload Box */}
                 <div className="bg-white mb-10 p-8 rounded-xl w-full max-w-5xl xl:p-6"
                     style={{ boxShadow: '0px 10px 20px rgba(0, 123, 255, 0.4), 0px 4px 8px rgba(0, 0, 0, 0.1)' }}>
-                    
+
                     {/* Rules Section */}
                     <div className="mb-6">
                         <div className="text-black">
@@ -274,14 +273,14 @@ export default function UploadIDForm() {
                         {/* Driver's License Upload */}
                         <div>
                             <h3 className="text-lg font-semibold mb-3 text-center">Driver&apos;s License</h3>
-                            
+
                             {/* Show existing document if available and no new file is selected */}
                             {driversLicense && !driverLicenseFile ? (
                                 <div className="border-2 border-green-200 rounded-lg p-4 bg-green-50">
                                     <div className="flex items-center space-x-4">
                                         <div className="flex-shrink-0">
-                                            <img 
-                                                src={driversLicense} 
+                                            <img
+                                                src={driversLicense}
                                                 alt="Driver's License"
                                                 className="w-32 h-24 object-cover rounded-lg border shadow-sm"
                                                 onError={(e) => {
@@ -299,7 +298,7 @@ export default function UploadIDForm() {
                                                 <p className="text-xs mt-1">PDF</p>
                                             </div>
                                         </div>
-                                        
+
                                         <div className="flex-1">
                                             <div className="flex items-center">
                                                 <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -328,7 +327,7 @@ export default function UploadIDForm() {
                                     </div>
                                 </div>
                             ) : (
-                                <div 
+                                <div
                                     className="flex flex-col items-center justify-center bg-blue-100 p-6 rounded-lg border-2 border-dashed border-blue-300 hover:border-blue-500 transition-colors cursor-pointer"
                                     onDragOver={(e) => e.preventDefault()}
                                     onDrop={handleDriverLicenseDrop}
@@ -336,15 +335,15 @@ export default function UploadIDForm() {
                                 >
                                     <p className='text-lg font-bold mb-2'>Drop License Here</p>
                                     <p className='text-md font-bold mb-4'>Or</p>
-                                    <input 
-                                        type="file" 
-                                        id="driver-license-upload" 
-                                        accept=".pdf,.jpg,.png" 
-                                        onChange={handleDriverLicenseChange} 
+                                    <input
+                                        type="file"
+                                        id="driver-license-upload"
+                                        accept=".pdf,.jpg,.png"
+                                        onChange={handleDriverLicenseChange}
                                         className="hidden"
                                         aria-label="Upload driver license file"
                                     />
-                                    <button 
+                                    <button
                                         type="button"
                                         className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
                                         aria-label="Browse for driver license file"
@@ -355,7 +354,7 @@ export default function UploadIDForm() {
                                     >
                                         Browse Files
                                     </button>
-                                    
+
                                     {/* Show new file selected */}
                                     {driverLicenseFile && (
                                         <div className="mt-4 w-full">
@@ -389,14 +388,14 @@ export default function UploadIDForm() {
                         {/* Vehicle Libre Upload */}
                         <div>
                             <h3 className="text-lg font-semibold mb-3 text-center">Vehicle Libre (Registration)</h3>
-                            
+
                             {/* Show existing document if available and no new file is selected */}
                             {vehicleLibre && !vehicleLibreFile ? (
                                 <div className="border-2 border-green-200 rounded-lg p-4 bg-green-50">
                                     <div className="flex items-center space-x-4">
                                         <div className="flex-shrink-0">
-                                            <img 
-                                                src={vehicleLibre} 
+                                            <img
+                                                src={vehicleLibre}
                                                 alt="Vehicle Libre"
                                                 className="w-32 h-24 object-cover rounded-lg border shadow-sm"
                                                 onError={(e) => {
@@ -414,7 +413,7 @@ export default function UploadIDForm() {
                                                 <p className="text-xs mt-1">PDF</p>
                                             </div>
                                         </div>
-                                        
+
                                         <div className="flex-1">
                                             <div className="flex items-center">
                                                 <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -443,23 +442,23 @@ export default function UploadIDForm() {
                                     </div>
                                 </div>
                             ) : (
-                                <div 
+                                <div
                                     className="flex flex-col items-center justify-center bg-green-100 p-6 rounded-lg border-2 border-dashed border-green-300 hover:border-green-500 transition-colors cursor-pointer"
-                            onDragOver={(e) => e.preventDefault()}
+                                    onDragOver={(e) => e.preventDefault()}
                                     onDrop={handleVehicleLibreDrop}
                                     onClick={() => document.getElementById('vehicle-libre-upload')?.click()}
                                 >
                                     <p className='text-lg font-bold mb-2'>Drop Libre Here</p>
-                            <p className='text-md font-bold mb-4'>Or</p>
-                                    <input 
-                                        type="file" 
-                                        id="vehicle-libre-upload" 
-                                        accept=".pdf,.jpg,.png" 
-                                        onChange={handleVehicleLibreChange} 
+                                    <p className='text-md font-bold mb-4'>Or</p>
+                                    <input
+                                        type="file"
+                                        id="vehicle-libre-upload"
+                                        accept=".pdf,.jpg,.png"
+                                        onChange={handleVehicleLibreChange}
                                         className="hidden"
-                                        aria-label="Upload vehicle libre file" 
+                                        aria-label="Upload vehicle libre file"
                                     />
-                                    <button 
+                                    <button
                                         type="button"
                                         className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
                                         aria-label="Browse for vehicle libre file"
@@ -470,7 +469,7 @@ export default function UploadIDForm() {
                                     >
                                         Browse Files
                                     </button>
-                                    
+
                                     {/* Show new file selected */}
                                     {vehicleLibreFile && (
                                         <div className="mt-4 w-full">
@@ -511,20 +510,19 @@ export default function UploadIDForm() {
 
                     {/* Navigation Buttons */}
                     <div className="flex justify-between">
-                        <button 
-                            type="button" 
-                            onClick={handlePrevious} 
+                        <button
+                            type="button"
+                            onClick={handlePrevious}
                             className="bg-[#3AA4FF] text-white p-7 py-2 rounded hover:bg-blue-600 transition-colors"
                         >
                             Previous
                         </button>
-                        <button 
-                            type="button" 
-                            onClick={handleNext} 
+                        <button
+                            type="button"
+                            onClick={handleNext}
                             disabled={isUploading}
-                            className={`bg-blue-500 text-white p-10 py-2 rounded transition-colors ${
-                                isUploading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'
-                            }`}
+                            className={`bg-blue-500 text-white p-10 py-2 rounded transition-colors ${isUploading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'
+                                }`}
                         >
                             {isUploading ? (
                                 <span className="flex items-center">
@@ -534,7 +532,7 @@ export default function UploadIDForm() {
                                     </svg>
                                     Uploading...
                                 </span>
-                            ) : 
+                            ) :
                                 'Next'
                             }
                         </button>

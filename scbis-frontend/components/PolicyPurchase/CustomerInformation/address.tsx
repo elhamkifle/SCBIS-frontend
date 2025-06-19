@@ -26,7 +26,7 @@ export default function AddressForm() {
         // Create address data object from backend response
         const addressData = {
             country: user.country || '',
-            state: user.regionOrState || user.state || '', // Map regionOrState to state
+            state: user.regionOrState || '', // Map regionOrState to state
             city: user.city || '',
             subcity: user.subcity || '',
             zone: user.zone || '',
@@ -112,7 +112,6 @@ export default function AddressForm() {
         <div className="flex flex-col items-center px-4">
             <div className="w-full max-w-5xl flex justify-between items-center mt-8">
                 <h2 className="md:text-xl sm:text-lg font-bold">Policy Purchase</h2>
-                <button className="bg-[#0F1D3F] sm:text-xs md:text-lg text-white px-4 py-2 rounded">Save as draft</button>
             </div>
 
             {/* Progress Bar */}
@@ -199,7 +198,7 @@ export default function AddressForm() {
                         />
                     </div>
                     <div className="relative w-full">
-                        <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Zone *</label>
+                        <label className="absolute left-4 -top-2 text-black bg-white text-sm px-1">Zone/Sefer *</label>
                         <input
                             type="text"
                             name="zone"

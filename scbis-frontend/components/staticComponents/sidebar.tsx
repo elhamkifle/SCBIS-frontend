@@ -1,23 +1,69 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { User, LogOut, Settings, HelpCircle, ChevronLeft, ChevronRight } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useUserStore } from "@/store/authStore/useUserStore";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 
 export default function Sidebar() {
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const [completedStages, setCompletedStages] = useState<string[]>([]);
     const user = useUserStore((state) => state.user);
-    const profileName = user?.fullname.split(' ') || []; 
-
+    const profileName = user?.fullname.split(' ') || [];
     const router = useRouter();
+    const pathname = usePathname();
     const logout = useUserStore((state) => state.logout);
-    const handleLogout = () => {
-        const confirmLogout = window.confirm("Are you sure you want to log out?");
-        if (confirmLogout) {
-            logout();
-            router.push('/login');
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+    // Define claim submission stages and their corresponding paths
+    const claimStages = [
+        { name: "Claim Initiation Agreement", path: "/claim-submission/initiation" },
+        { name: "Incident Information", path: "/claim-submission/incident" },
+        { name: "Damage Details", path: "/claim-submission/damage" },
+        { name: "Declaration and Submission", path: "/claim-submission/declaration" }
+    ];
+
+    // Define policy purchase stages and their corresponding paths
+    const purchaseStages = [
+        { name: "Personal Information", path: "/policy-purchase/personal-information" },
+        { name: "Vehicle Details", path: "/policy-purchase/vehicle-details" },
+        { name: "Policy Selection", path: "/policy-purchase/policy-selection" },
+        { name: "Approval & Premium", path: "/policy-purchase/approval" },
+        { name: "Payment & Issuance", path: "/policy-purchase/payment" }
+    ];
+
+    // Determine which stages to use based on the current route
+    const isClaimSubmission = pathname.startsWith('/claim-submission');
+    const stages = isClaimSubmission ? claimStages : purchaseStages;
+
+    // Get current stage based on pathname
+    const getCurrentStage = () => {
+        return stages.find(stage => pathname.startsWith(stage.path))?.name || "";
+    };
+
+    // Get text color based on stage status
+    const getTextColor = (stageName: string) => {
+        if (stageName === getCurrentStage()) {
+            return "text-[#23C140]"; // Current stage
+        } else if (completedStages.includes(stageName)) {
+            return "text-[#3AF5FF]"; // Completed stage
         }
+        return "text-white"; // Default color for incomplete stages
+    };
+
+    const handleLogout = () => {
+        setShowLogoutModal(true);
+    };
+
+    const confirmLogout = () => {
+        logout();
+        router.push('/login');
+        setShowLogoutModal(false);
+    };
+
+    const cancelLogout = () => {
+        setShowLogoutModal(false);
     };
 
     // Safe function to get display name
@@ -39,14 +85,14 @@ export default function Sidebar() {
                 </div>
 
                 {/* Centered Navigation Sections */}
-                <div className="flex-1 flex flex-col justify-start py-24 space-y-8 px-4 text-md font-semibold text-white">
+                <div className="flex-1 flex flex-col justify-start py-24 space-y-8 px-4 text-md font-semibold">
                     {!isCollapsed && (
                         <>
-                            <div className="text-center">Personal Information</div>
-                            <div className="text-center">Vehicle Details</div>
-                            <div className="text-center">Policy Selection</div>
-                            <div className="text-center">Approval & Premium</div>
-                            <div className="text-center">Payment & Issuance</div>
+                            {stages.map((stage) => (
+                                <div key={stage.name} className={`text-center ${getTextColor(stage.name)}`}>
+                                    {stage.name}
+                                </div>
+                            ))}
                         </>
                     )}
                 </div>
@@ -79,30 +125,27 @@ export default function Sidebar() {
                 </button>
             </div>
 
-            {/* Card for Small & Medium Screens (Appears Above Other Content) */}
+            {/* Card for Small & Medium Screens */}
             <div className="lg:hidden w-[90%] max-w-lg bg-gradient-to-b from-[#102043] via-[#1B3E6C] to-[#235388] text-white rounded-xl shadow-xl p-6 text-center space-y-4 mx-auto mt-6">
-                {/* User Info Section
-                <div className="flex flex-col items-center mb-4">
-                    <User size={50} className="mb-2" />
-                    <span className="text-lg font-semibold">UserName</span>
-                </div> */}
-
                 {/* Navigation Sections */}
-                <div className="space-y-2 text-gray-200 font-semibold">
-                    <div>Personal Information</div>
-                    <div>Vehicle Details</div>
-                    <div>Policy Selection</div>
-                    <div>Approval & Premium</div>
-                    <div>Payment & Issuance</div>
+                <div className="space-y-2 font-semibold">
+                    {stages.map((stage) => (
+                        <div key={stage.name} className={getTextColor(stage.name)}>
+                            {stage.name}
+                        </div>
+                    ))}
                 </div>
-
-                {/* Bottom Buttons
-                <div className="flex justify-center gap-4 mt-4">
-                    <button className="p-2 bg-gray-700 rounded-full hover:bg-gray-600"><HelpCircle size={24} /></button>
-                    <button className="p-2 bg-gray-700 rounded-full hover:bg-gray-600"><Settings size={24} /></button>
-                    <button className="p-2 bg-gray-700 rounded-full hover:bg-red-500"><LogOut size={24} /></button>
-                </div> */}
             </div>
+
+            <ConfirmModal
+                isOpen={showLogoutModal}
+                title="Logout Confirmation"
+                message="Are you sure you want to log out?"
+                confirmText="Logout"
+                cancelText="Cancel"
+                onConfirm={confirmLogout}
+                onCancel={cancelLogout}
+            />
         </>
     );
 }

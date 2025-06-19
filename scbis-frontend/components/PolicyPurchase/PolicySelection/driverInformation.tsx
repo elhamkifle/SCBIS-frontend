@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useDriverInformationStore } from '@/store/policyPurchase/driverInformation'; 
+import { useDriverInformationStore } from '@/store/policyPurchase/driverInformation';
 
 interface Errors {
   employDriver?: string;
@@ -18,7 +18,7 @@ interface Errors {
 export default function DriverInformation() {
   const router = useRouter();
   const [errors, setErrors] = useState<Errors>({});
-  
+
   // Get state and actions from Zustand store
   const {
     formData,
@@ -90,9 +90,6 @@ export default function DriverInformation() {
     <div className="max-w-5xl mx-auto p-6 rounded-lg">
       <div className="w-full flex justify-between items-center mt-2">
         <h2 className="md:text-xl sm:text-lg font-bold">Policy Purchase</h2>
-        <button className="bg-[#0F1D3F] sm:text-xs md:text-lg text-white px-4 py-2 rounded">
-          Save as draft
-        </button>
       </div>
 
       {/* Progress Bar */}
@@ -138,10 +135,10 @@ export default function DriverInformation() {
             {formData.drivers.map((driver, index) => (
               <div key={index} className="flex flex-col lg:flex-row gap-4 mt-4">
                 <div className="flex-1">
-                <label className="block text-md font-medium text-black mb-2">Driver&apos;s License Grade/Level</label>
-                  <select 
-                    name="driverLicenseGrade" 
-                    className="border p-2 w-full" 
+                  <label className="block text-md font-medium text-black mb-2">Driver&apos;s License Grade/Level</label>
+                  <select
+                    name="driverLicenseGrade"
+                    className="border p-2 w-full"
                     value={driver.driverLicenseGrade}
                     onChange={(e) => handleDriverChange(index, e)}
                   >
@@ -149,7 +146,7 @@ export default function DriverInformation() {
                     <option value="1">1</option>
                     <option value="2">2</option>
                     <option value="3">3</option>
-                 </select>
+                  </select>
                   {errors.drivers?.[index]?.driverLicenseGrade && (
                     <p className="text-red-500">{errors.drivers[index].driverLicenseGrade}</p>
                   )}
@@ -195,7 +192,7 @@ export default function DriverInformation() {
                   <button
                     type="button"
                     className="bg-white text-red-500 border p-2 rounded-full w-12 h-12 flex items-center justify-center mt-0 lg:mt-8"
-                    onClick={() => removeDriver(index)} 
+                    onClick={() => removeDriver(index)}
                   >
                     <span className="text-4xl">-</span>
                   </button>

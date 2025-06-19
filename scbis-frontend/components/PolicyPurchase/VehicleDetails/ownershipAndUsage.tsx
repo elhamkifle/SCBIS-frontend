@@ -14,12 +14,12 @@ export default function OwnershipAndUsageForm() {
     useEffect(() => {
         console.log('🔍 Checking for pre-selected vehicle data in ownership page...');
         console.log('📋 Vehicle selection state:', { isExistingVehicle, vehicleData });
-        
+
         if (isExistingVehicle && vehicleData?.privateVehicle?.ownershipUsage) {
             console.log('✅ Pre-filling ownership form with existing vehicle data');
-            
+
             const { ownershipUsage } = vehicleData.privateVehicle;
-            
+
             // Map the API data to form fields
             const preFilledData = {
                 ownerType: ownershipUsage.ownerType || '',
@@ -28,7 +28,7 @@ export default function OwnershipAndUsageForm() {
                 purchasedValue: ownershipUsage.purchasedValue?.toString() || '',
                 dutyFree: ownershipUsage.dutyFree ? 'Yes' : 'No',
             };
-            
+
             setFormData(preFilledData);
             console.log('✅ Ownership details pre-filled:', preFilledData);
         } else {

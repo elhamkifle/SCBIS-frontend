@@ -3,14 +3,15 @@
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import useSignupStore from "@/store/authStore/useSignupStore"
+import { Eye, EyeOff } from "lucide-react"
 // import { span } from "framer-motion/client"
 
 
 export default function SignupStep2() {
   const router = useRouter()
   const {
-    fName, 
-    lName, 
+    fName,
+    lName,
     // dob, 
     pNo,
     email,
@@ -23,6 +24,8 @@ export default function SignupStep2() {
   const [confirmPass, setConfirmPass] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const handleSubmit = async () => {
     setError('')
@@ -57,17 +60,17 @@ export default function SignupStep2() {
       const data = await serverResponse.json()
 
 
-    if (serverResponse.ok){
-      clearSignupData()
-      router.push(`/verification?page=page2&email=${email}&phone=${pNo}`) // or wherever OTP page is
-    }
+      if (serverResponse.ok) {
+        clearSignupData()
+        router.push(`/verification?page=page2&email=${email}&phone=${pNo}`) // or wherever OTP page is
+      }
 
-    else {
+      else {
         // Handle specific error messages from backend
         setError(data.message || "Registration failed. Please try again.")
       }
 
-      console.log(data) 
+      console.log(data)
 
     }
 
@@ -97,19 +100,53 @@ export default function SignupStep2() {
           <div className="flex flex-col md:flex-row gap-3 md:gap-10">
             <div className="w-full md:w-1/2 flex flex-col gap-3 md:gap-5">
               <label htmlFor="password" className="text-[302F2F] text-sm font-bold font-inter">Password</label>
-              <input onChange={(e) => setPassword(e.target.value)} value={password} className="p-2 rounded" type="password" id="password" name="password" />
+              <div className="relative">
+                <input
+                  onChange={(e) => setPassword(e.target.value)}
+                  value={password}
+                  className="p-2 rounded w-full pr-10"
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  name="password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
             </div>
 
             <div className="w-full md:w-1/2 flex flex-col gap-3 md:gap-5">
               <label htmlFor="confirmPass" className="text-[302F2F] text-sm font-bold font-inter">Confirm Password</label>
-              <input onChange={(e) => setConfirmPass(e.target.value)} value={confirmPass} className="p-2 rounded" type="password" id="confirmPass" name="confirmPass" />
+              <div className="relative">
+                <input
+                  onChange={(e) => setConfirmPass(e.target.value)}
+                  value={confirmPass}
+                  className="p-2 rounded w-full pr-10"
+                  type={showConfirmPassword ? "text" : "password"}
+                  id="confirmPass"
+                  name="confirmPass"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                >
+                  {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
             </div>
           </div>
 
           <div className="flex justify-end items-center gap-[110px] md:gap-[155px]">
             <div className="flex items-center gap-3">
-                <p onClick={()=>router.push('/signup')} className="w-[30px] py-1 cursor-pointer text-center font-bold bg-[#2752D0]  font-inter text-sm text-white rounded">1</p>
-                <p onClick={()=>router.push('/signup/page2')} className="w-[30px] py-1 cursor-pointer text-center font-bold bg-[#3E99E7]  font-inter text-sm text-white rounded">2</p>
+              <p onClick={() => router.push('/signup')} className="w-[30px] py-1 cursor-pointer text-center font-bold bg-[#2752D0]  font-inter text-sm text-white rounded">1</p>
+              <p onClick={() => router.push('/signup/page2')} className="w-[30px] py-1 cursor-pointer text-center font-bold bg-[#3E99E7]  font-inter text-sm text-white rounded">2</p>
             </div>
             <button onClick={handleSubmit} className="bg-[#23C140] w-1/6 font-inter text-sm text-white p-1 rounded">{loading ? <span className="loading loading-dots loading-lg"></span> : "Signup"}</button>
           </div>

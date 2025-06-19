@@ -16,19 +16,19 @@ export default function PrivateVehicleCategory() {
         setError,
         logSelection
     } = usePrivateVehicleCategoryStore();
-    
+
     const { isExistingVehicle, vehicleData } = useVehicleSelectionStore();
 
     // Pre-fill form based on selected vehicle data
     useEffect(() => {
         console.log('🔍 Checking for pre-selected vehicle data in category page...');
         console.log('📋 Vehicle selection state:', { isExistingVehicle, vehicleData });
-        
+
         if (isExistingVehicle && vehicleData?.privateVehicle) {
             console.log('✅ Pre-filling category form with existing vehicle data');
-            
+
             const { vehicleCategory, usageType: vehicleUsageType } = vehicleData.privateVehicle;
-            
+
             // Map vehicle category to carType
             const categoryMapping: Record<string, string> = {
                 'Passenger Car': 'passenger',
@@ -37,7 +37,7 @@ export default function PrivateVehicleCategory() {
                 'Van': 'minivan',
                 'Mini-Bus': 'minivan'
             };
-            
+
             const mappedCarType = categoryMapping[vehicleCategory] || '';
             if (mappedCarType) {
                 setCarType(mappedCarType);
@@ -45,7 +45,7 @@ export default function PrivateVehicleCategory() {
             } else {
                 console.log(`⚠️ Unknown vehicle category: ${vehicleCategory}`);
             }
-            
+
             // Set usage type
             if (vehicleUsageType && vehicleUsageType.length > 0) {
                 const firstUsageType = vehicleUsageType[0];
@@ -68,8 +68,8 @@ export default function PrivateVehicleCategory() {
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setError(false);
-        
-        if(!carType){
+
+        if (!carType) {
             setError(true);
             return;
         }
@@ -86,7 +86,6 @@ export default function PrivateVehicleCategory() {
         <div className="flex flex-col items-center px-4">
             <div className="w-full max-w-5xl flex justify-between items-center mt-8">
                 <h2 className="md:text-xl sm:text-lg font-bold">Policy Purchase</h2>
-                <button className="bg-[#0F1D3F] sm:text-xs md:text-lg text-white px-4 py-2 rounded">Save as draft</button>
             </div>
 
             {/* Progress Bar */}
@@ -120,80 +119,82 @@ export default function PrivateVehicleCategory() {
             <div className="bg-white mb-10 lg:p-8 rounded-xl w-full max-w-5xl">
                 <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-10 xl:gap-16">
                     <div className='col-span-1 md:col-span-3 flex flex-col gap-5'>
-                    <div className='flex flex-col gap-3'>
-        <p className='text-sm md:text-base lg:text-lg font-syne mb-2 font-semibold'>Private Vehicles</p>
-        <div className='flex gap-2 items-center'>
-            <input 
-                type="checkbox" 
-                name='private-type' 
-                id='personal'
-                checked={usageType === 'personal'}
-                onChange={() => handleCheckboxChange('Personal Use')}
-            />
-            <label htmlFor="personal" className='font-inter text-sm md:text-xs lg:text-xs'>
-                Private or Personal Use
-            </label>
-        </div>
-        <div className='flex gap-2 items-center'>
-            <input 
-                type="checkbox" 
-                name='private-type' 
-                id='business'
-                checked={usageType === 'business'}
-                onChange={() => handleCheckboxChange('Business')}
-            />
-            <label htmlFor="business" className='font-inter text-sm md:text-xs lg:text-xs'>
-                Private Business Use
-            </label>
-        </div>
-    </div>
+                        <div className='flex flex-col gap-3'>
+                            <p className='text-sm md:text-base lg:text-lg font-syne mb-2 font-semibold'>Private Vehicles</p>
+                            <div className='flex gap-2 items-center'>
+                                <input
+                                    type="checkbox"
+                                    name='private-type'
+                                    id='personal'
+                                    checked={usageType === 'personal'}
+                                    onChange={() => handleCheckboxChange('Personal Use')}
+                                    className="bg-white border border-black rounded"
+                                />
+                                <label htmlFor="personal" className='font-inter text-sm md:text-xs lg:text-xs'>
+                                    Private or Personal Use
+                                </label>
+                            </div>
+                            <div className='flex gap-2 items-center'>
+                                <input
+                                    type="checkbox"
+                                    name='private-type'
+                                    id='business'
+                                    checked={usageType === 'business'}
+                                    onChange={() => handleCheckboxChange('Business')}
+                                    className="bg-white border border-black rounded"
+                                />
+                                <label htmlFor="business" className='font-inter text-sm md:text-xs lg:text-xs'>
+                                    Private Business Use
+                                </label>
+                            </div>
+                        </div>
 
                         <p className='font-syne text-sm md:text-base lg:text-lg font-semibold'>Select one category that best describes your vehicle. (Required)</p>
 
                         <div className='flex flex-col flex-wrap sm:flex-row justify-center gap-8 lg:flex-nowrap gap-5'>
-                            <div 
-                                onClick={() => setCarType('passenger')} 
-                                className={`w-full border ${carType === 'passenger' ? 'border-green-500' : 'border-gray-300'} cursor-pointer sm:w-[45%] lg:w-1/4 rounded-2xl flex flex-col items-center py-5`} 
+                            <div
+                                onClick={() => setCarType('passenger')}
+                                className={`w-full border ${carType === 'passenger' ? 'border-green-500' : 'border-gray-300'} cursor-pointer sm:w-[45%] lg:w-1/4 rounded-2xl flex flex-col items-center py-5`}
                                 style={{ boxShadow: '0 0 8px rgba(0, 123, 255, 0.4)' }}
                             >
-                                <img className='' style={{marginTop:'-25px'}} src="/passengercars.svg" alt="" />
+                                <img className='' style={{ marginTop: '-25px' }} src="/passengercars.svg" alt="" />
                                 <p className='h-[45px] text-center px-5 mb-[15px] text-sm md:text-base lg:text-lg font-syne mb-2 font-semibold'>Passenger Cars</p>
                                 <p className='text-center px-5 font-inter text-sm md:text-xs lg:text-xs'>For personal & family transport, daily use, and business calls</p>
                             </div>
 
-                            <div 
-                                onClick={() => setCarType('suvs')} 
-                                className={`w-full border ${carType === 'suvs' ? 'border-green-500' : 'border-gray-300'} cursor-pointer sm:w-[45%] lg:w-1/4 rounded-2xl flex flex-col items-center py-5`}  
+                            <div
+                                onClick={() => setCarType('suvs')}
+                                className={`w-full border ${carType === 'suvs' ? 'border-green-500' : 'border-gray-300'} cursor-pointer sm:w-[45%] lg:w-1/4 rounded-2xl flex flex-col items-center py-5`}
                                 style={{ boxShadow: '0 0 8px rgba(0, 123, 255, 0.4)' }}
                             >
-                                <img className='' style={{marginTop:'-25px'}} src="/suvs.svg" alt="" />
+                                <img className='' style={{ marginTop: '-25px' }} src="/suvs.svg" alt="" />
                                 <p className='h-[45px] text-center px-5 mb-[15px] text-sm md:text-base lg:text-lg font-syne mb-2 font-semibold'>SUVs & Off-Road Vehicles</p>
                                 <p className='text-center px-5 font-inter text-sm md:text-xs lg:text-xs'>For rugged terrain, long-distance travel, and city use</p>
                             </div>
 
-                            <div 
-                                onClick={() => setCarType('pickup')} 
-                                className={`w-full border ${carType === 'pickup' ? 'border-green-500' : 'border-gray-300'} cursor-pointer sm:w-[45%] lg:w-1/4 rounded-2xl flex flex-col items-center py-5`} 
+                            <div
+                                onClick={() => setCarType('pickup')}
+                                className={`w-full border ${carType === 'pickup' ? 'border-green-500' : 'border-gray-300'} cursor-pointer sm:w-[45%] lg:w-1/4 rounded-2xl flex flex-col items-center py-5`}
                                 style={{ boxShadow: '0 0 8px rgba(0, 123, 255, 0.4)' }}
                             >
-                                <img className='' style={{marginTop:'-25px'}} src="/pickup.svg" alt="" />
+                                <img className='' style={{ marginTop: '-25px' }} src="/pickup.svg" alt="" />
                                 <p className='h-[45px] text-center px-5 mb-[15px] text-sm md:text-base lg:text-lg font-syne mb-2 font-semibold'>Pickup Trucks & Utility Vehicles</p>
                                 <p className='text-center px-5 font-inter text-sm md:text-xs lg:text-xs'>For personal goods transport, not commercial delivery</p>
                             </div>
 
-                            <div 
-                                onClick={() => setCarType('minivan')} 
-                                className={`w-full border ${carType === 'minivan' ? 'border-green-500' : 'border-gray-300'} cursor-pointer sm:w-[45%] lg:w-1/4 rounded-2xl flex flex-col items-center py-5`} 
+                            <div
+                                onClick={() => setCarType('minivan')}
+                                className={`w-full border ${carType === 'minivan' ? 'border-green-500' : 'border-gray-300'} cursor-pointer sm:w-[45%] lg:w-1/4 rounded-2xl flex flex-col items-center py-5`}
                                 style={{ boxShadow: '0 0 8px rgba(0, 123, 255, 0.4)' }}
                             >
-                                <img className='' style={{marginTop:'-25px'}} src="/minivan.svg" alt="" />
+                                <img className='' style={{ marginTop: '-25px' }} src="/minivan.svg" alt="" />
                                 <p className='h-[45px] text-center px-5 mb-[15px] text-sm md:text-base lg:text-lg font-syne mb-2 font-semibold'>Vans & Mini-Buses</p>
                                 <p className='text-center px-5 font-inter text-sm md:text-xs lg:text-xs'>For private family/group transport, non-commercial use</p>
                             </div>
                         </div>
                         {error && !carType && <p className='font-bold text-center text-sm text-red-600 font-inter'>Please select your vehicle category</p>}
                     </div>
-                   
+
                     <div className="col-span-1 md:col-span-3 flex justify-between">
                         <button type="button" className="bg-[#3AA4FF] text-white p-7 py-2 rounded" onClick={handlePrevious}>Previous</button>
                         <button type="submit" className="bg-blue-500 text-white p-10 py-2 rounded">Next</button>

@@ -12,7 +12,7 @@ import { vehiclePersistenceService } from '@/utils/vehicleApi';
 
 export default function CommercialVehiclePreview() {
   const router = useRouter();
-  
+
   // Get all data from stores
   const { selectedCategories: commercialCategories1 } = useCommercialVehicleCategoryStore();
   const { selectedCategories: commercialCategories2 } = useCommercialVehicleTwoStore();
@@ -39,7 +39,7 @@ export default function CommercialVehiclePreview() {
   const mapCommercialCategoriesToVehicleCategory = () => {
     const allCategories = { ...commercialCategories1, ...commercialCategories2 };
     const selectedKeys = Object.keys(allCategories).filter(key => allCategories[key]);
-    
+
     // Determine primary category based on selections
     if (selectedKeys.some(key => key.includes('taxi') || key.includes('bus'))) {
       return 'Commercial Bus';
@@ -50,23 +50,23 @@ export default function CommercialVehiclePreview() {
     } else if (selectedKeys.some(key => key.includes('gcv'))) {
       return 'Commercial GCV';
     }
-    
+
     return 'Commercial Vehicle'; // Default
   };
 
   const handleSubmit = async () => {
     console.log('🚀 Starting commercial vehicle submission process...');
-    
+
     // Check if documents are uploaded
     if (!driversLicense || !vehicleLibre) {
       const missingDocs = [];
       if (!driversLicense) missingDocs.push("Driver's License");
       if (!vehicleLibre) missingDocs.push("Vehicle Libre");
-      
+
       const shouldContinue = confirm(
         `⚠️ Warning: You haven't uploaded the following required documents: ${missingDocs.join(', ')}.\n\nDo you want to continue without these documents? (Not recommended)`
       );
-      
+
       if (!shouldContinue) {
         return;
       }
@@ -99,7 +99,7 @@ export default function CommercialVehiclePreview() {
 
       // Step 2: Save or update vehicle data
       let vehiclePersistenceResult;
-      
+
       if (isExistingVehicle && selectedVehicleId) {
         console.log('🔄 Updating existing commercial vehicle...');
         vehiclePersistenceResult = await vehiclePersistenceService.saveVehicleData(
@@ -119,7 +119,7 @@ export default function CommercialVehiclePreview() {
 
       // Step 3: Continue with policy submission
       const vehicleId = vehiclePersistenceResult.data._id || selectedVehicleId;
-      
+
       if (!vehicleId) {
         throw new Error('Vehicle ID not found after persistence operation');
       }
@@ -127,12 +127,12 @@ export default function CommercialVehiclePreview() {
       console.log('📋 Using vehicle ID for policy submission:', vehicleId);
 
       // Show success message
-      const successMessage = vehiclePersistenceResult.isUpdate 
-        ? 'Commercial vehicle updated successfully!' 
+      const successMessage = vehiclePersistenceResult.isUpdate
+        ? 'Commercial vehicle updated successfully!'
         : 'New commercial vehicle created successfully!';
-      
+
       alert(successMessage);
-      
+
       // Clear form data
       localStorage.removeItem('insurance-storage');
       localStorage.removeItem('commercial-vehicle-storage');
@@ -141,7 +141,7 @@ export default function CommercialVehiclePreview() {
       localStorage.removeItem('ownership-usage-storage');
       localStorage.removeItem('vehicle-selection-storage');
       localStorage.removeItem('vehicle-documents-storage');
-      
+
       console.log('🧹 Cleared form storage');
       router.push('/policy-purchase/purchase/policySelection');
 
@@ -186,7 +186,7 @@ export default function CommercialVehiclePreview() {
           'cartage_small': 'Cartage - Small',
           'cartage_medium': 'Cartage - Medium',
           'cartage_large': 'Cartage - Large',
-          
+
           // Commercial Vehicle Category 2
           'own_goods_tanker_trailers': 'Own Goods - Tanker Trailers',
           'own_goods_small_liquid': 'Own Goods - Small Liquid',
@@ -220,7 +220,6 @@ export default function CommercialVehiclePreview() {
     <div className="flex flex-col items-center px-4">
       <div className="w-full max-w-5xl flex justify-between items-center mt-8">
         <h2 className="md:text-xl sm:text-lg font-bold">Policy Purchase</h2>
-        <button className="bg-[#0F1D3F] sm:text-xs md:text-lg text-white px-4 py-2 rounded">Save as draft</button>
       </div>
 
       {/* Progress Bar */}
@@ -269,7 +268,7 @@ export default function CommercialVehiclePreview() {
           <div className="flex justify-between items-center">
             <h2 className="text-lg font-bold text-blue-600">2. Commercial Vehicle Categories (Part 1)</h2>
           </div>
-          
+
           {isEditing.category1 ? (
             <div className="mt-4 text-red-500">
               <p>Please go back to the category selection pages to make changes</p>
@@ -294,7 +293,7 @@ export default function CommercialVehiclePreview() {
               {isEditing.category2 ? <Check size={20} /> : <Edit size={20} />}
             </button>
           </div>
-          
+
           {isEditing.category2 ? (
             <div className="mt-4 text-red-500">
               <p>Please go back to the category selection pages to make changes</p>
@@ -352,22 +351,22 @@ export default function CommercialVehiclePreview() {
         <div className="border-b pb-4 mb-8">
           <div className="flex justify-between items-center">
             <h2 className="text-lg font-bold text-blue-600">6. Required Documents</h2>
-            <button 
-              onClick={() => router.push('/policy-purchase/vehicle-information/uploadDocs')} 
+            <button
+              onClick={() => router.push('/policy-purchase/vehicle-information/uploadDocs')}
               className="text-blue-500 hover:text-blue-700 text-sm"
             >
               Upload Documents
             </button>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 px-4">
             <div>
               <strong>Driver&apos;s License:</strong>
               <p className={`flex items-center gap-2 ${driversLicense ? 'text-green-600' : 'text-red-600'}`}>
                 {driversLicense ? '✅ Uploaded' : '❌ Not uploaded'}
                 {driversLicense && (
-                  <button 
-                    onClick={() => window.open(driversLicense, '_blank')} 
+                  <button
+                    onClick={() => window.open(driversLicense, '_blank')}
                     className="text-blue-500 hover:text-blue-700 text-sm underline"
                   >
                     View
@@ -380,8 +379,8 @@ export default function CommercialVehiclePreview() {
               <p className={`flex items-center gap-2 ${vehicleLibre ? 'text-green-600' : 'text-red-600'}`}>
                 {vehicleLibre ? '✅ Uploaded' : '❌ Not uploaded'}
                 {vehicleLibre && (
-                  <button 
-                    onClick={() => window.open(vehicleLibre, '_blank')} 
+                  <button
+                    onClick={() => window.open(vehicleLibre, '_blank')}
                     className="text-blue-500 hover:text-blue-700 text-sm underline"
                   >
                     View
@@ -396,15 +395,15 @@ export default function CommercialVehiclePreview() {
 
         {/* Navigation Buttons */}
         <div className="w-full max-w-5xl flex justify-between my-6 pr-4">
-          <button 
-            onClick={handlePrevious} 
+          <button
+            onClick={handlePrevious}
             className="bg-[#3AA4FF] text-white p-2 px-6 rounded"
             disabled={isLoading}
           >
             Previous
           </button>
-          <button 
-            onClick={handleSubmit} 
+          <button
+            onClick={handleSubmit}
             className="bg-green-500 text-white p-2 px-6 rounded"
             disabled={isLoading}
           >

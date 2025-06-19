@@ -94,12 +94,6 @@ export default function PolicySelection() {
     <div className="flex flex-col items-center px-4 mb-10">
       <div className="w-full flex justify-between items-center mt-2">
         <h2 className="md:text-xl sm:text-lg font-bold">Policy Purchase</h2>
-        <button
-          className="bg-[#0F1D3F] sm:text-xs md:text-lg text-white px-4 py-2 rounded"
-          onClick={resetPolicy}
-        >
-          Save as draft
-        </button>
       </div>
 
       {/* Progress Bar */}
@@ -129,15 +123,14 @@ export default function PolicySelection() {
         {covers.map((cover, index) => (
           <div
             key={index}
-            className={`bg-white p-6 text-black rounded-2xl shadow-lg flex flex-col justify-between space-y-4 text-center md:mb-[20px] md:min-h-[400px] cursor-pointer ${
-              selectedPolicy === cover.title ? 'border-2 border-green-500' : 'border border-gray-300'
-            }`}
+            className={`bg-white p-6 text-black rounded-2xl shadow-lg flex flex-col justify-between space-y-4 text-center md:mb-[20px] md:min-h-[400px] cursor-pointer ${selectedPolicy === cover.title ? 'border-2 border-green-500' : 'border border-gray-300'
+              }`}
             style={{ boxShadow: '0px 10px 20px rgba(0, 123, 255, 0.4), 0px 4px 8px rgba(0, 0, 0, 0.1)' }}
             onClick={() => handleSelect(cover.title)}
           >
             <div className="flex justify-center">
-              <Image 
-                src={cover.image} 
+              <Image
+                src={cover.image}
                 alt={cover.title}
                 width={120}
                 height={120}
@@ -192,7 +185,7 @@ export default function PolicySelection() {
 
       <div className="flex justify-between w-full max-w-6xl mt-8">
         <button className="border border-black px-4 py-2 rounded-lg text-black"
-        onClick={() => router.push('/policy-information')}
+          onClick={() => router.push('/policy-information')}
         >Learn More</button>
         <button
           onClick={handleNext}

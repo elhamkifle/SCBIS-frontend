@@ -21,7 +21,7 @@ export default function Declaration() {
   const [error, setError] = useState('');
 
   const handlePrevious = () => router.push('/claim-submission/damage-details');
-  
+
   const handleNext = () => {
     if (!driverFullName.trim()) {
       setError('Please enter driver\'s full name');
@@ -39,7 +39,7 @@ export default function Declaration() {
       setError('You must agree to continue');
       return;
     }
-    
+
     setError('');
     router.push('/claim-submission/preview');
   };
@@ -48,19 +48,14 @@ export default function Declaration() {
     <div className="max-w-5xl mx-auto p-6 bg-white">
       <div className="w-full flex justify-between items-center mt-2 mb-10">
         <h2 className="md:text-xl sm:text-lg font-bold">Claim Submission</h2>
-        <div className="flex gap-2">
-          <button className="bg-[#0F1D3F] sm:text-xs md:text-lg text-white px-4 py-2 rounded">
-            Save as draft
-          </button>
-        </div>
       </div>
 
       <div className="mt-8">
         <h2 className="text-xl font-bold mb-4">Declaration</h2>
-        
+
         <div className="bg-white p-6">
           <p className="mb-6">
-            I/We declare the foregoing particulars to be true and correct in every respect, 
+            I/We declare the foregoing particulars to be true and correct in every respect,
             and undertake to render the Company every assistance in my/our power in dealing with the matter.
           </p>
 

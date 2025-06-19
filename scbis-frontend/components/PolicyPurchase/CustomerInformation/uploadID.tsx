@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUploadIDStore } from '@/store/customerInformationStore/uploadID';
 import { usePersonalDetailStore } from '@/store/customerInformationStore/personalDetails';
-import { useAddressStore } from '@/store/customerInformationStore/addressStore'; 
+import { useAddressStore } from '@/store/customerInformationStore/addressStore';
 import { uploadToCloudinary } from '@/utils/uploadToCloudinary';
 import { useUserStore } from '@/store/authStore/useUserStore';
 
@@ -15,17 +15,17 @@ export default function UploadIDForm() {
     const { address } = useAddressStore();
     const user = useUserStore((state) => state.user);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    
+
     // Check for existing uploaded URLs on component mount
     const [existingUrls, setExistingUrls] = useState<string[]>([]);
-    
+
     useEffect(() => {
         // Load existing URLs from multiple sources in priority order:
         // 1. Zustand store (most recent)
         // 2. User data from backend (persistent)  
         // 3. localStorage (fallback)
         let storedUrls: string[] = [];
-        
+
         if (uploadedUrls.length > 0) {
             storedUrls = uploadedUrls;
         } else if (user?.idDocumentUrls && user.idDocumentUrls.length > 0) {
@@ -33,14 +33,14 @@ export default function UploadIDForm() {
         } else {
             storedUrls = JSON.parse(localStorage.getItem('uploaded-id-urls') || '[]');
         }
-        
+
         console.log('Loading existing URLs from:', {
             fromStore: uploadedUrls,
             fromUser: user?.idDocumentUrls,
             fromLocalStorage: JSON.parse(localStorage.getItem('uploaded-id-urls') || '[]'),
             finalUrls: storedUrls
         });
-        
+
         if (storedUrls.length > 0) {
             setExistingUrls(storedUrls);
             setUploadedUrls(storedUrls); // Ensure store is updated
@@ -48,17 +48,17 @@ export default function UploadIDForm() {
     }, [uploadedUrls, setUploadedUrls, user?.idDocumentUrls]);
 
     const handlePrevious = () => router.push('/policy-purchase/personal-information/address');
-    
+
     const handleNext = async () => {
         // Check if we have either new files to upload or existing uploaded images
         if (files.length < 1 && existingUrls.length < 1) {
             setError('❌ Please upload an ID before proceeding.');
             return;
         }
-        
+
         setError('');
         setIsSubmitting(true);
-        
+
         try {
             // If we have existing images and no new files, just proceed
             if (existingUrls.length > 0 && files.length === 0) {
@@ -72,28 +72,28 @@ export default function UploadIDForm() {
             console.log('Uploading files to Cloudinary...');
             const uploadPromises = files.map(file => uploadToCloudinary(file));
             const uploadedUrls = await Promise.all(uploadPromises);
-            
+
             console.log('Raw upload results:', uploadedUrls);
-            
+
             // Filter out any failed uploads (null values)
             const successfulUploads = uploadedUrls.filter(url => url !== null) as string[];
-            
+
             if (successfulUploads.length === 0) {
                 setError('❌ Failed to upload files. Please try again.');
                 return;
             }
-            
+
             console.log('✅ Files uploaded successfully:', successfulUploads);
-            
+
             // Store the uploaded URLs in the store
             setUploadedUrls(successfulUploads);
             setExistingUrls(successfulUploads);
-            
+
             // Also store them in localStorage as a backup
             localStorage.setItem('uploaded-id-urls', JSON.stringify(successfulUploads));
-            
+
             logAllFormData();
-            
+
             // Navigate to customer information preview page
             router.push('/policy-purchase/personal-information/preview');
         } catch (error) {
@@ -181,31 +181,30 @@ export default function UploadIDForm() {
     const hasFiles = files.length > 0 || existingUrls.length > 0;
     console.log('hasFiles', hasFiles, files, existingUrls);
 
-   return (
+    return (
         <div className="flex items-start justify-center h-full px-4">
             <div className="w-full max-w-5xl">
                 <div className="w-full max-w-5xl flex justify-between items-center mt-8">
                     <h2 className="md:text-xl sm:text-lg font-bold mt-8">Policy Purchase</h2>
-                    <button className="bg-[#0F1D3F] sm:text-xs md:text-lg text-white px-4 py-2 rounded">Save as draft</button>
                 </div>
 
-            {/* Progress Bar */}
-            <div className="flex flex-wrap sm:justify-start md:justify-center items-center gap-4 sm:gap-8 mt-6 mb-4">
-                <div className="flex items-center">
-                    <div className="w-8 h-8 flex items-center justify-center bg-green-500 text-white rounded-full">1</div>
-                    <span className="ml-2 font-medium text-black text-sm sm:text-base">Personal Detail</span>
+                {/* Progress Bar */}
+                <div className="flex flex-wrap sm:justify-start md:justify-center items-center gap-4 sm:gap-8 mt-6 mb-4">
+                    <div className="flex items-center">
+                        <div className="w-8 h-8 flex items-center justify-center bg-green-500 text-white rounded-full">1</div>
+                        <span className="ml-2 font-medium text-black text-sm sm:text-base">Personal Detail</span>
+                    </div>
+                    <div className="w-16 sm:border-t-2 border-l-2 border-gray-400"></div>
+                    <div className="flex items-center">
+                        <div className="w-8 h-8 flex items-center justify-center bg-green-500 text-white rounded-full">2</div>
+                        <span className="ml-2 text-black text-sm sm:text-base">Address</span>
+                    </div>
+                    <div className="w-16 sm:border-t-2 border-l-2 border-gray-400"></div>
+                    <div className="flex items-center">
+                        <div className="w-8 h-8 flex items-center justify-center bg-[#1F4878] text-white rounded-full">3</div>
+                        <span className="ml-2 text-black text-sm sm:text-base">Upload ID</span>
+                    </div>
                 </div>
-                <div className="w-16 sm:border-t-2 border-l-2 border-gray-400"></div>
-                <div className="flex items-center">
-                    <div className="w-8 h-8 flex items-center justify-center bg-green-500 text-white rounded-full">2</div>
-                    <span className="ml-2 text-black text-sm sm:text-base">Address</span>
-                </div>
-                <div className="w-16 sm:border-t-2 border-l-2 border-gray-400"></div>
-                <div className="flex items-center">
-                    <div className="w-8 h-8 flex items-center justify-center bg-[#1F4878] text-white rounded-full">3</div>
-                    <span className="ml-2 text-black text-sm sm:text-base">Upload ID</span>
-                </div>
-            </div>
 
                 <div className="bg-white mb-10 p-8 rounded-xl w-full max-w-5xl xl:p-6"
                     style={{ boxShadow: '0px 10px 20px rgba(0, 123, 255, 0.4), 0px 4px 8px rgba(0, 0, 0, 0.1)' }} >
@@ -224,7 +223,7 @@ export default function UploadIDForm() {
 
                         <div className="text-black">
                             <p className="text-xl font-bold mb-4">Upload Your ID</p>
-                            
+
                             {/* Show existing images if they exist */}
                             {existingUrls.length > 0 ? (
                                 <div className="space-y-4">
@@ -235,8 +234,8 @@ export default function UploadIDForm() {
                                                 {/* Image Preview */}
                                                 <div className="flex items-center space-x-4">
                                                     <div className="flex-shrink-0">
-                                                        <img 
-                                                            src={url} 
+                                                        <img
+                                                            src={url}
                                                             alt={`ID Document ${index + 1}`}
                                                             className="w-32 h-24 object-cover rounded-lg border shadow-sm"
                                                             onError={(e) => {
@@ -254,7 +253,7 @@ export default function UploadIDForm() {
                                                             <p className="text-xs mt-1">PDF</p>
                                                         </div>
                                                     </div>
-                                                    
+
                                                     {/* Image Info */}
                                                     <div className="flex-1">
                                                         <div className="flex items-center">
@@ -366,13 +365,11 @@ export default function UploadIDForm() {
                             type="button"
                             onClick={handleNext}
                             disabled={isSubmitting}
-                            className={`${
-                                hasFiles 
-                                    ? 'bg-green-600 hover:bg-green-700' 
+                            className={`${hasFiles
+                                    ? 'bg-green-600 hover:bg-green-700'
                                     : 'bg-blue-600 hover:bg-blue-700'
-                            } text-white px-6 py-2 rounded transition-colors ${
-                                isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
-                            }`}
+                                } text-white px-6 py-2 rounded transition-colors ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
+                                }`}
                         >
                             {isSubmitting ? 'Submitting...' : (!hasFiles ? 'Submit' : 'Next')}
                         </button>

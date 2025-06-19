@@ -31,11 +31,6 @@ export default function LiabilityInformation() {
     <div className="max-w-5xl mx-auto p-6 bg-white">
       <div className="w-full flex justify-between items-center mt-2 mb-10">
         <h2 className="md:text-xl sm:text-lg font-bold">Claim Submission</h2>
-        <div className="flex gap-2">
-          <button className="bg-[#0F1D3F] sm:text-xs md:text-lg text-white px-4 py-2 rounded">
-            Save as draft
-          </button>
-        </div>
       </div>
 
       {/* Progress Bar */}
@@ -121,7 +116,7 @@ export default function LiabilityInformation() {
       {/* Police Involvement */}
       <div className="mt-4">
         <p className="font-semibold">Were particulars taken by police?</p>
-        <div className="flex space-x-6"> 
+        <div className="flex space-x-6">
           <label className="flex items-center">
             <input
               type="radio"

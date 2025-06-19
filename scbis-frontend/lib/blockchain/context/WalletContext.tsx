@@ -1,6 +1,8 @@
 'use client'
 import { createContext, useContext, useEffect, useState } from "react";
 import { ethers } from "ethers";
+import { useSnackbar } from "@/hooks/useSnackbar";
+import Snackbar from "@/components/ui/Snackbar";
 
 interface WalletContextType {
   walletAddress: string | null;
@@ -10,16 +12,17 @@ interface WalletContextType {
 
 const WalletContext = createContext<WalletContextType>({
   walletAddress: null,
-  connectWallet: async () => {},
+  connectWallet: async () => { },
   isConnected: false,
 });
 
 export const WalletProvider = ({ children }: { children: React.ReactNode }) => {
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
+  const { snackbar, showError, hideSnackbar } = useSnackbar();
 
   const connectWallet = async () => {
     if (!window.ethereum) {
-      alert("Please install Metamask");
+      showError("Please install Metamask");
       return;
     }
     const provider = new ethers.BrowserProvider(window.ethereum);
@@ -47,6 +50,12 @@ export const WalletProvider = ({ children }: { children: React.ReactNode }) => {
       value={{ walletAddress, connectWallet, isConnected: !!walletAddress }}
     >
       {children}
+      <Snackbar
+        message={snackbar.message}
+        type={snackbar.type}
+        isOpen={snackbar.isOpen}
+        onClose={hideSnackbar}
+      />
     </WalletContext.Provider>
   );
 };

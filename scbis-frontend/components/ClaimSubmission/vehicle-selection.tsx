@@ -37,11 +37,6 @@ export default function VehicleSelection() {
         <div className="flex flex-col items-center px-4 mb-10">
             <div className="w-full flex justify-between items-center mt-2 mb-10">
                 <h2 className="md:text-xl sm:text-lg font-bold">Claim Submission </h2>
-                <div className="flex gap-2">
-                    <button className="bg-[#0F1D3F] sm:text-xs md:text-lg text-white px-4 py-2 rounded">
-                        Save as draft
-                    </button>
-                </div>
             </div>
             <div className="w-full flex-col justify-between items-center mt-2 md:ml-12 md:mb-12">
                 <p className='text-[#3AA4FF] font-bold text-start text-[22px] mb-2'>
