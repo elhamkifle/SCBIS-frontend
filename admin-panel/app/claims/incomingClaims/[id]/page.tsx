@@ -59,20 +59,26 @@ function ClaimDetailsPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "draft":
+      case "pending":
         return "bg-gray-100 text-gray-700";
       case "submitted":
+      case "Submitted":
         return "bg-blue-100 text-blue-700";
       case "Under Review":
+      case "policeReportUnderReview":
         return "bg-yellow-100 text-yellow-800";
       case "Approved":
+      case "adminApproved":
         return "bg-green-100 text-green-800";
       case "Rejected":
+      case "rejected":
         return "bg-red-100 text-red-700";
-      case "Needs More Info":
+      case "winnerAnnounced":
         return "bg-orange-100 text-orange-700";
-      case "Forwarded":
-        return "bg-purple-100 text-purple-700";
+      case "proformaSubmissionPending":
+        return "bg-indigo-100 text-indigo-700";
+      case "proformaUnderReview":
+        return "bg-pink-100 text-pink-700";
       default:
         return "bg-gray-100 text-gray-700";
     }
