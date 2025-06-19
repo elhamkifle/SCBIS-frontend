@@ -114,7 +114,7 @@ function AllPoliciesPage() {
         await socket.connect();
 
         // Listen for new purchase requests
-        const unsubscribeNew = socket.on('new-purchase-request', (data) => {
+        const unsubscribeNew = socket.on('new-purchase-request', () => {
           // Refresh the list to include new request
           fetchPolicies(pagination.page, search, filter);
         });

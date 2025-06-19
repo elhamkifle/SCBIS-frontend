@@ -57,6 +57,12 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
     return status.value || 'pending';
   };
 
+  // Helper function to get status display value
+  const getStatusDisplayValue = (status: string | { value: string }): string => {
+    const statusValue = getStatusValue(status);
+    return statusValue.charAt(0).toUpperCase() + statusValue.slice(1);
+  };
+
   // Fetch request details - separate from socket logic
   useEffect(() => {
     const fetchRequestDetails = async () => {
@@ -324,7 +330,7 @@ function RequestDetailsPage({ params }: { params: Promise<{ id: string }> }) {
                   getStatusValue(requestData.status) === 'canceled' ? 'bg-red-100 text-red-700' :
                     'bg-gray-100 text-gray-700'
                 }`}>
-                {getStatusValue(requestData.status)?.charAt(0).toUpperCase() + getStatusValue(requestData.status)?.slice(1) || "Unknown"}
+                {getStatusDisplayValue(requestData.status)}
               </span>
             </p>
             <p><strong>Submitted On:</strong> {requestData.submittedOn ? new Date(requestData.submittedOn).toLocaleDateString() : "N/A"}</p>

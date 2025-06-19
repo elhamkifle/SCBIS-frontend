@@ -10,6 +10,15 @@ import { usePurchaseRequestsSocket } from "../services/socket";
 import withAuth from "../utils/withAuth";
 import PurchaseRequestNotifications from "../components/notifications/PurchaseRequestNotifications";
 
+// Helper function to get status display value
+const getStatusDisplayValue = (status: string | { value: string }): string => {
+  // If status is an object, extract the value
+  const statusValue = typeof status === 'object' && status?.value ? status.value : String(status);
+  
+  // Capitalize first letter
+  return statusValue.charAt(0).toUpperCase() + statusValue.slice(1);
+};
+
 function IncomingRequestsPage() {
   const [requests, setRequests] = useState<PurchaseRequest[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,10 +51,16 @@ function IncomingRequestsPage() {
 
         // Listen for new purchase requests
         const unsubscribeNew = socket.on('new-purchase-request', (data) => {
-          // Add new request to the top of the list with proper type conversion
+          // Map socket data to PurchaseRequest format
           const newRequest: PurchaseRequest = {
-            ...data.data,
-            submittedOn: new Date(data.timestamp).toISOString()
+            id: data.data.id,
+            policyType: data.data.policyType,
+            submittedOn: new Date(data.timestamp).toISOString(),
+            status: data.data.status,
+            user: {
+              id: data.data.user.id,
+              fullname: data.data.user.name, // Map name to fullname
+            }
           };
           setRequests(prev => [newRequest, ...prev]);
         });
@@ -86,7 +101,7 @@ function IncomingRequestsPage() {
         });
 
         // Listen for reupload requests
-        const unsubscribeReuploadRequested = socket.on('purchase-request-reupload-requested', (data) => {
+        const unsubscribeReuploadRequested = socket.on('purchase-request-reupload-requested', () => {
           // This is a global notification - no need to update the request list
           // The notification will be handled by PurchaseRequestNotifications component
         });
@@ -199,7 +214,7 @@ function IncomingRequestsPage() {
                         'bg-gray-100 text-gray-700'
                       }`}
                     >
-                      {req.status?.charAt(0).toUpperCase() + req.status?.slice(1) || "Unknown"}
+                      {getStatusDisplayValue(req.status)}
                     </span>
                   </div>
                 </div>

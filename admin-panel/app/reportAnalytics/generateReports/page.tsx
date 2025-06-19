@@ -62,7 +62,7 @@ export default function GenerateReportsPage() {
     const doc = await PDFDocument.create();
     const page = doc.addPage([595, 842]); // A4 size
     const font = await doc.embedFont(StandardFonts.Helvetica);
-    const { width, height } = page.getSize();
+    const { height } = page.getSize();
     const margin = 50;
     let y = height - margin;
 
