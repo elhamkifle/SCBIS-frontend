@@ -28,6 +28,15 @@ const statusDisplayNames = {
   canceled: "Canceled"
 };
 
+// Helper function to get status display value
+const getStatusDisplayValue = (status: string | { value: string }): string => {
+  // If status is an object, extract the value
+  const statusValue = typeof status === 'object' && status?.value ? status.value : String(status);
+  
+  // Return the display name or the status value as fallback
+  return statusDisplayNames[statusValue as keyof typeof statusDisplayNames] || statusValue;
+};
+
 function AllPoliciesPage() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<'pending' | 'approved' | 'rejected' | 'all'>('all');
@@ -314,7 +323,7 @@ function AllPoliciesPage() {
                       statusColors[policy.status as keyof typeof statusColors] || 'bg-gray-100 text-gray-800'
                     }`}
                   >
-                    {statusDisplayNames[policy.status as keyof typeof statusDisplayNames] || policy.status}
+                    {getStatusDisplayValue(policy.status)}
                   </Badge>
                 </div>
                 <div className="col-span-2 text-sm">
