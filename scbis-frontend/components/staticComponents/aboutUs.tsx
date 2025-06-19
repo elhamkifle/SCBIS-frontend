@@ -21,14 +21,14 @@ export default function AboutPage() {
         {
             name: "Yanet Yohannes",
             role: "Frontend Developer",
-            image: "/images/team/john.jpg",
+            image: "/yanet.jpg",
             email:"yanetyohabeyene@gmail.com"
         },
 
         {
             name: "Bereket Legesse",
             role: "Full Stack Developer",
-            image: "/images/team/jane.jpg",
+            image: "/bereket.jpg",
             email:"bereketlegesse@gmail.com"
         },
 

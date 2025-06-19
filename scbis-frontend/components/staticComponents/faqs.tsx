@@ -26,6 +26,14 @@ const faqs = [
     answer:
       "Yes, the frontend is responsive. However, to interact with smart contracts, you'll need a Web3-compatible mobile browser or MetaMask Mobile.",
   },
+
+    {
+    question: "How do I download, set up, and connect MetaMask?",
+    answer:
+      "Go to the meta mask extension download page, download the meta mask extension, set up a profile for yourself and give your meta account credentials.",
+
+      
+  },
 ];
 
 export default function FAQPage() {
