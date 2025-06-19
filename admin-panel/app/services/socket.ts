@@ -84,10 +84,13 @@ export interface PurchaseRequestWebSocketEvents {
   };
 }
 
+// Type for callback functions
+type EventCallback = (...args: any[]) => void;
+
 class PurchaseRequestsSocketService {
   private socket: Socket | null = null;
   private isConnected = false;
-  private listeners = new Map<string, Function[]>();
+  private listeners = new Map<string, EventCallback[]>();
 
   // Initialize Socket.IO connection
   connect(): Promise<void> {
@@ -133,7 +136,7 @@ class PurchaseRequestsSocketService {
         });
 
         // Handle successful room join
-        this.socket.on('joined-admin-room', (data) => {
+        this.socket.on('joined-admin-room', () => {
           // console.log('Successfully joined admin room:', data);
         });
 
