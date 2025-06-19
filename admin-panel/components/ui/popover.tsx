@@ -45,6 +45,6 @@ interface PopoverContentProps {
 export function PopoverContent({ children, isOpen, className, align }: PopoverContentProps) {
     const alignmentClass = align === 'start' ? 'left-0' : align === 'end' ? 'right-0' : 'mx-auto';
   return isOpen ? (
-    <div className={`absolute bg-white shadow-md ${className}`}>{children}</div>
+    <div className={`absolute bg-white shadow-md ${alignmentClass} ${className}`}>{children}</div>
   ) : null;
 }

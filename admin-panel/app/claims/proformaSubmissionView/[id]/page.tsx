@@ -1,11 +1,12 @@
 import ProformaSubmissionView from "@/components/claims/proformaSubmissionView";
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
-export default function Page({ params }: PageProps) {
-  return <ProformaSubmissionView claimId={params.id} />;
+export default async function Page({ params }: PageProps) {
+  const { id } = await params;
+  return <ProformaSubmissionView claimId={id} />;
 }
